@@ -1,5 +1,5 @@
-import Login from "./screens/login";
+import Registro from "./screens/registro";
 
 export default function App() {
-  return <Login />;
+  return <Registro />;
 }
