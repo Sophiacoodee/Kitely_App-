@@ -31,19 +31,25 @@ const CustomInput = ({
   </View>
 );
 
-export default function Index() {
+export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = () => {
+    if (!email || !password) {
+      alert("Por favor ingresa tus datos completos");
+      return;
+    }
+
     console.log("Iniciando sesión con:", email, password);
+    navigation.navigate("Registro");
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.topSection}>
         <Image
-          source={require('../assets/KITELY.png')}
+          source={require("../assets/KITELY.png")}
           style={styles.logo}
         />
       </View>
@@ -54,7 +60,6 @@ export default function Index() {
 
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>Email address</Text>
-
             <CustomInput
               icon="mail"
               placeholder="Enter your gmail or username"
@@ -65,7 +70,6 @@ export default function Index() {
 
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>Password</Text>
-
             <CustomInput
               icon="lock-closed"
               placeholder="Enter your password"
@@ -87,7 +91,7 @@ export default function Index() {
               Don’t have an account?
             </Text>
 
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Registro")}>
               <Text style={styles.signUp}>Sign up</Text>
             </TouchableOpacity>
           </View>
@@ -104,7 +108,6 @@ export default function Index() {
               d="M0 72 C75 67 125 83 190 82 C275 80 325 50 400 10 L400 125 L0 125 Z"
               fill="#D8D4FF"
             />
-
             <Path
               d="M0 91 C75 86 125 101 190 100 C275 98 325 69 400 28 L400 125 L0 125 Z"
               fill="#BDB7F5"
@@ -123,21 +126,18 @@ export default function Index() {
               stroke="#55A605"
               strokeWidth="3"
             />
-
             <Path
               d="M48 10 L50 55"
               fill="none"
               stroke="#55A605"
               strokeWidth="3"
             />
-
             <Path
               d="M50 55 C55 68 51 75 42 82 C32 89 23 86 16 94 C10 101 13 108 7 116"
               fill="none"
               stroke="#55A605"
               strokeWidth="3"
             />
-
             <Polygon
               points="17,89 27,97 23,108 13,101 14,92"
               fill="none"
@@ -156,7 +156,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#021B42",
   },
-
   topSection: {
     height: "21%",
     backgroundColor: "#021B42",
@@ -164,13 +163,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingTop: 10,
   },
-
   logo: {
     width: 165,
     height: 90,
     resizeMode: "contain",
   },
-
   whitePanel: {
     flex: 1,
     backgroundColor: "#FFFFFF",
@@ -178,24 +175,20 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 38,
     overflow: "hidden",
   },
-
   content: {
     paddingHorizontal: 35,
     paddingTop: 38,
     zIndex: 5,
   },
-
   title: {
     fontSize: 29,
     fontWeight: "700",
     color: "#021533",
     marginBottom: 32,
   },
-
   fieldContainer: {
     marginBottom: 20,
   },
-
   label: {
     fontSize: 18,
     color: "#021533",
@@ -203,7 +196,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontWeight: "500",
   },
-
   inputContainer: {
     height: 58,
     borderWidth: 1,
@@ -214,7 +206,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     backgroundColor: "#FFFFFF",
   },
-
   input: {
     flex: 1,
     fontSize: 16,
@@ -222,7 +213,6 @@ const styles = StyleSheet.create({
     marginLeft: 13,
     paddingVertical: 0,
   },
-
   button: {
     height: 57,
     backgroundColor: "#55C900",
@@ -231,13 +221,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 7,
   },
-
   buttonText: {
     color: "#FFFFFF",
     fontSize: 20,
     fontWeight: "500",
   },
-
   footer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -245,19 +233,16 @@ const styles = StyleSheet.create({
     marginTop: 22,
     zIndex: 10,
   },
-
   footerText: {
     color: "#8A8A8A",
     fontSize: 16,
   },
-
   signUp: {
     color: "#173C53",
     fontSize: 17,
     fontWeight: "600",
     marginLeft: 7,
   },
-
   decoration: {
     position: "absolute",
     bottom: 0,
@@ -266,17 +251,14 @@ const styles = StyleSheet.create({
     height: 135,
     zIndex: 1,
   },
-
   wave: {
     position: "absolute",
     bottom: 0,
     left: 0,
   },
-
   kite: {
     position: "absolute",
     bottom: 2,
     left: "43%",
   },
 });
- 
