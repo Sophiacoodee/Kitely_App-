@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
+    Alert,
     Image,
     StyleSheet,
     Text,
@@ -9,6 +10,10 @@ import {
     View,
 } from "react-native";
 import Svg, { Path, Polygon } from "react-native-svg";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../firebase/config";
+
 const CustomInput = ({
     placeholder,
     secureTextEntry,
@@ -30,19 +35,47 @@ const CustomInput = ({
     </View>
 );
 
-export default function Index() {
+export default function Index({ navigation }) {
     const [name, setName] = useState("");
     const [identity, setIdentity] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleSignUp = () => {
-        console.log("Registrando usuario:", {
-            name,
-            identity,
-            email,
-            password,
-        });
+    const handleSignUp = async () => {
+        if (!name || !identity || !email || !password) {
+            Alert.alert("Error", "Please fill in all fields.");
+            return;
+        }
+
+        try {
+            const userCredential = await createUserWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+            const user = userCredential.user;
+
+            await setDoc(doc(db, "Usuarios", user.uid), {
+                nombre: name,
+                identidad: identity,
+                correo: email,
+                uid: user.uid,
+            });
+
+            Alert.alert("Success!", "User registered successfully.");
+
+            if (navigation) navigation.navigate("Login");
+        } catch (error) {
+            if (error.code === "auth/email-already-in-use") {
+                Alert.alert("Email Exists", "This email is already registered.");
+            } else if (error.code === "auth/invalid-email") {
+                Alert.alert("Invalid Email", "The email entered is not valid.");
+            } else if (error.code === "auth/weak-password") {
+                Alert.alert("Weak Password", "Password must be at least 6 characters long.");
+            } else {
+                Alert.alert("Error", error.message);
+            }
+        }
     };
 
     return (
@@ -75,7 +108,7 @@ export default function Index() {
 
                     <View style={styles.fieldContainer}>
                         <CustomInput
-                            icon="eye-off"
+                            icon="card"
                             placeholder="Enter your identity number"
                             value={identity}
                             onChangeText={setIdentity}
@@ -85,7 +118,7 @@ export default function Index() {
                     <View style={styles.fieldContainer}>
                         <CustomInput
                             icon="mail"
-                            placeholder="Enter your gmail or username"
+                            placeholder="Enter your email or username"
                             value={email}
                             onChangeText={setEmail}
                         />
@@ -113,13 +146,12 @@ export default function Index() {
                             Already have an account?
                         </Text>
 
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => navigation && navigation.navigate("Login")}>
                             <Text style={styles.logIn}>Log in</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
 
-                {/* DECORACIÓN */}
                 <View style={styles.decoration} pointerEvents="none">
                     <Svg
                         width="100%"
@@ -231,12 +263,12 @@ const styles = StyleSheet.create({
     },
 
     label: {
-    fontSize: 16,
-    color: "#021533",
-    marginLeft: 18,
-    marginBottom: 8,
-    fontWeight: "500",
-  },
+        fontSize: 16,
+        color: "#021533",
+        marginLeft: 18,
+        marginBottom: 8,
+        fontWeight: "500",
+    },
 
     inputContainer: {
         height: 55,
