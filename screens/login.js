@@ -34,7 +34,7 @@ const CustomInput = ({
   </View>
 );
 
-export default function Login({ navigation }) {
+export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -53,7 +53,6 @@ export default function Login({ navigation }) {
       const user = userCredential.user;
 
       Alert.alert("Welcome back!", `Logged in as: ${user.email}`);
-
 
       if (navigation) navigation.navigate("Home");
     } catch (error) {
@@ -91,6 +90,7 @@ export default function Login({ navigation }) {
           </Text>
 
           <View style={styles.fieldContainer}>
+            <Text style={styles.label}>Email address</Text>
             <CustomInput
               icon="mail"
               placeholder="Enter your email"
@@ -100,6 +100,7 @@ export default function Login({ navigation }) {
           </View>
 
           <View style={styles.fieldContainer}>
+            <Text style={styles.label}>Password</Text>
             <CustomInput
               icon="lock-closed"
               placeholder="Enter password"
@@ -109,21 +110,14 @@ export default function Login({ navigation }) {
             />
           </View>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleLogin}
-          >
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
             <Text style={styles.buttonText}>Log in</Text>
           </TouchableOpacity>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>
-              Don't have an account?
-            </Text>
+            <Text style={styles.footerText}>Don't have an account?</Text>
             <TouchableOpacity
-              onPress={() =>
-                navigation && navigation.navigate("Registro")
-              }
+              onPress={() => navigation && navigation.navigate("Registro")}
             >
               <Text style={styles.signUp}>Sign up</Text>
             </TouchableOpacity>
@@ -148,7 +142,7 @@ export default function Login({ navigation }) {
           </Svg>
 
           <Svg
-            width="95"
+            width="100"
             height="120"
             viewBox="0 0 95 120"
             style={styles.kite}
@@ -226,6 +220,13 @@ const styles = StyleSheet.create({
   },
   fieldContainer: {
     marginBottom: 20,
+  },
+  label: {
+    fontSize: 18,
+    color: "#021533",
+    marginLeft: 18,
+    marginBottom: 8,
+    fontWeight: "500",
   },
   inputContainer: {
     height: 55,
