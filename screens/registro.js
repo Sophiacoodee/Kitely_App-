@@ -84,7 +84,7 @@ export default function RegistroScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Top Header Section */}
+
       <View style={styles.topSection}>
         <Image
           source={require("../assets/KITELY.png")}
@@ -92,7 +92,6 @@ export default function RegistroScreen({ navigation }) {
         />
       </View>
 
-      {/* Main White Card Panel */}
       <View style={styles.whitePanel}>
         <View style={styles.content}>
           <Text style={styles.title}>Create your account</Text>
@@ -111,7 +110,7 @@ export default function RegistroScreen({ navigation }) {
 
           <View style={styles.fieldContainer}>
             <CustomInput
-              icon="eye-off-outline"
+              icon="card-outline"
               placeholder="Enter your identity number"
               value={idNumber}
               onChangeText={setIdNumber}
