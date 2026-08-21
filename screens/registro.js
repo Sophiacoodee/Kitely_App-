@@ -150,7 +150,7 @@ export default function RegistroScreen({ navigation }) {
           </View>
         </View>
 
-        {/* Bottom Decorative Wave & Kite */}
+        {/* Diseño inferior de la pantalla */}
         <View style={styles.decoration} pointerEvents="none">
           <Svg
             width="100%"

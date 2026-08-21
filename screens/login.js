@@ -130,7 +130,8 @@ export default function LoginScreen({ navigation }) {
             </TouchableOpacity>
           </View>
         </View>
-
+        
+        {/* Diseño inferior de la pantalla */}
         <View style={styles.decoration} pointerEvents="none">
           <Svg
             width="100%"
