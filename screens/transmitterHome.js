@@ -13,7 +13,7 @@ import {
   MaterialIcons,
   Octicons,
 } from "@expo/vector-icons";
-import styles from "./styleHome";
+import styles from './styleTransmitterHome';
 
 const QuickActionButton = ({ icon, label, iconFamily: IconComponent }) => (
   <TouchableOpacity style={styles.quickActionCard}>

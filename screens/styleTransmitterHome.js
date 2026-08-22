@@ -6,7 +6,6 @@ export default StyleSheet.create({
     borderRadius: 15,
     padding: 15,
     marginTop: 15,
-    // Sombra simple para Android e iOS
     elevation: 3,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },

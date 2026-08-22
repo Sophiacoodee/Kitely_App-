@@ -45,7 +45,7 @@ export default function LoginScreen({ navigation }) {
       return;
     }
 
-        if (!fullName.trim() || !idNumber.trim() || !email.trim() || !password) {
+    if (!fullName.trim() || !idNumber.trim() || !email.trim() || !password) {
       Alert.alert("Incomplete Fields", "Please fill in all fields.");
       return;
     }
@@ -61,7 +61,7 @@ export default function LoginScreen({ navigation }) {
       return;
     }
 
-    
+
     if (!/[$#/&?@!]/.test(password)) {
       Alert.alert("Invalid Password", "Password must contain at least one special character.");
       return;
@@ -140,8 +140,11 @@ export default function LoginScreen({ navigation }) {
               Forgot password?
             </Text>
           </TouchableOpacity>
-
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation && navigation.navigate("TransmitterHome")}
+          >
             <Text style={styles.buttonText}>Log in</Text>
           </TouchableOpacity>
 
@@ -154,7 +157,7 @@ export default function LoginScreen({ navigation }) {
             </TouchableOpacity>
           </View>
         </View>
-        
+
         {/* Diseño inferior de la pantalla */}
         <View style={styles.decoration} pointerEvents="none">
           <Svg

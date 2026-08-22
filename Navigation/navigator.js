@@ -6,6 +6,7 @@ import RegistroScreen from "../screens/registro";
 import LoginScreen from "../screens/login";
 import ForgotPasswordScreen from "../screens/forgotPassword";
 import HomeStoreScreen from "../screens/homeStore";
+import TransmitterHome from "../screens/transmitterHome";
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +21,7 @@ export default function AppNavigator() {
         <Stack.Screen name="Registro" component={RegistroScreen} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
         <Stack.Screen name="HomeStore" component={HomeStoreScreen} />
+        <Stack.Screen name="TransmitterHome" component={TransmitterHome} />
       </Stack.Navigator>
     </NavigationContainer>
   );
