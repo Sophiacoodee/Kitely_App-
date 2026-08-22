@@ -1,6 +1,97 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform, Dimensions } from "react-native";
+
+const { width } = Dimensions.get("window");
 
 export default StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#021B42",
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+
+  topSection: {
+    backgroundColor: "#021B42",
+    paddingHorizontal: 25,
+    paddingTop: Platform.OS === "android" ? 20 : 10,
+    paddingBottom: 25,
+  },
+  headerTopBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  notificationButton: {
+    padding: 4,
+  },
+  welcomeContainer: {
+    marginBottom: 15,
+  },
+  welcomeText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+  },
+  subtitleText: {
+    fontSize: 13,
+    color: "rgba(255, 255, 255, 0.8)",
+    marginTop: 2,
+    lineHeight: 18,
+  },
+  balanceContainer: {
+    marginTop: 5,
+  },
+  balanceLabel: {
+    fontSize: 12,
+    color: "#55C900",
+    fontWeight: "600",
+    fontStyle: "italic",
+  },
+  balanceAmount: {
+    fontSize: 34,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    marginTop: 2,
+  },
+
+  whitePanel: {
+    flex: 1,
+    backgroundColor: "#F4F6F9",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingHorizontal: 20,
+    paddingTop: 25,
+    paddingBottom: 30,
+  },
+  quickActionsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  quickActionCard: {
+    backgroundColor: "#FFFFFF",
+    width: (width - 40 - 24) / 3,
+    height: 90,
+    borderRadius: 18,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 6,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+  },
+  quickActionLabel: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#021B42",
+    textAlign: "center",
+    marginTop: 6,
+  },
+
   cardContainer: {
     backgroundColor: "#FFFFFF",
     borderRadius: 15,
