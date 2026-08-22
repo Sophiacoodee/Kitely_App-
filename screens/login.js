@@ -45,6 +45,30 @@ export default function LoginScreen({ navigation }) {
       return;
     }
 
+        if (!fullName.trim() || !idNumber.trim() || !email.trim() || !password) {
+      Alert.alert("Incomplete Fields", "Please fill in all fields.");
+      return;
+    }
+
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(fullName)) {
+      Alert.alert("Invalid Name", "Name must only contain letters.");
+      return;
+    }
+
+
+    if (!/[A-Z]/.test(password)) {
+      Alert.alert("Invalid Password", "Password must contain at least one uppercase letter.");
+      return;
+    }
+
+    
+    if (!/[$#/&?@!]/.test(password)) {
+      Alert.alert("Invalid Password", "Password must contain at least one special character.");
+      return;
+    }
+
+
+
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
