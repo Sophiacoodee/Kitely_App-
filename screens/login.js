@@ -55,7 +55,7 @@ export default function LoginScreen({ navigation }) {
 
       Alert.alert("Welcome back!", `Logged in as: ${user.email}`);
 
-      if (navigation) navigation.navigate("Home");
+      if (navigation) navigation.replace("HomeStore");
     } catch (error) {
       if (
         error.code === "auth/user-not-found" ||
@@ -185,4 +185,5 @@ export default function LoginScreen({ navigation }) {
     </View>
   );
 }
+
 
