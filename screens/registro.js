@@ -44,8 +44,26 @@ export default function RegistroScreen({ navigation }) {
   const [password, setPassword] = useState("");
 
   const handleRegister = async () => {
-    if (!fullName || !idNumber || !email || !password) {
-      Alert.alert("Error", "Please fill in all fields.");
+   
+    if (!fullName.trim() || !idNumber.trim() || !email.trim() || !password) {
+      Alert.alert("Incomplete Fields", "Please fill in all fields.");
+      return;
+    }
+
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(fullName)) {
+      Alert.alert("Invalid Name", "Name must only contain letters.");
+      return;
+    }
+
+
+    if (!/[A-Z]/.test(password)) {
+      Alert.alert("Invalid Password", "Password must contain at least one uppercase letter.");
+      return;
+    }
+
+    
+    if (!/[$#/&?@!]/.test(password)) {
+      Alert.alert("Invalid Password", "Password must contain at least one special character.");
       return;
     }
 
@@ -150,7 +168,7 @@ export default function RegistroScreen({ navigation }) {
           </View>
         </View>
 
-        {/* Bottom Decorative Wave & Kite */}
+        {/* Bottom screen design */}
         <View style={styles.decoration} pointerEvents="none">
           <Svg
             width="100%"
@@ -204,4 +222,3 @@ export default function RegistroScreen({ navigation }) {
     </View>
   );
 }
-

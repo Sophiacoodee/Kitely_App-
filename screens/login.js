@@ -45,6 +45,30 @@ export default function LoginScreen({ navigation }) {
       return;
     }
 
+    if (!fullName.trim() || !idNumber.trim() || !email.trim() || !password) {
+      Alert.alert("Incomplete Fields", "Please fill in all fields.");
+      return;
+    }
+
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(fullName)) {
+      Alert.alert("Invalid Name", "Name must only contain letters.");
+      return;
+    }
+
+
+    if (!/[A-Z]/.test(password)) {
+      Alert.alert("Invalid Password", "Password must contain at least one uppercase letter.");
+      return;
+    }
+
+
+    if (!/[$#/&?@!]/.test(password)) {
+      Alert.alert("Invalid Password", "Password must contain at least one special character.");
+      return;
+    }
+
+
+
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
@@ -55,7 +79,7 @@ export default function LoginScreen({ navigation }) {
 
       Alert.alert("Welcome back!", `Logged in as: ${user.email}`);
 
-      if (navigation) navigation.navigate("Home");
+      if (navigation) navigation.replace("HomeStore");
     } catch (error) {
       if (
         error.code === "auth/user-not-found" ||
@@ -116,8 +140,11 @@ export default function LoginScreen({ navigation }) {
               Forgot password?
             </Text>
           </TouchableOpacity>
-
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation && navigation.navigate("TransmitterHome")}
+          >
             <Text style={styles.buttonText}>Log in</Text>
           </TouchableOpacity>
 
@@ -131,6 +158,7 @@ export default function LoginScreen({ navigation }) {
           </View>
         </View>
 
+        {/* Diseño inferior de la pantalla */}
         <View style={styles.decoration} pointerEvents="none">
           <Svg
             width="100%"
@@ -184,4 +212,5 @@ export default function LoginScreen({ navigation }) {
     </View>
   );
 }
+
 

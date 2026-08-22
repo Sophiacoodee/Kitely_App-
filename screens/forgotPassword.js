@@ -118,6 +118,8 @@ export const recuperarContrasena = async (
   correo,
   nuevaContrasena
 ) => {
+import styles from "./stylePassword";
+
 export default function ForgotPasswordScreen({ navigation }) {
   const [emailToReset, setEmailToReset] = useState("");
 
@@ -359,3 +361,4 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
 });
+
