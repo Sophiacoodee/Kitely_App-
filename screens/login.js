@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import {
   Alert,
   Image,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -40,46 +39,23 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert("Error", "Please enter both email and password.");
+
+    if (!email.trim() || !password) {
+      Alert.alert("Incomplete Fields", "Please enter both email and password.");
       return;
     }
-
-    if (!fullName.trim() || !idNumber.trim() || !email.trim() || !password) {
-      Alert.alert("Incomplete Fields", "Please fill in all fields.");
-      return;
-    }
-
-    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(fullName)) {
-      Alert.alert("Invalid Name", "Name must only contain letters.");
-      return;
-    }
-
-
-    if (!/[A-Z]/.test(password)) {
-      Alert.alert("Invalid Password", "Password must contain at least one uppercase letter.");
-      return;
-    }
-
-
-    if (!/[$#/&?@!]/.test(password)) {
-      Alert.alert("Invalid Password", "Password must contain at least one special character.");
-      return;
-    }
-
-
 
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
-        email,
+        email.trim(),
         password
       );
       const user = userCredential.user;
 
       Alert.alert("Welcome back!", `Logged in as: ${user.email}`);
 
-      if (navigation) navigation.replace("HomeStore");
+      if (navigation) navigation.replace("TransmitterHome");
     } catch (error) {
       if (
         error.code === "auth/user-not-found" ||
@@ -143,7 +119,7 @@ export default function LoginScreen({ navigation }) {
           
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation && navigation.navigate("TransmitterHome")}
+            onPress={handleLogin}
           >
             <Text style={styles.buttonText}>Log in</Text>
           </TouchableOpacity>
@@ -212,5 +188,3 @@ export default function LoginScreen({ navigation }) {
     </View>
   );
 }
-
-
