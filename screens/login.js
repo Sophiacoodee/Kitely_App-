@@ -55,7 +55,7 @@ export default function LoginScreen({ navigation }) {
 
       Alert.alert("Welcome back!", `Logged in as: ${user.email}`);
 
-      if (navigation) navigation.replace("TransmitterHome");
+      if (navigation) navigation.replace("Selectrol");
     } catch (error) {
       if (
         error.code === "auth/user-not-found" ||
