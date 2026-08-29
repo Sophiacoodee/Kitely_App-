@@ -7,8 +7,10 @@ import LoginScreen from "../screens/login";
 import ForgotPasswordScreen from "../screens/forgotPassword";
 import HomeStoreScreen from "../screens/homeStore";
 import TransmitterHome from "../screens/transmitterHome";
-import SelectrolScreen from '../screens/selectrol';
+import SelectrolScreen from "../screens/selectrol";
 import InicioReceptor from "../screens/inicioReceptor";
+import FamilyTransmitter from "../screens/familyTransmitter";
+import CategoryTransmitter from "../screens/categoryTransmitter";
 
 const Stack = createNativeStackNavigator();
 
@@ -22,11 +24,12 @@ export default function AppNavigator() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Registro" component={RegistroScreen} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-        <Stack.Screen name="HomeStore" component={HomeStoreScreen} />
-        <Stack.Screen name="TransmitterHome" component={TransmitterHome} />
         <Stack.Screen name="Selectrol" component={SelectrolScreen} />
-        <Stack.Screen name="HomeStoreScreen" component={HomeStoreScreen} />
+        <Stack.Screen name="HomeStore" component={HomeStoreScreen} />
         <Stack.Screen name="InicioReceptor" component={InicioReceptor} />
+        <Stack.Screen name="TransmitterHome" component={TransmitterHome} />
+        <Stack.Screen name="FamilyTransmitter" component={FamilyTransmitter} />
+        <Stack.Screen name="CategoryTransmitter" component={CategoryTransmitter} />
       </Stack.Navigator>
     </NavigationContainer>
   );

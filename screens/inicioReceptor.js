@@ -71,8 +71,8 @@ export default function InicioReceptor({ navigation }) {
         
         {/* Header con Menú Hamburguesa, Saludo e Icono de Perfil */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="menu-sharp" size={26} color="#FFFFFF" />
+          <TouchableOpacity style={styles.avatarButton} onPress={() => {}}>
+            <FontAwesome5 name="user" size={18} color="#021024" />
           </TouchableOpacity>
 
           <View style={styles.headerTextContainer}>
@@ -82,8 +82,8 @@ export default function InicioReceptor({ navigation }) {
             </Text>
           </View>
 
-          <TouchableOpacity style={styles.avatarButton}>
-            <FontAwesome5 name="user" size={18} color="#021024" />
+          <TouchableOpacity style={styles.avatarButton} onPress={() => {}}>
+            <Ionicons name="settings-outline" size={22} color="#021024" />
           </TouchableOpacity>
         </View>
 
