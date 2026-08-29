@@ -9,7 +9,8 @@ import HomeStoreScreen from "../screens/homeStore";
 import TransmitterHome from "../screens/transmitterHome";
 import SelectrolScreen from '../screens/selectrol';
 import InicioReceptor from "../screens/inicioReceptor";
-
+import PerfilScreen from "../screens/perfil";
+import MetodoPagoScreen from "../screens/metodosPagos";
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
@@ -27,6 +28,8 @@ export default function AppNavigator() {
         <Stack.Screen name="Selectrol" component={SelectrolScreen} />
         <Stack.Screen name="HomeStoreScreen" component={HomeStoreScreen} />
         <Stack.Screen name="InicioReceptor" component={InicioReceptor} />
+        <Stack.Screen name="Perfil" component={PerfilScreen} />
+        <Stack.Screen name="MetodosPagos" component={MetodoPagoScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
