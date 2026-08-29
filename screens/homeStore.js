@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from "react"; // Agregue este nuevo Usestate y UseEffect
 import {
   StyleSheet,
   Text,
@@ -13,51 +13,69 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import MapView, { Marker } from 'react-native-maps';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import dayjs from 'dayjs';
+import {doc, getDoc,collection, query, where, getDocs,orderBy,limit} from 'firebase/firestore';//Aca nuevo
+import { db } from '../firebase/config'; // Ajuste la ruta según la ubicación de su archivo config.js
 
 const { width } = Dimensions.get('window');
 
-export default function HomeStoreScreen() {
-  const expirationDate = dayjs('2026-08-14').format('DD MMM, YYYY');
+// iconos sgun nombre de categorias para que la cuadricula sepa que dibujar
+const iconosPorCategoria = {
+  Food: 'shopping-cart',
+  Medicine: 'medical-services',
+  Education: 'school',
+  Entertainment: 'movie',
+};
 
-  const recentActivities = [
-    {
-      id: '1',
-      title: 'Redirection - Food',
-      subtitle: 'Register 02 • Ticket #1042',
-      amount: '+$25.00',
-      time: 'Today 10:24 a.m.',
-      status: 'Completed',
-      icon: 'shopping-cart',
-    },
-    {
-      id: '2',
-      title: 'Redirection - Medicine',
-      subtitle: 'Register 01 • Ticket #1038',
-      amount: '+$12.50',
-      time: 'Yesterday 4:15 p.m.',
-      status: 'Completed',
-      icon: 'medical-services',
-    },
-    {
-      id: '3',
-      title: 'Redirection - Food',
-      subtitle: 'Register 04 • Ticket #1012',
-      amount: '+$45.00',
-      time: '10 Aug 2:30 p.m.',
-      status: 'Completed',
-      icon: 'shopping-cart',
-    },
-    {
-      id: '4',
-      title: 'Redirection - Entertainment',
-      subtitle: 'Register 03 • Ticket #0998',
-      amount: '+$18.00',
-      time: '08 Aug 11:10 a.m.',
-      status: 'Completed',
-      icon: 'movie',
-    },
-  ];
+export default function HomeStoreScreen({ route }) {
+ // agrego este que tiene que ir antes de la funcion
 
+ const {usuarioId} = route.params;
+ const [comercio, setComercio] = useState(null);
+ const [saldo, setSaldo] = useState(0);
+ const [categorias, setCategorias] = useState([]);
+ const [actividadesRecientes, setActividadesRecientes] = useState([]);
+
+ useEffect(() => {
+   async function cargarDatos() {
+     // Paso 1: encontrar el comercio de este usuaruo
+
+     const refUsuario = doc(db, 'Usuarios', usuarioId);
+     const qComercio = query(collection(db, 'comercios'), where('id_usuario', '==', refUsuario));
+     const snapComercio = await getDocs(qComercio);
+    if (snapComercio.empty) {
+     console.log('No business was found for this user.');
+      return;
+      }
+
+      const comercioEncontrado = {id: snapComercio.docs[0].id, ...snapComercio.docs[0].data()};
+      setComercio(comercioEncontrado);
+      const refComercio = doc(db, 'comercios', comercioEncontrado.id);
+
+      // Paso 2: calcular el saldo sumando las remesas
+      const qTransacciones = query(collection(db, 'transacciones'), where('id_comercio', '==', refComercio));
+      const snapTransacciones = await getDocs(qTransacciones);
+      let saldoTotal = 0;
+      snapTransacciones.forEach((t) => {saldoTotal += t.data().monto_transaccion || 0;});
+      setSaldo(saldoTotal);
+
+      // Paso 3: obtener las categorías únicas de las transacciones para la cuadrícula
+      const qProductos = query(collection(db, 'productos'), where('id_comercio', '==', refComercio));
+      const snapProductos = await getDocs(qProductos);
+      const nombresUnicos = [...new Set(snapProductos.docs.map((p) => p.data().categoriaNombre))];
+      setCategorias(nombresUnicos);
+      
+      // al paso 4 traer las ultimas 4 transacciones
+
+      const qActividad = query(collection(db, 'transacciones'), where('id_comercio', '==', refComercio), orderBy('fecha_transaccion', 'desc'), limit(4));
+      const snapActividad = await getDocs(qActividad);
+      setActividadesRecientes(snapActividad.docs.map((d) => ({id: d.id, ...d.data()})));
+
+      }
+      cargarDatos();
+      }, [usuarioId]);
+      const expirationDate = dayjs().add(30, 'day').format('DD MMM YYYY'); // 
+
+// ACA YA EL RETURN CCON LOS CAMBIOS
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
@@ -68,15 +86,19 @@ export default function HomeStoreScreen() {
             <Ionicons name="menu-outline" size={28} color="#ffffff" />
           </TouchableOpacity>
           <View style={styles.headerTextContainer}>
-            <Text style={styles.greeting}>Super Selectos - Escalón</Text>
-            <Text style={styles.subGreeting}>Authorized Branch • ID: #4082</Text>
+
+          {/* CAMBIO: antes decía SUPER SELECTOS - ESCALON */}
+          <Text style={styles.greeting}>{comercio?.nombre_comercial}</Text>
+          <Text style={styles.subGreeting}>Authorized Branch • ID: #{comercio?.id}</Text>
           </View>
         </View>
+            
 
         <View style={styles.balanceCard}>
           <View style={styles.balanceInfo}>
             <Text style={styles.balanceLabel}>Available Register Balance</Text>
-            <Text style={styles.balanceAmount}>$250.00</Text>
+            {/* antes estaba como $250.00 */}
+            <Text style={styles.balanceAmount}>${saldo.toFixed(2)}</Text>
             <Text style={styles.expiryText}>Cut-off date: {expirationDate}</Text>
           </View>
         </View>
@@ -85,8 +107,10 @@ export default function HomeStoreScreen() {
           <MapView
             style={styles.map}
             initialRegion={{
-              latitude: 13.7013,
-              longitude: -89.2244,
+              //usa la ubicacion real del comercio si existe ,sino cae en las coordenadas del ejemplo
+
+              latitude:comercio?.latitud || 13.7013,
+              longitude:comercio?.longitude || -89.2244,
               latitudeDelta: 0.01,
               longitudeDelta: 0.01,
             }}
@@ -94,8 +118,8 @@ export default function HomeStoreScreen() {
             showsCompass={false}
           >
             <Marker 
-              coordinate={{ latitude: 13.7013, longitude: -89.2244 }} 
-              title="Escalón Branch"
+              coordinate={{ latitude: comercio?.latitud || 13.7013, longitude: comercio?.longitude || -89.2244 }} 
+              title= {comercio?.nombreComercial}
               pinColor="red" 
             />
           </MapView>
@@ -103,45 +127,39 @@ export default function HomeStoreScreen() {
 
         <Text style={styles.sectionTitle}>Authorized Categories</Text>
         <View style={styles.gridContainer}>
-          <TouchableOpacity style={styles.categoryCard}>
-            <MaterialIcons name="shopping-cart" size={28} color="#021B42" />
-            <Text style={styles.categoryText}>Food</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.categoryCard}>
-            <MaterialIcons name="medical-services" size={28} color="#021B42" />
-            <Text style={styles.categoryText}>Medicine</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.categoryCard}>
-            <MaterialIcons name="school" size={28} color="#021B42" />
-            <Text style={styles.categoryText}>Education</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.categoryCard}>
-            <MaterialIcons name="movie" size={28} color="#021B42" />
-            <Text style={styles.categoryText}>Entertainment</Text>
-          </TouchableOpacity>
+          {categorias.map((nombreCat) => (
+            <TouchableOpacity style={styles.categoryCard} key={nombreCat}>
+              <MaterialIcons
+                name={iconosPorCategorias[nombreCat] || 'category'}
+                size={28}
+                color="#021B42"
+              />
+              <Text style={styles.categoryText}>{nombreCat}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         <Text style={styles.sectionTitle}>Branch Recent Activity</Text>
+
         
-        {recentActivities.map((item) => (
+        {actividadesRecientes.map((item) => (
           <View key={item.id} style={styles.activityCard}>
             <View style={styles.activityLeft}>
               <View style={styles.cartIconBg}>
-                <MaterialIcons name={item.icon} size={24} color="#55C900" />
+                <MaterialIcons name={iconosPorCategoria[item.categoriaNombre] || 'category'} size={24} color="#55C900" />
               </View>
               <View style={styles.activityDetails}>
-                <Text style={styles.activityTitle} numberOfLines={1}>{item.title}</Text>
-                <Text style={styles.activitySubtitle} numberOfLines={1}>{item.subtitle}</Text>
+                <Text style={styles.activityTitle} numberOfLines={1}>Redirection -{item.categoriaNombre}</Text>
+              <Text style={styles.activitySubtitle} numberOfLines={1}>Tiket #{item.id}</Text>
+              <Text style = {styles.actividadStatus}>Completed</Text>
               </View>
             </View>
+           
 
             <View style={styles.activityRight}>
-              <Text style={styles.activityAmount}>{item.amount}</Text>
+              <Text style={styles.activityAmount}>+${item.monto_transaccion.toFixed(2)}</Text>
               <Text style={styles.activityTime} numberOfLines={1}>{item.time}</Text>
-              <Text style={styles.activityStatus}>{item.status}</Text>
+              <Text style={styles.activityStatus}>{item.fecha_transaccion?.toDate?.()?.toLocaleString() ?? ' '}</Text>
             </View>
           </View>
         ))}

@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../firebase/config";
-import { Alert } from "react-native";
 import {
   collection,
   query,
@@ -20,16 +19,6 @@ import {
 } from "firebase/firestore";
 import bcrypt from "bcryptjs";
 import { db } from "../firebase/config";
- 
-import { Alert } from "react-native";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  updateDoc,
-} from "firebase/firestore";
-import bcrypt from "bcryptjs";
  
 export const recuperarContrasena = async (
   correo,
@@ -113,12 +102,6 @@ export const recuperarContrasena = async (
     );
   }
 };
- 
-export const recuperarContrasena = async (
-  correo,
-  nuevaContrasena
-) => {
-import styles from "./stylePassword";
 
 export default function ForgotPasswordScreen({ navigation }) {
   const [emailToReset, setEmailToReset] = useState("");
@@ -131,7 +114,10 @@ export default function ForgotPasswordScreen({ navigation }) {
 
     sendPasswordResetEmail(auth, emailToReset)
       .then(() => {
-        Alert.alert("Success", "Check your email for instructions to reset your password");
+        Alert.alert(
+          "Success",
+          "Check your email for instructions to reset your password"
+        );
         if (navigation) {
           navigation.navigate("Login");
         }
@@ -190,92 +176,11 @@ export default function ForgotPasswordScreen({ navigation }) {
   );
 }
 
-
-  try {
-    const correoLimpio = correo.trim().toLowerCase();
- 
-    const formatoCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
- 
-    if (!formatoCorreo.test(correoLimpio)) {
-      Alert.alert("Error", "Ingresa un correo válido.");
-      return;
-    }
- 
-    if (nuevaContrasena.length < 6) {
-      Alert.alert(
-        "Error",
-        "La contraseña debe tener al menos 6 caracteres."
-      );
-      return;
-    }
- 
-    if (!/[0-9]/.test(nuevaContrasena)) {
-      Alert.alert(
-        "Error",
-        "La contraseña debe contener al menos un número."
-      );
-      return;
-    }
- 
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(nuevaContrasena)) {
-      Alert.alert(
-        "Error",
-        "La contraseña debe contener un carácter especial."
-      );
-      return;
-    }
- 
-    const usuariosRef = collection(db, "Usuarios");
- 
-    const consulta = query(
-      usuariosRef,
-      where("correo", "==", correoLimpio)
-    );
- 
-    const resultado = await getDocs(consulta);
- 
-    if (resultado.empty) {
-      Alert.alert(
-        "Error",
-        "El correo no está registrado."
-      );
-      return;
-    }
- 
-    const salt = bcrypt.genSaltSync(10);
- 
-    const contrasenaHash = bcrypt.hashSync(
-      nuevaContrasena,
-      salt
-    );
- 
-    const usuario = resultado.docs[0];
- 
-    await updateDoc(usuario.ref, {
-      contrasena_hash: contrasenaHash,
-    });
- 
-    Alert.alert(
-      "Éxito",
-      "La contraseña fue actualizada correctamente."
-    );
- 
-  } catch (error) {
-    console.error(error);
- 
-    Alert.alert(
-      "Error",
-      "No se pudo actualizar la contraseña."
-    );
-  }
-};
-
 const styles = StyleSheet.create({
+  container: {},
   forgotContainer: {
     flex: 1,
     backgroundColor: "#021B42",
-    justifyContent: "center",
-    paddingHorizontal: 30,
   },
   forgotContent: {
     alignItems: "center",
