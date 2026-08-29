@@ -24,7 +24,7 @@ export default function PerfilScreen({ navigation }) {
       >
         <View style={styles.topHeader}>
           <Image
-             source={require("../assets/images.jpg")}
+            source={{ uri: 'https://via.placeholder.com/150' }}
             style={styles.avatar}
           />
           <View style={styles.headerTextContainer}>
@@ -34,7 +34,7 @@ export default function PerfilScreen({ navigation }) {
         </View>
 
         <View style={styles.whitePanel}>
-  
+
           <TouchableOpacity style={styles.menuOption} activeOpacity={0.7}>
             <FontAwesome5 name="user-alt" size={20} color="#021B42" style={styles.icon} />
             <View style={styles.optionTextContainer}>
@@ -45,8 +45,11 @@ export default function PerfilScreen({ navigation }) {
           </TouchableOpacity>
           <View style={styles.separator} />
 
-
-          <TouchableOpacity style={styles.menuOption} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={styles.menuOption}
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate('MetodosPagos')}
+          >
             <Ionicons name="card" size={22} color="#021B42" style={styles.icon} />
             <View style={styles.optionTextContainer}>
               <Text style={styles.optionTitle}>Payment methods</Text>

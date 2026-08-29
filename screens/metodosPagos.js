@@ -13,14 +13,14 @@ import { FontAwesome5, FontAwesome } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function MetodoPagoScreen({ navigation }) {
-  const [cardholderName, setCardholderName] = useState('Alan Martínez');
-  const [cardNumber, setCardNumber] = useState('••••••••••••••••');
-  const [expireDate, setExpireDate] = useState('06/27');
+  const [cardholderName, setCardholderName] = useState();
+  const [cardNumber, setCardNumber] = useState();
+  const [expireDate, setExpireDate] = useState();
   const [cvv, setCvv] = useState('');
 
   return (
     <LinearGradient
-      colors={['#021024','#021024','#021024','#011f49','#002355', '#0050a5']}
+      colors={['#021B42','#021B42']}
       style={styles.container}
     >
       <SafeAreaView style={{ flex: 1 }}>

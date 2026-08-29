@@ -64,7 +64,7 @@ export default function HomeStoreScreen({ navigation }) {
         
         {/* Header con Perfil a la Izquierda y Configuración a la Derecha */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.avatarButton} onPress={() => {}}>
+          <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Perfil')}>
             <FontAwesome5 name="user" size={18} color="#021024" />
           </TouchableOpacity>
 
