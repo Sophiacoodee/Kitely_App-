@@ -12,7 +12,7 @@ export default function RoleSelectionScreen({ navigation }) {
     } else if (selectedRole === 'receiver') {
       navigation.navigate('InicioReceptor');
     } else if (selectedRole === 'store') {
-      navigation.navigate('HomeStoreScreen');
+      navigation.navigate('HomeStore');
     }
   };
 

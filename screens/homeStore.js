@@ -11,12 +11,12 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MapView, { Marker } from 'react-native-maps';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import dayjs from 'dayjs';
+import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
-export default function HomeStoreScreen() {
+export default function HomeStoreScreen({ navigation }) {
   const expirationDate = dayjs('2026-08-14').format('DD MMM, YYYY');
 
   const recentActivities = [
@@ -62,15 +62,20 @@ export default function HomeStoreScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         
-        {/* Header con botón de menú a la izquierda */}
+        {/* Header con Perfil a la Izquierda y Configuración a la Derecha */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.menuButton}>
-            <Ionicons name="menu-outline" size={28} color="#ffffff" />
+          <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Perfil')}>
+            <FontAwesome5 name="user" size={18} color="#021024" />
           </TouchableOpacity>
+
           <View style={styles.headerTextContainer}>
             <Text style={styles.greeting}>Super Selectos - Escalón</Text>
             <Text style={styles.subGreeting}>Authorized Branch • ID: #4082</Text>
           </View>
+
+          <TouchableOpacity style={styles.avatarButton} onPress={() => {}}>
+            <Ionicons name="settings-outline" size={22} color="#021024" />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.balanceCard}>
@@ -165,24 +170,28 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  menuButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
-    padding: 8,
-    borderRadius: 12,
-    marginRight: 14,
+  avatarButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTextContainer: {
     flex: 1,
+    marginHorizontal: 12,
   },
   greeting: {
     color: '#ffffff',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   subGreeting: {
     color: '#a0aab8',
-    fontSize: 14,
+    fontSize: 12,
     marginTop: 2,
   },
   balanceCard: {

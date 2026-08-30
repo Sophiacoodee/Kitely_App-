@@ -52,11 +52,11 @@ export default function TransmitterHome({ navigation }) {
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        
-        {/* Header con Menú Hamburguesa, Saludo e Icono de Perfil */}
+
+        {/* Encabezado con Perfil y Ajustes */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="menu-sharp" size={26} color="#FFFFFF" />
+          <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Perfil')}>
+            <FontAwesome5 name="user" size={18} color="#021024" />
           </TouchableOpacity>
 
           <View style={styles.headerTextContainer}>
@@ -66,8 +66,8 @@ export default function TransmitterHome({ navigation }) {
             </Text>
           </View>
 
-          <TouchableOpacity style={styles.avatarButton}>
-            <FontAwesome5 name="user" size={18} color="#021024" />
+          <TouchableOpacity style={styles.avatarButton} onPress={() => {}}>
+            <Ionicons name="settings-outline" size={22} color="#021024" />
           </TouchableOpacity>
         </View>
 
@@ -79,12 +79,18 @@ export default function TransmitterHome({ navigation }) {
 
         {/* Botones de Acción Rápida */}
         <View style={styles.actionButtonsContainer}>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => navigation.navigate('CategoryTransmitter')}
+          >
             <Ionicons name="paper-plane" size={24} color="#021024" />
             <Text style={styles.actionText}>Send{'\n'}Remittance</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => navigation.navigate('FamilyTransmitter')}
+          >
             <FontAwesome5 name="users" size={20} color="#021024" />
             <Text style={styles.actionText}>Beneficiaries</Text>
           </TouchableOpacity>
@@ -349,22 +355,5 @@ const styles = StyleSheet.create({
     color: '#55C900',
     fontStyle: 'italic',
     marginTop: 2,
-  },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 60,
-    backgroundColor: '#021024',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: '#1E293B',
-  },
-  navItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
