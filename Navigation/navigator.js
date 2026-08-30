@@ -11,13 +11,14 @@ import SelectrolScreen from '../screens/selectrol';
 import InicioReceptor from "../screens/inicioReceptor";
 import PerfilScreen from "../screens/perfil";
 import MetodoPagoScreen from "../screens/metodosPagos";
+import AboutUScreen from "../screens/aboutus";
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator 
-        initialRouteName="Login" 
+        initialRouteName="login" 
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Login" component={LoginScreen} />
@@ -30,6 +31,7 @@ export default function AppNavigator() {
         <Stack.Screen name="InicioReceptor" component={InicioReceptor} />
         <Stack.Screen name="Perfil" component={PerfilScreen} />
         <Stack.Screen name="MetodosPagos" component={MetodoPagoScreen} />
+        <Stack.Screen name="AboutUs" component={AboutUScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
