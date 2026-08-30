@@ -13,6 +13,7 @@ import FamilyTransmitter from "../screens/familyTransmitter";
 import CategoryTransmitter from "../screens/categoryTransmitter";
 import PerfilScreen from "../screens/perfil";
 import MetodoPagoScreen from "../screens/metodosPagos";
+import AboutUScreen from "../screens/aboutus";
 
 const Stack = createNativeStackNavigator();
 
@@ -20,7 +21,7 @@ export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator 
-        initialRouteName="Login" 
+        initialRouteName="login" 
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Login" component={LoginScreen} />
@@ -34,6 +35,7 @@ export default function AppNavigator() {
         <Stack.Screen name="CategoryTransmitter" component={CategoryTransmitter} />
         <Stack.Screen name="Perfil" component={PerfilScreen} />
         <Stack.Screen name="MetodosPagos" component={MetodoPagoScreen} />
+        <Stack.Screen name="AboutUs" component={AboutUScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
