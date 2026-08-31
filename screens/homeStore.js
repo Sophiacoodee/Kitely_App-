@@ -61,7 +61,7 @@ export default function HomeStoreScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        
+
         {/* Header con Perfil a la Izquierda y Configuración a la Derecha */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Perfil')}>
@@ -73,18 +73,21 @@ export default function HomeStoreScreen({ navigation }) {
             <Text style={styles.subGreeting}>Authorized Branch • ID: #4082</Text>
           </View>
 
-          <TouchableOpacity style={styles.avatarButton} onPress={() => {}}>
+          <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Settings')}>
             <Ionicons name="settings-outline" size={22} color="#021024" />
           </TouchableOpacity>
         </View>
 
-        <View style={styles.balanceCard}>
+        <TouchableOpacity
+          style={styles.balanceCard}
+          onPress={() => navigation.navigate("BalanceDiario")}
+        >
           <View style={styles.balanceInfo}>
             <Text style={styles.balanceLabel}>Available Register Balance</Text>
             <Text style={styles.balanceAmount}>$250.00</Text>
             <Text style={styles.expiryText}>Cut-off date: {expirationDate}</Text>
           </View>
-        </View>
+        </TouchableOpacity>
 
         <View style={styles.mapContainer}>
           <MapView
@@ -98,10 +101,10 @@ export default function HomeStoreScreen({ navigation }) {
             toolbarEnabled={false}
             showsCompass={false}
           >
-            <Marker 
-              coordinate={{ latitude: 13.7013, longitude: -89.2244 }} 
+            <Marker
+              coordinate={{ latitude: 13.7013, longitude: -89.2244 }}
               title="Escalón Branch"
-              pinColor="red" 
+              pinColor="red"
             />
           </MapView>
         </View>
@@ -130,7 +133,7 @@ export default function HomeStoreScreen({ navigation }) {
         </View>
 
         <Text style={styles.sectionTitle}>Branch Recent Activity</Text>
-        
+
         {recentActivities.map((item) => (
           <View key={item.id} style={styles.activityCard}>
             <View style={styles.activityLeft}>

@@ -80,14 +80,17 @@ export default function PerfilScreen({ navigation }) {
           <View style={styles.separator} />
 
 
-          <TouchableOpacity style={styles.menuOption} activeOpacity={0.7}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("AboutUs")}
+          >
             <Ionicons name="information-circle" size={24} color="#021B42" style={styles.icon} />
             <View style={styles.optionTextContainer}>
               <Text style={styles.optionTitle}>About Kitely</Text>
               <Text style={styles.optionSubtitle}>App version 1.00</Text>
             </View>
-            <Ionicons name="chevron-forward" size={22} color="#021B42" />
+            <Ionicons name="" size={22} color="#021B42" />
           </TouchableOpacity>
+
         </View>
       </ScrollView>
     </SafeAreaView>

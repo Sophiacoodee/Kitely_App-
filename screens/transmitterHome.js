@@ -66,7 +66,7 @@ export default function TransmitterHome({ navigation }) {
             </Text>
           </View>
 
-          <TouchableOpacity style={styles.avatarButton} onPress={() => {}}>
+          <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Settings')}>
             <Ionicons name="settings-outline" size={22} color="#021024" />
           </TouchableOpacity>
         </View>
