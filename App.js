@@ -1,6 +1,6 @@
 import React from "react";
-import AppNavigator from "./Navigation/navigator";
+import { Transaction } from "./screens/transaction";
 
 export default function App() {
-  return <AppNavigator />;
+  return <Transaction/> 
 }
