@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
   Alert,
@@ -7,6 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../firebase/config";
 import styles from "./stylePassword";
@@ -27,7 +27,7 @@ export default function ForgotPasswordScreen({ navigation }) {
           "Check your email for instructions to reset your password"
         );
         if (navigation) {
-          navigation.navigate("LoginScreen");
+          navigation.navigate("Login");
         }
       })
       .catch((error) => {
