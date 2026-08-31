@@ -1,147 +1,102 @@
-import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-  Dimensions,
-} from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
- 
-const { width } = Dimensions.get("window");
- 
+import React from 'react';
+import { StyleSheet, Text, View, Image, SafeAreaView, ScrollView } from 'react-native';
+
 export default function AboutUsScreen() {
   return (
-    <LinearGradient
-      colors={["#001436", "#001436", "#001436", "#0A3D91"]}
-      start={{ x: 0.5, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
-      style={styles.container}
-    >
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
- 
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        
+        {/* Logo desde assets */}
         <View style={styles.logoContainer}>
           <Image
-            source={require("../assets/kitelyBR.png")}
-            style={styles.logo}
+            source={require('../assets/kitelyBR.png')} 
+            style={styles.logoImage}
             resizeMode="contain"
           />
         </View>
- 
- 
-        <Text style={styles.title}>About us</Text>
- 
-        {/* TARJETA OUR MISSION */}
-        <View style={styles.missionCard}>
- 
-          <Text style={styles.missionTitle}>
-            Our Mission
+
+        {/* Título de la sección */}
+        <Text style={styles.headerTitle}>About us</Text>
+
+        {/* Tarjeta de Nuestra Misión */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Our Mission</Text>
+          <Text style={styles.cardBody}>
+            We transform the traditional remittance model in El Salvador by offering a transparent and secure platform. We make sure that the effort of those sending money from abroad turns into direct well-being through exchanges in key areas.
           </Text>
- 
-          <Text style={styles.missionText}>
-            We transform the traditional remittance model in El Salvador by
-            offering a transparent and secure platform. We make sure that the
-            effort of those sending money from abroad turns into direct
-            well-being through exchanges in key areas.
-          </Text>
- 
         </View>
- 
+
+        {/* Imagen inferior de transferencia */}
+        <View style={styles.imageContainer}>
+          <Image
+            source={require('../assets/transferencia.png')}
+            style={styles.illustration}
+            resizeMode="contain"
+          />
+        </View>
+
       </ScrollView>
-    </LinearGradient>
+    </SafeAreaView>
   );
 }
- 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#021B42',
   },
- 
   scrollContent: {
-    alignItems: "center",
-    paddingTop: 35,
-    paddingBottom: 60,
+    alignItems: 'center',
+    paddingVertical: 40,
+    paddingHorizontal: 20,
   },
- 
- 
- 
   logoContainer: {
-    width: "90%",
-    height: 145,
-    alignItems: "center",
-    justifyContent: "center",
+    marginBottom: 20,
+    alignItems: 'center',
   },
- 
-  logo: {
+  logoImage: {
+    marginTop: 30,
     width: 300,
-    height: 135,
+    height: 80,
   },
- 
- 
- 
+  headerTitle: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 24,
+  },
+  card: {
+    backgroundColor: '#082147',
+    borderRadius: 24,
+    padding: 28,
+    width: '100%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+    marginBottom: 20,
+  },
+  cardTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 16,
+  },
+  cardBody: {
+    fontSize: 17,
+    color: '#E2E8F0',
+    textAlign: 'center',
+    lineHeight: 26,
+  },
   imageContainer: {
-    width: width * 0.90,
-    height: 300,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 5,
-    marginBottom: 10,
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 10,
   },
- 
-  aboutImage: {
-    width: width * 0.88,
-    height: 300,
-  },
- 
- 
- 
-  title: {
-    color: "#FFFFFF",
-    fontSize: 52,
-    fontWeight: "300",
-    textAlign: "center",
-    marginTop: 5,
-    marginBottom: 45,
-  },
- 
- 
-  missionCard: {
-    width: "84%",
-    backgroundColor: "#001841",
-    borderRadius: 40,
-    paddingHorizontal: 30,
-    paddingVertical: 35,
- 
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 10,
-    },
-    shadowOpacity: 0.35,
-    shadowRadius: 18,
-    elevation: 12,
-  },
- 
-  missionTitle: {
-    color: "#FFFFFF",
-    fontSize: 29,
-    fontWeight: "400",
-    textAlign: "center",
-    marginBottom: 18,
-  },
- 
-  missionText: {
-    color: "#FFFFFF",
-    fontSize: 20,
-    lineHeight: 34,
-    fontWeight: "300",
-    textAlign: "left",
+  illustration: {
+    width: 280,
+    height: 240,
   },
 });
- 
- 
- 

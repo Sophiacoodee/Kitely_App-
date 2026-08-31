@@ -68,7 +68,7 @@ export default function InicioReceptor({ navigation }) {
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        
+
         {/* Header con Menú Hamburguesa, Saludo e Icono de Perfil */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Perfil')}>
@@ -82,7 +82,7 @@ export default function InicioReceptor({ navigation }) {
             </Text>
           </View>
 
-          <TouchableOpacity style={styles.avatarButton} onPress={() => {}}>
+          <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Settings')}>
             <Ionicons name="settings-outline" size={22} color="#021024" />
           </TouchableOpacity>
         </View>
@@ -94,7 +94,10 @@ export default function InicioReceptor({ navigation }) {
             <Text style={styles.actionText}>Senders</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => navigation.navigate("QRScanner")}
+          >
             <MaterialIcons name="qr-code-scanner" size={24} color="#021024" />
             <Text style={styles.actionText}>Scan Code</Text>
           </TouchableOpacity>
