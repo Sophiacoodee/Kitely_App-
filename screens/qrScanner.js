@@ -1,12 +1,54 @@
-import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { CameraView, useCameraPermissions } from "expo-camera";
 
 export default function QRScannerScreen({ navigation }) {
+  const [permission, requestPermission] = useCameraPermissions();
+  const [scanned, setScanned] = useState(false);
+  const [result, setResult] = useState("");
+  const [flash, setFlash] = useState(false);
+
+  if (!permission) {
+    return <View style={styles.container} />;
+  }
+
+  if (!permission.granted) {
+    return (
+      <SafeAreaView style={[styles.container, { justifyContent: "center" }]}>
+        <Text style={styles.title}>Permiso Requerido</Text>
+        <Text style={[styles.subtitle, { textAlign: "center", marginBottom: 20 }]}>
+          Necesitamos acceso a la cámara para escanear el código QR.
+        </Text>
+        <TouchableOpacity style={styles.iconButton} onPress={requestPermission}>
+          <Ionicons name="camera-outline" size={28} color="#FFFFFF" />
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
+
+  const handleBarCodeScanned = ({ type, data }) => {
+    setScanned(true);
+    setResult(data);
+
+    console.log("Tipo: ", type);
+    console.log("Codigo QR: ", data);
+
+    Alert.alert("Código QR Escaneado", `Resultado: ${data}`, [
+      {
+        text: "Escanear nuevamente",
+        onPress: () => {
+          setScanned(false);
+          setResult("");
+        },
+      },
+    ]);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
+
       <View style={styles.headerContainer}>
-        {/* Botón opcional para regresar si se abre desde otra pantalla */}
         <TouchableOpacity 
           style={styles.backButton} 
           onPress={() => navigation && navigation.goBack()}
@@ -18,26 +60,43 @@ export default function QRScannerScreen({ navigation }) {
         <Text style={styles.subtitle}>Center the QR code inside the frame</Text>
       </View>
 
-      {/* marco de escaneo y codigo QR simulado */}
       <View style={styles.scannerFrame}>
         <View style={styles.qrContainer}>
-          <Ionicons name="qr-code-outline" size={140} color="#FFFFFF" />
+          <CameraView
+            style={StyleSheet.absoluteFillObject}
+            enableTorch={flash}
+            barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+            onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+          />
 
-          {/* esquinas decorativas del marco */}
-          <View style={[styles.corner, styles.topLeft]} />
-          <View style={[styles.corner, styles.topRight]} />
-          <View style={[styles.corner, styles.bottomLeft]} />
-          <View style={[styles.corner, styles.bottomRight]} />
+          <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
+            <View style={[styles.corner, styles.topLeft]} />
+            <View style={[styles.corner, styles.topRight]} />
+            <View style={[styles.corner, styles.bottomLeft]} />
+            <View style={[styles.corner, styles.bottomRight]} />
+          </View>
         </View>
       </View>
 
-      {/* botones inferiores de la flash y camera */}
       <View style={styles.footerContainer}>
-        <TouchableOpacity style={styles.iconButton}>
-          <Ionicons name="flash-off" size={28} color="#FFFFFF" />
+        <TouchableOpacity 
+          style={styles.iconButton} 
+          onPress={() => setFlash(!flash)}
+        >
+          <Ionicons 
+            name={flash ? "flash" : "flash-off"} 
+            size={28} 
+            color="#FFFFFF" 
+          />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.iconButton}>
+        <TouchableOpacity 
+          style={styles.iconButton} 
+          onPress={() => {
+            setScanned(false);
+            setResult("");
+          }}
+        >
           <Ionicons name="camera-outline" size={32} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
@@ -91,6 +150,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     position: "relative",
+    overflow: "hidden",
   },
   corner: {
     position: "absolute",
