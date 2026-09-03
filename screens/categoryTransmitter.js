@@ -53,14 +53,14 @@ export default function CategoriesScreen({ navigation }) {
   return (
     <View style={styles.container}>
       {/* Sección Deslizable (Categorías) */}
-      <ScrollView 
-        showsVerticalScrollIndicator={false} 
+      <ScrollView
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton} 
+          <TouchableOpacity
+            style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
             <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
@@ -86,11 +86,11 @@ export default function CategoriesScreen({ navigation }) {
                 activeOpacity={0.8}
               >
                 <Text style={styles.categoryName}>{item.name}</Text>
-                <Ionicons 
-                  name={item.icon} 
-                  size={44} 
-                  color="#021024" 
-                  style={{ marginTop: 10 }} 
+                <Ionicons
+                  name={item.icon}
+                  size={44}
+                  color="#021024"
+                  style={{ marginTop: 10 }}
                 />
                 {isSelected && (
                   <View style={styles.checkBadge}>
@@ -122,7 +122,7 @@ export default function CategoriesScreen({ navigation }) {
         </View>
 
         {/* Botón Continuar */}
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.continueButton}
           onPress={handleContinue}
           activeOpacity={0.8}
