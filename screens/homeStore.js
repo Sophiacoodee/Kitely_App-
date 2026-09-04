@@ -62,7 +62,7 @@ export default function HomeStoreScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
 
-        {/* Header con Perfil a la Izquierda y Configuración a la Derecha */}
+        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Perfil')}>
             <FontAwesome5 name="user" size={18} color="#021024" />
@@ -78,6 +78,7 @@ export default function HomeStoreScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
+        {/* Balance Card */}
         <TouchableOpacity
           style={styles.balanceCard}
           onPress={() => navigation.navigate("BalanceDiario")}
@@ -109,7 +110,10 @@ export default function HomeStoreScreen({ navigation }) {
           </MapView>
         </View>
 
-        <Text style={styles.sectionTitle}>Authorized Categories</Text>
+        <TouchableOpacity onPress={() => navigation.navigate("AuthorizedCategories")}>
+          <Text style={styles.sectionTitle}>Authorized Categories</Text>
+        </TouchableOpacity>
+
         <View style={styles.gridContainer}>
           <TouchableOpacity style={styles.categoryCard}>
             <MaterialIcons name="shopping-cart" size={28} color="#021B42" />
@@ -132,6 +136,7 @@ export default function HomeStoreScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
+        {/* Recent Activity */}
         <Text style={styles.sectionTitle}>Branch Recent Activity</Text>
 
         {recentActivities.map((item) => (

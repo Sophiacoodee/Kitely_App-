@@ -101,8 +101,10 @@ export default function InicioReceptor({ navigation }) {
             <MaterialIcons name="qr-code-scanner" size={24} color="#021024" />
             <Text style={styles.actionText}>Scan Code</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => navigation.navigate('AllTransactions')}
+          >
             <MaterialIcons name="history" size={24} color="#021024" />
             <Text style={styles.actionText}>History</Text>
           </TouchableOpacity>
