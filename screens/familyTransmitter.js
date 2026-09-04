@@ -195,3 +195,106 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+
+const listaInicial = [
+  {
+    id: "1",
+    name: "Lucía Pocsangre",
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2",
+  },
+  {
+    id: "2",
+    name: "Alan Martínez",
+    avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a",
+  },
+  {
+    id: "3",
+    name: "Mariana Munguía",
+    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956",
+  },
+  {
+    id: "4",
+    name: "Moises Rivas",
+    avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde",
+  },
+];
+
+export default function Beneficiarios() {
+  const [beneficiarios, setBeneficiarios] = useState(listaInicial);
+
+  const eliminar = (id) => {
+    Alert.alert("Eliminar", "¿Eliminar beneficiario?", [
+      { text: "Cancelar" },
+      {
+        text: "Sí",
+        onPress: () =>
+          setBeneficiarios((lista) =>
+            lista.filter((item) => item.id !== id)
+          ),
+      },
+    ]);
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Familia</Text>
+
+      {beneficiarios.map((item) => (
+        <View style={styles.card} key={item.id}>
+          <Image source={{ uri: item.avatar }} style={styles.avatar} />
+
+          <Text style={styles.name}>{item.name}</Text>
+
+          <TouchableOpacity onPress={() => eliminar(item.id)}>
+            <Ionicons name="trash" size={25} color="red" />
+          </TouchableOpacity>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+const style = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#061A3A",
+    padding: 20,
+  },
+  title: {
+    color: "white",
+    fontSize: 30,
+    fontWeight: "bold",
+    marginBottom: 25,
+  },
+  card: {
+    backgroundColor: "#102E63",
+    padding: 15,
+    marginBottom: 15,
+    borderRadius: 15,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  avatar: {
+    width: 55,
+    height: 55,
+    borderRadius: 30,
+  },
+  name: {
+    color: "white",
+    fontSize: 18,
+    flex: 1,
+    marginLeft: 15,
+  },
+});
+
