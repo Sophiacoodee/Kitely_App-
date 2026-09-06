@@ -47,10 +47,10 @@ export default function BeneficiariesScreen({ navigation }) {
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const eliminar = (id) => {
+  const deleted = (id) => {
     Alert.alert(
-      'Eliminar',
-      '¿Eliminar beneficiario?',
+      'deleted',
+      '¿deleted beneficiaries?',
       [
         {
           text: 'Cancelar',

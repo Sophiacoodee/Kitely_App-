@@ -1,5 +1,6 @@
 import React from "react";
-import Navigator from "./Navigation/navigator"; 
+import AppNavigator from "./Navigation/navigator";
+
 export default function App() {
-  return <Navigator />;
+  return <AppNavigator />;
 }
