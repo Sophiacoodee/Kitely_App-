@@ -95,10 +95,14 @@ export default function TransmitterHome({ navigation }) {
             <Text style={styles.actionText}>Beneficiaries</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => navigation.navigate('AllTransactions')}
+          >
             <Ionicons name="time" size={24} color="#021024" />
             <Text style={styles.actionText}>History</Text>
           </TouchableOpacity>
+
         </View>
 
         {/* Resumen por Categorías */}
