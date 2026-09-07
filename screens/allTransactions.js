@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Modal,
   Platform,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
@@ -68,6 +69,9 @@ const INITIAL_TRANSACTIONS = [
 const CATEGORIES = ["All", "Groceries", "Medicine", "Construction"];
 
 export default function AllTransactions({ navigation }) {
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 600;
+
   const [selectedDate, setSelectedDate] = useState(new Date("2026-05-22"));
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -90,85 +94,85 @@ export default function AllTransactions({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.headerBar}>
+      <View style={[styles.headerBar, isTablet && styles.headerBarTablet]}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={24} color="#021B42" />
+          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
         </TouchableOpacity>
         <Text style={styles.title}>All the transactions</Text>
         <View style={{ width: 24 }} />
       </View>
 
       <View style={styles.content}>
-        {/* Subheader con botón de filtro */}
-        <View style={styles.historyHeader}>
-          <Text style={styles.history}>
-            History {selectedCategory !== "All" && `(${selectedCategory})`}
-          </Text>
-          <TouchableOpacity onPress={() => setShowFilterModal(true)}>
-            <Ionicons name="filter-outline" size={24} color="#021533" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Caja de selección de fecha */}
-        <TouchableOpacity
-          style={styles.dateBox}
-          onPress={() => setShowDatePicker(true)}
+        <View
+          style={[styles.mainWrapper, isTablet && styles.mainWrapperTablet]}
         >
-          <Text style={styles.date}>
-            {dayjs(selectedDate).format("MMM DD, YYYY")}
-          </Text>
-          <Ionicons name="calendar-outline" size={20} color="#55C900" />
-        </TouchableOpacity>
-
-        {showDatePicker && (
-          <DateTimePicker
-            value={selectedDate}
-            mode="date"
-            display="default"
-            onChange={handleDateChange}
-          />
-        )}
-
-        {/* Lista de transacciones */}
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.list}
-        >
-          {filteredTransactions.length > 0 ? (
-            filteredTransactions.map((transaction) => (
-              <View key={transaction.id} style={styles.transactionCard}>
-                <View style={styles.iconBox}>
-                  <Ionicons
-                    name={getIconoPorCategoria(transaction.category)}
-                    size={22}
-                    color="#FFFFFF"
-                  />
-                </View>
-
-                <View style={styles.info}>
-                  <Text style={styles.name}>{transaction.name}</Text>
-                  <Text style={styles.details}>
-                    {transaction.category} - {transaction.location}
-                  </Text>
-                  <Text style={styles.time}>{transaction.time}</Text>
-                </View>
-
-                <Text style={styles.amount}>{transaction.amount}</Text>
-                <Text style={styles.completed}>Completed</Text>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.emptyText}>
-              No transactions found for this date.
+          <View style={styles.historyHeader}>
+            <Text style={styles.history}>
+              History {selectedCategory !== "All" && `(${selectedCategory})`}
             </Text>
+            <TouchableOpacity onPress={() => setShowFilterModal(true)}>
+              <Ionicons name="filter-outline" size={24} color="#021533" />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            style={styles.dateBox}
+            onPress={() => setShowDatePicker(true)}
+          >
+            <Text style={styles.date}>
+              {dayjs(selectedDate).format("MMM DD, YYYY")}
+            </Text>
+            <Ionicons name="calendar-outline" size={20} color="#55C900" />
+          </TouchableOpacity>
+
+          {showDatePicker && (
+            <DateTimePicker
+              value={selectedDate}
+              mode="date"
+              display="default"
+              onChange={handleDateChange}
+            />
           )}
-        </ScrollView>
+
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.list}
+          >
+            {filteredTransactions.length > 0 ? (
+              filteredTransactions.map((transaction) => (
+                <View key={transaction.id} style={styles.transactionCard}>
+                  <View style={styles.iconBox}>
+                    <Ionicons
+                      name={getIconoPorCategoria(transaction.category)}
+                      size={22}
+                      color="#FFFFFF"
+                    />
+                  </View>
+
+                  <View style={styles.info}>
+                    <Text style={styles.name}>{transaction.name}</Text>
+                    <Text style={styles.details}>
+                      {transaction.category} - {transaction.location}
+                    </Text>
+                    <Text style={styles.time}>{transaction.time}</Text>
+                  </View>
+
+                  <Text style={styles.amount}>{transaction.amount}</Text>
+                  <Text style={styles.completed}>Completed</Text>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.emptyText}>
+                No transactions found for this date.
+              </Text>
+            )}
+          </ScrollView>
+        </View>
       </View>
 
-      {/* Modal de Filtros de Categoría */}
       <Modal
         visible={showFilterModal}
         transparent={true}
@@ -180,7 +184,12 @@ export default function AllTransactions({ navigation }) {
           activeOpacity={1}
           onPress={() => setShowFilterModal(false)}
         >
-          <View style={styles.modalContent}>
+          <View
+            style={[
+              styles.modalContent,
+              isTablet && styles.modalContentTablet,
+            ]}
+          >
             <Text style={styles.modalTitle}>Filter by Category</Text>
             {CATEGORIES.map((cat) => (
               <TouchableOpacity
@@ -224,6 +233,11 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     paddingBottom: 20,
   },
+  headerBarTablet: {
+    maxWidth: 600,
+    width: "100%",
+    alignSelf: "center",
+  },
   backButton: {
     padding: 4,
   },
@@ -240,6 +254,14 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
     paddingHorizontal: 20,
     paddingTop: 20,
+  },
+  mainWrapper: {
+    flex: 1,
+    width: "100%",
+  },
+  mainWrapperTablet: {
+    maxWidth: 600,
+    alignSelf: "center",
   },
   historyHeader: {
     flexDirection: "row",
@@ -344,6 +366,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
     padding: 20,
+  },
+  modalContentTablet: {
+    maxWidth: 400,
   },
   modalTitle: {
     fontSize: 18,

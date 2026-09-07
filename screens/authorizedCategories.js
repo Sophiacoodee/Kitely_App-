@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  useWindowDimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -22,9 +23,11 @@ const INITIAL_CATEGORIES = [
 ];
 
 export default function AuthorizedCategories({ navigation }) {
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 600;
+
   const [categories, setCategories] = useState(INITIAL_CATEGORIES);
 
-  // Cargar categorías guardadas cuando la pantalla se abre
   useEffect(() => {
     loadCategories();
   }, []);
@@ -46,14 +49,12 @@ export default function AuthorizedCategories({ navigation }) {
     setCategories(updatedCategories);
   };
 
-  // Guardar cambios en el almacenamiento persistente
   const handleSaveChanges = async () => {
     try {
       await AsyncStorage.setItem(
         "@user_categories",
         JSON.stringify(categories)
       );
-      // Redirigir a HomeStore después de guardar
       navigation.navigate("HomeStore");
     } catch (e) {
       Alert.alert("Error", "No se pudieron guardar los cambios");
@@ -63,43 +64,50 @@ export default function AuthorizedCategories({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Authorized Categories</Text>
-        <Text style={styles.subtitle}>
-          Choose the categories you want{"\n"}
-          to allow for transactions
-        </Text>
+        <View style={[styles.headerWrapper, isTablet && styles.headerWrapperTablet]}>
+          <Text style={styles.title}>Authorized Categories</Text>
+          <Text style={styles.subtitle}>
+            Choose the categories you want{"\n"}
+            to allow for transactions
+          </Text>
+        </View>
       </View>
 
       <ScrollView
         style={styles.card}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          isTablet && styles.scrollContentTablet,
+        ]}
         showsVerticalScrollIndicator={false}
       >
-        {categories.map((category, index) => (
-          <View style={styles.categoryRow} key={category.name}>
-            <View style={styles.categoryInfo}>
-              <Ionicons name={category.icon} size={30} color="#021533" />
-              <Text style={styles.categoryName}>{category.name}</Text>
+        <View style={[styles.mainWrapper, isTablet && styles.mainWrapperTablet]}>
+          {categories.map((category, index) => (
+            <View style={styles.categoryRow} key={category.name}>
+              <View style={styles.categoryInfo}>
+                <Ionicons name={category.icon} size={30} color="#021533" />
+                <Text style={styles.categoryName}>{category.name}</Text>
+              </View>
+
+              <Switch
+                value={category.enabled}
+                onValueChange={() => toggleCategory(index)}
+                trackColor={{
+                  false: "#E0E0E0",
+                  true: "#55C900",
+                }}
+                thumbColor="#FFFFFF"
+              />
             </View>
+          ))}
 
-            <Switch
-              value={category.enabled}
-              onValueChange={() => toggleCategory(index)}
-              trackColor={{
-                false: "#E0E0E0",
-                true: "#55C900",
-              }}
-              thumbColor="#FFFFFF"
-            />
-          </View>
-        ))}
-
-        <TouchableOpacity
-          style={styles.saveButton}
-          onPress={handleSaveChanges}
-        >
-          <Text style={styles.saveText}>Save changes</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPress={handleSaveChanges}
+          >
+            <Text style={styles.saveText}>Save changes</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
@@ -116,6 +124,13 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 30,
     alignItems: "center",
+  },
+  headerWrapper: {
+    width: "100%",
+    alignItems: "center",
+  },
+  headerWrapperTablet: {
+    maxWidth: 600,
   },
   title: {
     color: "#FFFFFF",
@@ -141,6 +156,15 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 50,
+  },
+  scrollContentTablet: {
+    alignItems: "center",
+  },
+  mainWrapper: {
+    width: "100%",
+  },
+  mainWrapperTablet: {
+    maxWidth: 600,
   },
   categoryRow: {
     flexDirection: "row",
