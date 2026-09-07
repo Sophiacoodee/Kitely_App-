@@ -1,8 +1,39 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useState, useEffect } from 'react';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../../path/to/firebase';
 
-export default function CanjeExitosoScreen({ navigation }) {
+export default function CanjeExitosoScreen({ navigation, route }) {
+  const { transactionId } = route.params || {};
+  const [transaction, setTransaction] = useState(null);
+
+  useEffect(() =>{
+    const cargarDatos = async () => {
+
+    if (transactionId) {
+      console.log("The transaction ID was not received")
+      return;
+      
+    }
+    try {
+          const docRef = doc(db, 'transactions', transactionId);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setTransaction(docSnap.data());
+          }
+        } catch (error) {
+          console.log("The transaction was not obtained")
+        }
+        };
+
+        cargarDatos();
+        }, [transactionId]);
+
+        
+        
+ 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -19,7 +50,7 @@ export default function CanjeExitosoScreen({ navigation }) {
               <Ionicons name="storefront-outline" size={22} color="#1F2937" />
               <Text style={styles.label}>Place</Text>
             </View>
-            <Text style={styles.value}>Super Selectos</Text>
+            <Text style={styles.value}>{transaction?.place}</Text>
           </View>
 
           <View style={styles.rowItem}>
@@ -27,7 +58,7 @@ export default function CanjeExitosoScreen({ navigation }) {
               <Ionicons name="pricetag-outline" size={22} color="#1F2937" />
               <Text style={styles.label}>Amount</Text>
             </View>
-            <Text style={styles.value}>$25.00</Text>
+            <Text style={styles.value}>{transaction?.amount != null ? `$${transaction.amount}` : ''}</Text>
           </View>
 
           <View style={styles.rowItem}>
@@ -35,7 +66,7 @@ export default function CanjeExitosoScreen({ navigation }) {
               <Ionicons name="grid-outline" size={22} color="#1F2937" />
               <Text style={styles.label}>Category</Text>
             </View>
-            <Text style={styles.value}>Groceries</Text>
+            <Text style={styles.value}>{transaction?.category}</Text>
           </View>
 
           <View style={styles.rowItem}>
@@ -43,13 +74,13 @@ export default function CanjeExitosoScreen({ navigation }) {
               <Ionicons name="calendar-outline" size={22} color="#1F2937" />
               <Text style={styles.label}>Date</Text>
             </View>
-            <Text style={styles.value}>May 08, 2026</Text>
+            <Text style={styles.value}>{transaction?.date}</Text>
           </View>
 
           <TouchableOpacity 
             style={styles.primaryButton} 
             activeOpacity={0.8}
-            onPress={() => navigation?.navigate('AllTransactions')}
+            onPress={() => navigation.navigate('AllTransactions', { transactionId})}
           >
             <Text style={styles.primaryButtonText}>View details</Text>
           </TouchableOpacity>
@@ -57,7 +88,8 @@ export default function CanjeExitosoScreen({ navigation }) {
           <TouchableOpacity 
             style={styles.linkButton} 
             activeOpacity={0.6}
-            onPress={() => navigation?.goBack()}
+            onPress={() => navigation.navigate('InicioReceptor')}
+          
           >
             <Text style={styles.linkText}>Back to home</Text>
           </TouchableOpacity>
