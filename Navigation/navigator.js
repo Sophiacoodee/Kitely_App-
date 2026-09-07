@@ -25,6 +25,10 @@ import AuthorizedCategoriesScreen from "../screens/authorizedCategories";
 import Canje from '../screens/canje';
 import Transaction from "../screens/transaction";
 import Pin from "../screens/pin";
+import ContactUs from '../screens/contacUs';
+import HelpCenter from '../screens/helpCenter';
+import Languaje from '../screens/languaje';
+import PersonalInformation from '../screens/personalInformation';
 
 const Stack = createNativeStackNavigator();
 
@@ -58,6 +62,10 @@ export default function AppNavigator() {
         <Stack.Screen name="Canje" component={Canje} />
         <Stack.Screen name="Transaction" component={Transaction} />
         <Stack.Screen name="Pin" component={Pin} />
+        <Stack.Screen name="ContactUs" component={ContactUs} />
+        <Stack.Screen name="HelpCenter" component={HelpCenter} />
+        <Stack.Screen name="Languaje" component={Languaje} />
+        <Stack.Screen name="PersonalInformation" component={PersonalInformation} />
       </Stack.Navigator>
     </NavigationContainer>
   );

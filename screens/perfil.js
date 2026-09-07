@@ -7,12 +7,12 @@ import {
   Image,
   ScrollView,
   SafeAreaView,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import {
   FontAwesome5,
   Ionicons,
-  MaterialIcons,
-  Octicons,
 } from '@expo/vector-icons';
 
 export default function PerfilScreen({ navigation }) {
@@ -34,8 +34,12 @@ export default function PerfilScreen({ navigation }) {
         </View>
 
         <View style={styles.whitePanel}>
-
-          <TouchableOpacity style={styles.menuOption} activeOpacity={0.7}>
+          {/* PERSONAL INFORMATION */}
+          <TouchableOpacity
+            style={styles.menuOption}
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate('PersonalInformation')}
+          >
             <FontAwesome5 name="user-alt" size={20} color="#021B42" style={styles.icon} />
             <View style={styles.optionTextContainer}>
               <Text style={styles.optionTitle}>Personal information</Text>
@@ -45,6 +49,7 @@ export default function PerfilScreen({ navigation }) {
           </TouchableOpacity>
           <View style={styles.separator} />
 
+          {/* PAYMENT METHODS */}
           <TouchableOpacity
             style={styles.menuOption}
             activeOpacity={0.7}
@@ -59,17 +64,12 @@ export default function PerfilScreen({ navigation }) {
           </TouchableOpacity>
           <View style={styles.separator} />
 
-          <TouchableOpacity style={styles.menuOption} activeOpacity={0.7}>
-            <Ionicons name="notifications" size={22} color="#021B42" style={styles.icon} />
-            <View style={styles.optionTextContainer}>
-              <Text style={styles.optionTitle}>Notifications</Text>
-              <Text style={styles.optionSubtitle}>View your alerts</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={22} color="#021B42" />
-          </TouchableOpacity>
-          <View style={styles.separator} />
-
-          <TouchableOpacity style={styles.menuOption} activeOpacity={0.7}>
+          {/* HELP CENTER */}
+          <TouchableOpacity
+            style={styles.menuOption}
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate('HelpCenter')}
+          >
             <Ionicons name="help-circle" size={24} color="#021B42" style={styles.icon} />
             <View style={styles.optionTextContainer}>
               <Text style={styles.optionTitle}>Help</Text>
@@ -79,18 +79,19 @@ export default function PerfilScreen({ navigation }) {
           </TouchableOpacity>
           <View style={styles.separator} />
 
-
+          {/* ABOUT KITELY */}
           <TouchableOpacity
-            onPress={() => navigation.navigate("AboutUs")}
+            style={styles.menuOption}
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate('AboutUs')}
           >
             <Ionicons name="information-circle" size={24} color="#021B42" style={styles.icon} />
             <View style={styles.optionTextContainer}>
               <Text style={styles.optionTitle}>About Kitely</Text>
               <Text style={styles.optionSubtitle}>App version 1.00</Text>
             </View>
-            <Ionicons name="" size={22} color="#021B42" />
+            <Ionicons name="chevron-forward" size={22} color="#021B42" />
           </TouchableOpacity>
-
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -101,16 +102,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#021B42',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 10 : 10,
   },
   scrollContent: {
     flexGrow: 1,
   },
-
   topHeader: {
     backgroundColor: '#021B42',
     paddingHorizontal: 25,
-    paddingTop: 70,
-    paddingBottom: 55,
+    paddingTop: 30,
+    paddingBottom: 40,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -135,20 +136,19 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.7)',
     marginTop: 2,
   },
-
   whitePanel: {
     flex: 1,
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 32,
     borderTopRightRadius: 32,
     paddingHorizontal: 24,
-    paddingTop: 10,
-    paddingBottom: 10,
+    paddingTop: 16,
+    paddingBottom: 30,
   },
   menuOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 30,
+    paddingVertical: 18,
   },
   icon: {
     width: 32,
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 1,
-    backgroundColor: '#021533',
+    backgroundColor: '#E2E8F0',
     marginVertical: 2,
   },
 });

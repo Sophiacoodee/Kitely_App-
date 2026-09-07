@@ -8,60 +8,60 @@ import {
   FlatList,
   Image,
   Alert,
+  Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const BENEFICIARIES_DATA = [
+const INITIAL_BENEFICIARIES = [
   {
     id: '1',
     name: 'Lucia Pocasangre',
-    avatar:
-      'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150',
+    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150',
   },
   {
     id: '2',
     name: 'Alan Martinez',
-    avatar:
-      'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
   },
   {
     id: '3',
     name: 'Mariana Munguia',
-    avatar:
-      'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
   },
   {
     id: '4',
     name: 'Moises Rivas',
-    avatar:
-      'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150',
+    avatar: 'https://healthyceleb.com/wp-content/uploads/2020/04/Fernanfloo-in-a-selfie-in-October-2018.jpg',
   },
 ];
 
 export default function BeneficiariesScreen({ navigation }) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [beneficiaries, setBeneficiaries] =
-    useState(BENEFICIARIES_DATA);
+  const [beneficiaries, setBeneficiaries] = useState(INITIAL_BENEFICIARIES);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newAvatar, setNewAvatar] = useState('');
 
   const filteredBeneficiaries = beneficiaries.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const deleted = (id) => {
+  const handleDelete = (id) => {
     Alert.alert(
-      'deleted',
-      '¿deleted beneficiaries?',
+      'Delete Beneficiary',
+      'Are you sure you want to delete this beneficiary?',
       [
         {
-          text: 'Cancelar',
+          text: 'Cancel',
           style: 'cancel',
         },
         {
-          text: 'Sí',
+          text: 'Delete',
           style: 'destructive',
           onPress: () => {
-            setBeneficiaries((lista) =>
-              lista.filter((item) => item.id !== id)
+            setBeneficiaries((list) =>
+              list.filter((item) => item.id !== id)
             );
           },
         },
@@ -69,199 +69,161 @@ export default function BeneficiariesScreen({ navigation }) {
     );
   };
 
+  const handleAddBeneficiary = () => {
+    if (!newName.trim()) {
+      Alert.alert('Error', 'Please enter a name for the beneficiary.');
+      return;
+    }
+
+    const newBeneficiary = {
+      id: Date.now().toString(),
+      name: newName.trim(),
+      avatar: newAvatar.trim() || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150',
+    };
+
+    setBeneficiaries([newBeneficiary, ...beneficiaries]);
+    setNewName('');
+    setNewAvatar('');
+    setModalVisible(false);
+  };
+
   return (
     <View style={styles.container}>
-
       <View style={styles.header}>
         <View style={styles.headerTitleContainer}>
 
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons
-              name="arrow-back"
-              size={24}
-              color="#FFFFFF"
-            />
-          </TouchableOpacity>
-
           <View>
-            <Text style={styles.headerTitle}>
-              My family
-            </Text>
-
-            <Text style={styles.headerSubtitle}>
-              Your beneficiaries
-            </Text>
+            <Text style={styles.headerTitle}>My family</Text>
+            <Text style={styles.headerSubtitle}>Your beneficiaries</Text>
           </View>
-
         </View>
 
         <TouchableOpacity
           style={styles.addButton}
-          onPress={() => {
-            Alert.alert(
-              'Add',
-              'Función para agregar beneficiarios'
-            );
-          }}
+          onPress={() => setModalVisible(true)}
         >
-          <Ionicons
-            name="add"
-            size={20}
-            color="#FFFFFF"
-          />
-
-          <Text style={styles.addButtonText}>
-            Add
-          </Text>
+          <Ionicons name="add" size={20} color="#FFFFFF" />
+          <Text style={styles.addButtonText}>Add</Text>
         </TouchableOpacity>
-
       </View>
 
+      {/* SEARCH BAR */}
       <View style={styles.searchContainer}>
-
         <TextInput
           style={styles.searchInput}
-          placeholder="Search a Beneficiary"
+          placeholder="Search a beneficiary"
           placeholderTextColor="#94A3B8"
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-
-        <Ionicons
-          name="search-outline"
-          size={20}
-          color="#021024"
-        />
-
+        <Ionicons name="search-outline" size={20} color="#021024" />
       </View>
 
+      {/* BENEFICIARIES LIST */}
       <FlatList
         data={filteredBeneficiaries}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>
-            No beneficiaries found
-          </Text>
+          <Text style={styles.emptyText}>No beneficiaries found</Text>
         }
         renderItem={({ item }) => (
           <View style={styles.card}>
-
-            <Image
-              source={{ uri: item.avatar }}
-              style={styles.avatar}
-            />
-
-            <Text style={styles.nameText}>
-              {item.name}
-            </Text>
+            <Image source={{ uri: item.avatar }} style={styles.avatar} />
+            <Text style={styles.nameText}>{item.name}</Text>
 
             <TouchableOpacity
               style={styles.deleteButton}
-              onPress={() => eliminar(item.id)}
+              onPress={() => handleDelete(item.id)}
             >
-              <Ionicons
-                name="trash-outline"
-                size={23}
-                color="#FF3B30"
-              />
+              <Ionicons name="trash-outline" size={23} color="#021024" />
             </TouchableOpacity>
 
-            <Ionicons
-              name="chevron-forward"
-              size={20}
-              color="#021024"
-            />
-
+            <Ionicons name="chevron-forward" size={20} color="#021024" />
           </View>
         )}
       />
 
-      <View style={styles.bottomNav}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Add Beneficiary</Text>
 
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons
-            name="home-outline"
-            size={24}
-            color="#FFFFFF"
-          />
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Full Name"
+              placeholderTextColor="#94A3B8"
+              value={newName}
+              onChangeText={setNewName}
+            />
 
-          <Text style={styles.navText}>
-            Home
-          </Text>
-        </TouchableOpacity>
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Photo URL (Optional)"
+              placeholderTextColor="#94A3B8"
+              value={newAvatar}
+              onChangeText={setNewAvatar}
+            />
 
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons
-            name="people-outline"
-            size={24}
-            color="#55A605"
-          />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
 
-          <Text style={styles.navText}>
-            Family
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons
-            name="person-outline"
-            size={24}
-            color="#FFFFFF"
-          />
-
-          <Text style={styles.navText}>
-            Profile
-          </Text>
-        </TouchableOpacity>
-
-      </View>
-
+              <TouchableOpacity
+                style={[styles.modalButton, styles.saveButton]}
+                onPress={handleAddBeneficiary}
+              >
+                <Text style={styles.saveButtonText}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     backgroundColor: '#021B42',
     paddingTop: 50,
   },
-
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
     marginBottom: 20,
+    marginLeft: 20,
   },
-
   headerTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-
   backButton: {
     marginRight: 12,
   },
-
   headerTitle: {
     fontSize: 22,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
-
   headerSubtitle: {
     fontSize: 13,
     color: '#94A3B8',
     marginTop: 2,
   },
-
   addButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -270,14 +232,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 12,
   },
-
   addButtonText: {
     color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 14,
     marginLeft: 4,
   },
-
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -288,19 +248,16 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 20,
   },
-
   searchInput: {
     flex: 1,
     fontSize: 14,
     color: '#021024',
     marginRight: 10,
   },
-
   listContent: {
     paddingHorizontal: 20,
     paddingBottom: 90,
   },
-
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -309,33 +266,28 @@ const styles = StyleSheet.create({
     padding: 14,
     marginBottom: 12,
   },
-
   avatar: {
     width: 48,
     height: 48,
     borderRadius: 24,
     marginRight: 14,
   },
-
   nameText: {
     flex: 1,
     fontSize: 16,
     fontWeight: 'bold',
     color: '#021024',
   },
-
   deleteButton: {
     padding: 8,
     marginRight: 4,
   },
-
   emptyText: {
     color: '#FFFFFF',
     textAlign: 'center',
     marginTop: 30,
     fontSize: 16,
   },
-
   bottomNav: {
     position: 'absolute',
     bottom: 0,
@@ -349,16 +301,73 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#1E293B',
   },
-
   navItem: {
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   navText: {
     color: '#FFFFFF',
     fontSize: 11,
     marginTop: 2,
   },
-
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  modalContent: {
+    width: '100%',
+    backgroundColor: '#021024',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#1E293B',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 16,
+  },
+  modalInput: {
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    height: 48,
+    fontSize: 14,
+    color: '#021024',
+    marginBottom: 12,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 8,
+  },
+  modalButton: {
+    flex: 1,
+    height: 44,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 6,
+  },
+  cancelButton: {
+    backgroundColor: '#1E293B',
+  },
+  saveButton: {
+    backgroundColor: '#55A605',
+  },
+  cancelButtonText: {
+    color: '#94A3B8',
+    fontWeight: 'bold',
+  },
+  saveButtonText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+  },
 });

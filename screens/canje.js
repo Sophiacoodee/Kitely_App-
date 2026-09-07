@@ -46,18 +46,18 @@ export default function CanjeExitosoScreen({ navigation }) {
             <Text style={styles.value}>May 08, 2026</Text>
           </View>
 
-          <TouchableOpacity 
-            style={styles.primaryButton} 
+          <TouchableOpacity
+            style={styles.primaryButton}
             activeOpacity={0.8}
             onPress={() => navigation?.navigate('AllTransactions')}
           >
             <Text style={styles.primaryButtonText}>View details</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.linkButton} 
+          <TouchableOpacity
+            style={styles.linkButton}
             activeOpacity={0.6}
-            onPress={() => navigation?.goBack()}
+            onPress={() => navigation.navigate('TransmitterHome')}
           >
             <Text style={styles.linkText}>Back to home</Text>
           </TouchableOpacity>
@@ -70,10 +70,10 @@ export default function CanjeExitosoScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#021B42', 
+    backgroundColor: '#021B42',
   },
   scrollContent: {
-    paddingTop: 70, // Mayor espacio superior para bajar la vista
+    paddingTop: 70, 
     paddingBottom: 30,
     alignItems: 'center',
     justifyContent: 'center',
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   },
   cardContainer: {
     width: '90%',
-    backgroundColor: '#F3F4F6', 
+    backgroundColor: '#F3F4F6',
     borderRadius: 28,
     padding: 20,
     gap: 12,

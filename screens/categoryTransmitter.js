@@ -57,21 +57,13 @@ export default function CategoriesScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
           <View>
             <Text style={styles.headerTitle}>Categories</Text>
             <Text style={styles.headerSubtitle}>Choose one or more categories</Text>
           </View>
         </View>
 
-        {/* Grilla de Selección de Categorías */}
         <View style={styles.gridContainer}>
           {CATEGORIES_DATA.map((item) => {
             const isSelected = selectedCategories.includes(item.id);
@@ -103,7 +95,7 @@ export default function CategoriesScreen({ navigation }) {
         </View>
       </ScrollView>
 
-      {/* Sección del Monto y Continuar Sobrepuesta / Flotante */}
+
       <View style={styles.overlayAmountSection}>
         <Text style={styles.amountLabel}>Amount</Text>
         <Text style={styles.amountSublabel}>You send (USD)</Text>
@@ -142,12 +134,13 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingBottom: 230, // Espacio suficiente para que el último elemento se lea completo sobre la tarjeta
+    paddingBottom: 230, 
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
+    marginLeft: 20,
   },
   backButton: {
     marginRight: 14,
@@ -198,7 +191,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#021024',
   },
-  // Contenedor Sobrepuesto Flotante al Fondo
+
   overlayAmountSection: {
     position: 'absolute',
     bottom: 0,
