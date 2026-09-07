@@ -124,7 +124,7 @@ export default function CategoriesScreen({ navigation }) {
         {/* Botón Continuar */}
         <TouchableOpacity
           style={styles.continueButton}
-          onPress={handleContinue}
+          onPress={() => navigation?.navigate("Transaction")}
           activeOpacity={0.8}
         >
           <Text style={styles.continueButtonText}>Continue</Text>

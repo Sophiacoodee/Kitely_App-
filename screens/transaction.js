@@ -36,7 +36,7 @@ export default function Transaction({ navigation }) {
           <View style={styles.receiverImage}>
             <Ionicons name="person" size={18} color="#FFFFFF" />
           </View>
-          <Text style={styles.inputText}>Lucia Pocasangre</Text>
+          <Text style={styles.inputText}>Name</Text>
           <TouchableOpacity>
             <Ionicons name="close-outline" size={20} color="#9AA5AD" />
           </TouchableOpacity>
@@ -51,7 +51,7 @@ export default function Transaction({ navigation }) {
 
         <TouchableOpacity
           style={styles.continueButton}
-          onPress={() => navigation.navigate("AllTransactions")}
+          onPress={() => navigation.navigate("Canje")}
         >
           <Text style={styles.continueText}>Continue</Text>
         </TouchableOpacity>

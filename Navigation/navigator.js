@@ -56,7 +56,7 @@ export default function AppNavigator() {
         <Stack.Screen name="AllTransactions" component={AllTransactionsScreen} />
         <Stack.Screen name="AuthorizedCategories" component={AuthorizedCategoriesScreen} />
         <Stack.Screen name="Canje" component={Canje} />
-        <Stack.Screen name="Transaction" component={TransactionScreen} />
+        <Stack.Screen name="Transaction" component={Transaction} />
         <Stack.Screen name="Pin" component={Pin} />
       </Stack.Navigator>
     </NavigationContainer>
