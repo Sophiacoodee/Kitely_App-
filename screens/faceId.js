@@ -1,15 +1,65 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     View,
     Text,
     StyleSheet,
     TouchableOpacity,
     ActivityIndicator,
+    Alert,
 } from "react-native";
 import {MaterialCommunityIcons, Ionicons} from "@expo/vector-icons";
 import {LinearGradient} from "expo-linear-gradient";
+import * as LocalAuthentication from "expo-local-authentication";
+
+
 
 export default function ConfirmacionFaceIdScreen ({navigation}){
+    const [isAuthenticating, setIsAuthenticating] = React.useState(false);
+
+    const handleFaceIdAuthentication = async () => {
+        try {
+            setIsAuthenticating(true);
+
+            const hasHardware = await LocalAuthentication.hasHardwareAsync();
+            if (!hasHardware) {
+                Alert.alert("Face ID is not available on this device.");
+                [{Text: "Use PIN", onPress: () => navigation.navigate("....")}];
+                setIsAuthenticating(false);
+                return;
+            }
+
+            const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+            if (!isEnrolled) {
+                Alert.alert("Required configuration" , "No biometric data is configured on this device.")
+                    [{Text: "Use PIN", onPress: () => navigation.navigate("...")}];
+                setIsAuthenticating(false);
+                return;
+            }
+            const result = await LocalAuthentication.authenticateAsync({
+                promptMessage: "Confirm your identity with Face ID",
+                fallbackLabel: "Use PIN",
+                cancelLabel: "Cancel",
+            });
+
+            if (result.success) {
+                navigation.navigate("...");
+
+        }else{
+            Alert.alert("Authentication failed", "Please try again.");
+        }
+            } catch (error) {
+                setIsAuthenticating(false);
+                console.error("Error", error);
+                Alert.alert("Authentication Error", "An error occurred during authentication. Please try again.");
+                } finally {
+            setIsAuthenticating(false);
+                }
+    } 
+     useEffect(() => {
+        handleFaceIdAuthentication();
+    }, []);
+
+
     return (
         <LinearGradient colors={["#021B42", "#061F4A"]} style={styles.container}>
             <View style={styles.content}>
@@ -30,12 +80,18 @@ export default function ConfirmacionFaceIdScreen ({navigation}){
             </View>
 
             <View style={styles.buscandoContainer}>
-                <Text style={styles.buscandoTexto}>Searching for Face ID...</Text>
+                <Text style={styles.buscandoTexto}>
+                   {isAuthenticating ? "Authenticating..." : "Tap circle to retry Face ID"}
+                </Text>
+
                 <ActivityIndicator size="small" color="#FFFFFF" style={{marginLeft: 8}}/>
                 </View>
                 
 
-                <TouchableOpacity style={styles.botonPin}>
+                <TouchableOpacity
+                    style={styles.botonPin}
+                    onPress={() => navigation.navigate("....")}
+                >
                     <Text style={styles.botonPinTexto}>And enter your security PIN</Text>
                 </TouchableOpacity>
                  </LinearGradient>
@@ -101,3 +157,4 @@ const styles =StyleSheet.create({
         fontWeight: "600",
     },
 });
+
