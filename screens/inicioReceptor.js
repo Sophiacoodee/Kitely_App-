@@ -89,7 +89,10 @@ export default function InicioReceptor({ navigation }) {
 
         {/* Botones de Acción Rápida */}
         <View style={styles.actionButtonsContainer}>
-          <TouchableOpacity style={styles.actionButton}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => navigation.navigate("FamilyTransmitter")}
+          >
             <FontAwesome5 name="users" size={20} color="#021024" />
             <Text style={styles.actionText}>Senders</Text>
           </TouchableOpacity>

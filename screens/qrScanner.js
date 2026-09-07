@@ -16,9 +16,9 @@ export default function QRScannerScreen({ navigation }) {
   if (!permission.granted) {
     return (
       <SafeAreaView style={[styles.container, { justifyContent: "center" }]}>
-        <Text style={styles.title}>Permiso Requerido</Text>
+        <Text style={styles.title}>Permission required</Text>
         <Text style={[styles.subtitle, { textAlign: "center", marginBottom: 20 }]}>
-          Necesitamos acceso a la cámara para escanear el código QR.
+          We need access to the camera to scan the QR code.
         </Text>
         <TouchableOpacity style={styles.iconButton} onPress={requestPermission}>
           <Ionicons name="camera-outline" size={28} color="#FFFFFF" />
@@ -34,7 +34,7 @@ export default function QRScannerScreen({ navigation }) {
     console.log("Tipo: ", type);
     console.log("Codigo QR: ", data);
 
-    Alert.alert("Código QR Escaneado", `Resultado: ${data}`, [
+    Alert.alert("QR Code Scanned", `Result: ${data}`, [
       {
         text: "Escanear nuevamente",
         onPress: () => {
