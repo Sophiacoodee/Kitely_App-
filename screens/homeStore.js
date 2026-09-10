@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,18 +6,78 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
-  Platform,
-  StatusBar,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MapView, { Marker } from 'react-native-maps';
 import dayjs from 'dayjs';
 import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
+import { auth, db } from '../firebase/config';
+import { doc, getDoc } from 'firebase/firestore';
 
 const { width } = Dimensions.get('window');
 
+const CATEGORY_ICONS = {
+  Food: 'shopping-cart',
+  Medicine: 'medical-services',
+  Education: 'school',
+  Entertainment: 'movie',
+  Construction: 'build',
+  'Pet supplies': 'pets',
+  Clothes: 'checkroom',
+};
+
 export default function HomeStoreScreen({ navigation }) {
   const expirationDate = dayjs('2026-08-14').format('DD MMM, YYYY');
+  const [activeCategories, setActiveCategories] = useState([]);
+  const [profileImage, setProfileImage] = useState(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadAuthorizedCategories();
+      loadUserData();
+    }, [])
+  );
+
+  const loadUserData = async () => {
+    try {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const savedImage = await AsyncStorage.getItem(
+          `@user_profile_image_${currentUser.uid}`
+        );
+        if (savedImage) {
+          setProfileImage(savedImage);
+        } else {
+          setProfileImage(null);
+        }
+      }
+    } catch (error) {
+      console.error('Error al cargar la foto de perfil:', error);
+    }
+  };
+
+  const loadAuthorizedCategories = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('@user_categories');
+      if (saved !== null) {
+        const parsed = JSON.parse(saved);
+        const enabledOnly = parsed.filter((cat) => cat.enabled);
+        setActiveCategories(enabledOnly);
+      } else {
+        setActiveCategories([
+          { name: 'Food', enabled: true },
+          { name: 'Medicine', enabled: true },
+          { name: 'Education', enabled: true },
+          { name: 'Entertainment', enabled: true },
+        ]);
+      }
+    } catch (e) {
+      console.error('Error al cargar categorías en la pantalla principal', e);
+    }
+  };
 
   const recentActivities = [
     {
@@ -65,7 +125,11 @@ export default function HomeStoreScreen({ navigation }) {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Perfil')}>
-            <FontAwesome5 name="user" size={18} color="#021024" />
+            {profileImage ? (
+              <Image source={{ uri: profileImage }} style={styles.avatarImage} />
+            ) : (
+              <FontAwesome5 name="user" size={18} color="#021024" />
+            )}
           </TouchableOpacity>
 
           <View style={styles.headerTextContainer}>
@@ -81,7 +145,7 @@ export default function HomeStoreScreen({ navigation }) {
         {/* Balance Card */}
         <TouchableOpacity
           style={styles.balanceCard}
-          onPress={() => navigation.navigate("BalanceDiario")}
+          onPress={() => navigation.navigate('BalanceDiario')}
         >
           <View style={styles.balanceInfo}>
             <Text style={styles.balanceLabel}>Available Register Balance</Text>
@@ -90,6 +154,7 @@ export default function HomeStoreScreen({ navigation }) {
           </View>
         </TouchableOpacity>
 
+        {/* Mapa */}
         <View style={styles.mapContainer}>
           <MapView
             style={styles.map}
@@ -110,30 +175,28 @@ export default function HomeStoreScreen({ navigation }) {
           </MapView>
         </View>
 
-        <TouchableOpacity onPress={() => navigation.navigate("AuthorizedCategories")}>
-          <Text style={styles.sectionTitle}>Authorized Categories</Text>
+        {/* Botón de Authorized Categories */}
+        <TouchableOpacity
+          style={styles.categoriesHeaderButton}
+          activeOpacity={0.7}
+          onPress={() => navigation.navigate('AuthorizedCategories')}
+        >
+          <Text style={styles.categoriesButtonText}>Authorized Categories</Text>
+          <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
         </TouchableOpacity>
 
+        {/* Grilla de categorías */}
         <View style={styles.gridContainer}>
-          <TouchableOpacity style={styles.categoryCard}>
-            <MaterialIcons name="shopping-cart" size={28} color="#021B42" />
-            <Text style={styles.categoryText}>Food</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.categoryCard}>
-            <MaterialIcons name="medical-services" size={28} color="#021B42" />
-            <Text style={styles.categoryText}>Medicine</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.categoryCard}>
-            <MaterialIcons name="school" size={28} color="#021B42" />
-            <Text style={styles.categoryText}>Education</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.categoryCard}>
-            <MaterialIcons name="movie" size={28} color="#021B42" />
-            <Text style={styles.categoryText}>Entertainment</Text>
-          </TouchableOpacity>
+          {activeCategories.map((item) => (
+            <View key={item.name} style={styles.categoryCard}>
+              <MaterialIcons
+                name={CATEGORY_ICONS[item.name] || 'category'}
+                size={28}
+                color="#021B42"
+              />
+              <Text style={styles.categoryText}>{item.name}</Text>
+            </View>
+          ))}
         </View>
 
         {/* Recent Activity */}
@@ -181,12 +244,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   avatarButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
   },
   headerTextContainer: {
     flex: 1,
@@ -243,6 +311,25 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  categoriesHeaderButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    marginHorizontal: 20,
+    marginTop: 22,
+    marginBottom: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  categoriesButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -253,7 +340,8 @@ const styles = StyleSheet.create({
   },
   gridContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: 10,
     paddingHorizontal: 20,
   },
   categoryCard: {

@@ -7,7 +7,6 @@ import {
   TextInput,
   ScrollView,
   Alert,
-  useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -22,12 +21,12 @@ const CATEGORIES_DATA = [
   { id: 'construction', name: 'Construction', icon: 'construct-sharp' },
 ];
 
-export default function CategoriesScreen({ navigation }) {
-  const { width } = useWindowDimensions();
-  const isTablet = width >= 600;
+// Límite máximo de dinero permitido
+const MAX_AMOUNT = 3000;
 
+export default function CategoriesScreen({ navigation }) {
   const [selectedCategories, setSelectedCategories] = useState(['clothing']);
-  const [amount, setAmount] = useState('250.00');
+  const [amount, setAmount] = useState('');
 
   const toggleCategory = (id) => {
     if (selectedCategories.includes(id)) {
@@ -37,26 +36,64 @@ export default function CategoriesScreen({ navigation }) {
     }
   };
 
+  // Manejador del texto para prevenir letras, signos negativos o múltiples puntos
+  const handleAmountChange = (text) => {
+    // Reemplaza comas por puntos y elimina cualquier caracter que no sea número o punto decimal
+    let cleanedText = text.replace(',', '.').replace(/[^0-9.]/g, '');
+
+    // Evita ingresar múltiples puntos decimales
+    const parts = cleanedText.split('.');
+    if (parts.length > 2) {
+      cleanedText = `${parts[0]}.${parts.slice(1).join('')}`;
+    }
+
+    // Limita la cantidad a 2 decimales
+    if (parts[1] && parts[1].length > 2) {
+      cleanedText = `${parts[0]}.${parts[1].slice(0, 2)}`;
+    }
+
+    setAmount(cleanedText);
+  };
+
   const handleContinue = () => {
+    // 1. Validar categorías seleccionadas
     if (selectedCategories.length === 0) {
       Alert.alert('Attention', 'Please select at least one category.');
       return;
     }
 
-    if (!amount || parseFloat(amount) <= 0) {
-      Alert.alert('Attention', 'Please enter a valid amount.');
+    // 2. Validar campo vacío o solo espacios
+    if (!amount || amount.trim() === '') {
+      Alert.alert('Attention', 'Please enter an amount.');
+      return;
+    }
+
+    const numericAmount = parseFloat(amount);
+
+    // 3. Validar si es un número válido y mayor a 0
+    if (isNaN(numericAmount) || numericAmount <= 0) {
+      Alert.alert('Attention', 'Please enter a valid amount greater than $0.00.');
+      return;
+    }
+
+    // 4. Validar límite máximo de dinero
+    if (numericAmount > MAX_AMOUNT) {
+      Alert.alert(
+        'Limit Exceeded',
+        `The maximum allowed amount per transaction is $${MAX_AMOUNT.toLocaleString('en-US', { minimumFractionDigits: 2 })}.`
+      );
       return;
     }
 
     navigation.navigate('TransmitterHome', {
       selectedCategories,
-      amount,
+      amount: numericAmount.toFixed(2),
     });
   };
 
   return (
     <View style={styles.container}>
-      <View style={[styles.mainWrapper, isTablet && styles.mainWrapperTablet]}>
+      <View style={styles.mainWrapper}>
         {/* Sección Deslizable (Categorías) */}
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -64,14 +101,6 @@ export default function CategoriesScreen({ navigation }) {
         >
           {/* Header */}
           <View style={styles.header}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => navigation.goBack()}
-              activeOpacity={0.7}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
             <View>
               <Text style={styles.headerTitle}>Categories</Text>
               <Text style={styles.headerSubtitle}>
@@ -89,7 +118,6 @@ export default function CategoriesScreen({ navigation }) {
                   key={item.id}
                   style={[
                     styles.categoryCard,
-                    isTablet && styles.categoryCardTablet,
                     isSelected && styles.selectedCategoryCard,
                   ]}
                   onPress={() => toggleCategory(item.id)}
@@ -112,26 +140,23 @@ export default function CategoriesScreen({ navigation }) {
             })}
           </View>
         </ScrollView>
-
-        {/* Sección del Monto y Continuar Sobrepuesta / Flotante */}
-        <View
-          style={[
-            styles.overlayAmountSection,
-            isTablet && styles.overlayAmountSectionTablet,
-          ]}
-        >
+        
+        <View style={styles.overlayAmountSection}>
           <Text style={styles.amountLabel}>Amount</Text>
-          <Text style={styles.amountSublabel}>You send (USD)</Text>
+          <Text style={styles.amountSublabel}>
+            You send (USD) - Max: ${MAX_AMOUNT.toLocaleString()}
+          </Text>
 
           <View style={styles.inputContainer}>
             <Text style={styles.currencySymbol}>$</Text>
             <TextInput
               style={styles.input}
               value={amount}
-              onChangeText={setAmount}
-              keyboardType="numeric"
+              onChangeText={handleAmountChange}
+              keyboardType="decimal-pad"
               placeholder="0.00"
               placeholderTextColor="#94A3B8"
+              maxLength={10}
             />
             <Text style={styles.currencyCode}>USD</Text>
           </View>
@@ -160,10 +185,6 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
   },
-  mainWrapperTablet: {
-    maxWidth: 600,
-    alignSelf: 'center',
-  },
   scrollContent: {
     paddingHorizontal: 20,
     paddingBottom: 230,
@@ -172,9 +193,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
-  },
-  backButton: {
-    marginRight: 14,
   },
   headerTitle: {
     fontSize: 22,
@@ -201,9 +219,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     padding: 12,
     position: 'relative',
-  },
-  categoryCardTablet: {
-    width: '31%',
   },
   selectedCategoryCard: {
     borderWidth: 3.5,
@@ -241,11 +256,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 10,
-  },
-  overlayAmountSectionTablet: {
-    maxWidth: 600,
-    alignSelf: 'center',
-    width: '100%',
   },
   amountLabel: {
     fontSize: 12,
