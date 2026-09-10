@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
-  Alert
+  Alert,
+  useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -22,6 +23,9 @@ const CATEGORIES_DATA = [
 ];
 
 export default function CategoriesScreen({ navigation }) {
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 600;
+
   const [selectedCategories, setSelectedCategories] = useState(['clothing']);
   const [amount, setAmount] = useState('250.00');
 
@@ -52,75 +56,95 @@ export default function CategoriesScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Sección Deslizable (Categorías) */}
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.headerTitle}>Categories</Text>
-            <Text style={styles.headerSubtitle}>Choose one or more categories</Text>
-          </View>
-        </View>
-
-        <View style={styles.gridContainer}>
-          {CATEGORIES_DATA.map((item) => {
-            const isSelected = selectedCategories.includes(item.id);
-            return (
-              <TouchableOpacity
-                key={item.id}
-                style={[
-                  styles.categoryCard,
-                  isSelected && styles.selectedCategoryCard
-                ]}
-                onPress={() => toggleCategory(item.id)}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.categoryName}>{item.name}</Text>
-                <Ionicons
-                  name={item.icon}
-                  size={44}
-                  color="#021024"
-                  style={{ marginTop: 10 }}
-                />
-                {isSelected && (
-                  <View style={styles.checkBadge}>
-                    <Ionicons name="checkmark" size={14} color="#FFFFFF" />
-                  </View>
-                )}
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </ScrollView>
-
-
-      <View style={styles.overlayAmountSection}>
-        <Text style={styles.amountLabel}>Amount</Text>
-        <Text style={styles.amountSublabel}>You send (USD)</Text>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.currencySymbol}>$</Text>
-          <TextInput
-            style={styles.input}
-            value={amount}
-            onChangeText={setAmount}
-            keyboardType="numeric"
-            placeholder="0.00"
-            placeholderTextColor="#94A3B8"
-          />
-          <Text style={styles.currencyCode}>USD</Text>
-        </View>
-
-        {/* Botón Continuar */}
-        <TouchableOpacity
-          style={styles.continueButton}
-          onPress={() => navigation?.navigate("Transaction")}
-          activeOpacity={0.8}
+      <View style={[styles.mainWrapper, isTablet && styles.mainWrapperTablet]}>
+        {/* Sección Deslizable (Categorías) */}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
         >
-          <Text style={styles.continueButtonText}>Continue</Text>
-        </TouchableOpacity>
+          {/* Header */}
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+              activeOpacity={0.7}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+            <View>
+              <Text style={styles.headerTitle}>Categories</Text>
+              <Text style={styles.headerSubtitle}>
+                Choose one or more categories
+              </Text>
+            </View>
+          </View>
+
+          {/* Grilla de Selección de Categorías */}
+          <View style={styles.gridContainer}>
+            {CATEGORIES_DATA.map((item) => {
+              const isSelected = selectedCategories.includes(item.id);
+              return (
+                <TouchableOpacity
+                  key={item.id}
+                  style={[
+                    styles.categoryCard,
+                    isTablet && styles.categoryCardTablet,
+                    isSelected && styles.selectedCategoryCard,
+                  ]}
+                  onPress={() => toggleCategory(item.id)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.categoryName}>{item.name}</Text>
+                  <Ionicons
+                    name={item.icon}
+                    size={44}
+                    color="#021024"
+                    style={{ marginTop: 10 }}
+                  />
+                  {isSelected && (
+                    <View style={styles.checkBadge}>
+                      <Ionicons name="checkmark" size={14} color="#FFFFFF" />
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </ScrollView>
+
+        {/* Sección del Monto y Continuar Sobrepuesta / Flotante */}
+        <View
+          style={[
+            styles.overlayAmountSection,
+            isTablet && styles.overlayAmountSectionTablet,
+          ]}
+        >
+          <Text style={styles.amountLabel}>Amount</Text>
+          <Text style={styles.amountSublabel}>You send (USD)</Text>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.currencySymbol}>$</Text>
+            <TextInput
+              style={styles.input}
+              value={amount}
+              onChangeText={setAmount}
+              keyboardType="numeric"
+              placeholder="0.00"
+              placeholderTextColor="#94A3B8"
+            />
+            <Text style={styles.currencyCode}>USD</Text>
+          </View>
+
+          {/* Botón Continuar */}
+          <TouchableOpacity
+            style={styles.continueButton}
+            onPress={handleContinue}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.continueButtonText}>Continue</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -132,15 +156,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#021B42',
     paddingTop: 50,
   },
+  mainWrapper: {
+    flex: 1,
+    width: '100%',
+  },
+  mainWrapperTablet: {
+    maxWidth: 600,
+    alignSelf: 'center',
+  },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingBottom: 230, 
+    paddingBottom: 230,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
-    marginLeft: 20,
   },
   backButton: {
     marginRight: 14,
@@ -171,6 +202,9 @@ const styles = StyleSheet.create({
     padding: 12,
     position: 'relative',
   },
+  categoryCardTablet: {
+    width: '31%',
+  },
   selectedCategoryCard: {
     borderWidth: 3.5,
     borderColor: '#55C900',
@@ -191,7 +225,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#021024',
   },
-
   overlayAmountSection: {
     position: 'absolute',
     bottom: 0,
@@ -208,6 +241,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 10,
+  },
+  overlayAmountSectionTablet: {
+    maxWidth: 600,
+    alignSelf: 'center',
+    width: '100%',
   },
   amountLabel: {
     fontSize: 12,

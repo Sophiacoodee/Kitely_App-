@@ -9,6 +9,10 @@ import {
   Image,
   Alert,
   Modal,
+  useWindowDimensions,
+  SafeAreaView,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -36,6 +40,9 @@ const INITIAL_BENEFICIARIES = [
 ];
 
 export default function BeneficiariesScreen({ navigation }) {
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 600;
+
   const [searchQuery, setSearchQuery] = useState('');
   const [beneficiaries, setBeneficiaries] = useState(INITIAL_BENEFICIARIES);
 
@@ -88,63 +95,79 @@ export default function BeneficiariesScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.headerTitleContainer}>
-
-          <View>
-            <Text style={styles.headerTitle}>My family</Text>
-            <Text style={styles.headerSubtitle}>Your beneficiaries</Text>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#021B42" />
+      <View style={[styles.mainContainer, isTablet && styles.tabletContainer]}>
+        
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.headerTitleContainer}>
+            <TouchableOpacity 
+              style={styles.backButton} 
+              onPress={() => navigation.goBack()}
+              activeOpacity={0.7}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+            <View>
+              <Text style={styles.headerTitle}>My family</Text>
+              <Text style={styles.headerSubtitle}>Your beneficiaries</Text>
+            </View>
           </View>
+
+          <TouchableOpacity 
+            style={styles.addButton}
+            activeOpacity={0.8}
+            onPress={() => setModalVisible(true)}
+          >
+            <Ionicons name="add" size={20} color="#FFFFFF" />
+            <Text style={styles.addButtonText}>Add</Text>
+          </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => setModalVisible(true)}
-        >
-          <Ionicons name="add" size={20} color="#FFFFFF" />
-          <Text style={styles.addButtonText}>Add</Text>
-        </TouchableOpacity>
-      </View>
+        {/* Buscador */}
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search a beneficiary"
+            placeholderTextColor="#94A3B8"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          <Ionicons name="search-outline" size={20} color="#021024" />
+        </View>
 
-      {/* SEARCH BAR */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search a beneficiary"
-          placeholderTextColor="#94A3B8"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
+        {/* Lista de Beneficiarios */}
+        <FlatList
+          data={filteredBeneficiaries}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No beneficiaries found</Text>
+            </View>
+          }
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <Image source={{ uri: item.avatar }} style={styles.avatar} />
+              <Text style={styles.nameText}>{item.name}</Text>
+
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => handleDelete(item.id)}
+              >
+                <Ionicons name="trash-outline" size={22} color="#021024" />
+              </TouchableOpacity>
+
+              <Ionicons name="chevron-forward" size={20} color="#021024" />
+            </View>
+          )}
         />
-        <Ionicons name="search-outline" size={20} color="#021024" />
       </View>
 
-      {/* BENEFICIARIES LIST */}
-      <FlatList
-        data={filteredBeneficiaries}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.listContent}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>No beneficiaries found</Text>
-        }
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Image source={{ uri: item.avatar }} style={styles.avatar} />
-            <Text style={styles.nameText}>{item.name}</Text>
-
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => handleDelete(item.id)}
-            >
-              <Ionicons name="trash-outline" size={23} color="#021024" />
-            </TouchableOpacity>
-
-            <Ionicons name="chevron-forward" size={20} color="#021024" />
-          </View>
-        )}
-      />
-
+      {/* Modal para agregar beneficiario */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -189,7 +212,7 @@ export default function BeneficiariesScreen({ navigation }) {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -197,15 +220,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#021B42',
-    paddingTop: 50,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
+  mainContainer: {
+    flex: 1,
+    width: '100%',
+  },
+  tabletContainer: {
+    maxWidth: 550,
+    alignSelf: 'center',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
+    marginTop: 15,
     marginBottom: 20,
-    marginLeft: 20,
   },
   headerTitleContainer: {
     flexDirection: 'row',
@@ -256,7 +287,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 20,
-    paddingBottom: 90,
+    paddingBottom: 40,
   },
   card: {
     flexDirection: 'row',
@@ -282,33 +313,13 @@ const styles = StyleSheet.create({
     padding: 8,
     marginRight: 4,
   },
+  emptyContainer: {
+    paddingVertical: 40,
+    alignItems: 'center',
+  },
   emptyText: {
-    color: '#FFFFFF',
-    textAlign: 'center',
-    marginTop: 30,
-    fontSize: 16,
-  },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 60,
-    backgroundColor: '#021024',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: '#1E293B',
-  },
-  navItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  navText: {
-    color: '#FFFFFF',
-    fontSize: 11,
-    marginTop: 2,
+    color: '#94A3B8',
+    fontSize: 15,
   },
   modalOverlay: {
     flex: 1,
@@ -319,6 +330,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: '100%',
+    maxWidth: 400,
     backgroundColor: '#021024',
     borderRadius: 20,
     padding: 20,
@@ -352,7 +364,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 44,
     borderRadius: 12,
-    justifyContent: 'center',
+    justify.content: 'center',
     alignItems: 'center',
     marginHorizontal: 6,
   },

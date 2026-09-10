@@ -1,40 +1,55 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image, SafeAreaView, ScrollView } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  useWindowDimensions,
+} from 'react-native';
 
 export default function AboutUsScreen() {
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 600;
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        
-        {/* Logo desde assets */}
-        <View style={styles.logoContainer}>
-          <Image
-            source={require('../assets/kitelyBR.png')} 
-            style={styles.logoImage}
-            resizeMode="contain"
-          />
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          isTablet && styles.scrollContentTablet,
+        ]}
+      >
+        <View style={[styles.mainWrapper, isTablet && styles.mainWrapperTablet]}>
+          <View style={styles.logoContainer}>
+            <Image
+              source={require('../assets/kitelyBR.png')}
+              style={[styles.logoImage, isTablet && styles.logoImageTablet]}
+              resizeMode="contain"
+            />
+          </View>
+
+          <Text style={styles.headerTitle}>About us</Text>
+
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Our Mission</Text>
+            <Text style={styles.cardBody}>
+              We transform the traditional remittance model in El Salvador by
+              offering a transparent and secure platform. We make sure that the
+              effort of those sending money from abroad turns into direct
+              well-being through exchanges in key areas.
+            </Text>
+          </View>
+
+          <View style={styles.imageContainer}>
+            <Image
+              source={require('../assets/transferencia.png')}
+              style={[styles.illustration, isTablet && styles.illustrationTablet]}
+              resizeMode="contain"
+            />
+          </View>
         </View>
-
-        {/* Título de la sección */}
-        <Text style={styles.headerTitle}>About us</Text>
-
-        {/* Tarjeta de Nuestra Misión */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Our Mission</Text>
-          <Text style={styles.cardBody}>
-            We transform the traditional remittance model in El Salvador by offering a transparent and secure platform. We make sure that the effort of those sending money from abroad turns into direct well-being through exchanges in key areas.
-          </Text>
-        </View>
-
-        {/* Imagen inferior de transferencia */}
-        <View style={styles.imageContainer}>
-          <Image
-            source={require('../assets/transferencia.png')}
-            style={styles.illustration}
-            resizeMode="contain"
-          />
-        </View>
-
       </ScrollView>
     </SafeAreaView>
   );
@@ -46,18 +61,34 @@ const styles = StyleSheet.create({
     backgroundColor: '#021B42',
   },
   scrollContent: {
+    flexGrow: 1,
     alignItems: 'center',
     paddingVertical: 40,
     paddingHorizontal: 20,
+  },
+  scrollContentTablet: {
+    justifyContent: 'center',
+    paddingVertical: 60,
+  },
+  mainWrapper: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  mainWrapperTablet: {
+    maxWidth: 560,
   },
   logoContainer: {
     marginBottom: 20,
     alignItems: 'center',
   },
   logoImage: {
-    marginTop: 30,
-    width: 300,
-    height: 80,
+    marginTop: 10,
+    width: 280,
+    height: 70,
+  },
+  logoImageTablet: {
+    width: 360,
+    height: 90,
   },
   headerTitle: {
     fontSize: 26,
@@ -96,7 +127,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   illustration: {
-    width: 280,
-    height: 240,
+    width: '100%',
+    maxWidth: 280,
+    height: 220,
+  },
+  illustrationTablet: {
+    maxWidth: 340,
+    height: 260,
   },
 });
