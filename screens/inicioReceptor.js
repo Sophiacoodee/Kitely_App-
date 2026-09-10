@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,14 +6,19 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
-  FlatList
+  FlatList,
+  ActivityIndicator,
+  Modal,
+  SafeAreaView
 } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { WebView } from 'react-native-webview';
 import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+
+import { db } from '../firebase/config';
+import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 
 const { width } = Dimensions.get('window');
 
-// Lista deslizable de movimientos del receptor
 const RECENT_SPENDING = [
   {
     id: '1',
@@ -57,19 +62,91 @@ const RECENT_SPENDING = [
   }
 ];
 
-export default function InicioReceptor({ navigation }) {
-  const initialRegion = {
+export default function InicioReceptor({ route, navigation }) {
+  const webViewRef = useRef(null);
+  const modalWebViewRef = useRef(null);
+  const [loadingMap, setLoadingMap] = useState(true);
+  const [isMapModalVisible, setIsMapModalVisible] = useState(false);
+
+  const [coords, setCoords] = useState({
     latitude: 13.69294,
     longitude: -89.21819,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
-  };
+    title: 'Super Selectos',
+    description: 'Sucursal'
+  });
+
+  const mapHtml = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <style>
+          body, html, #map { height: 100%; margin: 0; padding: 0; }
+        </style>
+      </head>
+      <body>
+        <div id="map"></div>
+        <script>
+          const map = L.map('map').setView([${coords.latitude}, ${coords.longitude}], 14);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+          }).addTo(map);
+
+          const marker = L.marker([${coords.latitude}, ${coords.longitude}]).addTo(map);
+          marker.bindPopup("<b>${coords.title}</b><br>${coords.description}").openPopup();
+        </script>
+      </body>
+    </html>
+  `;
+
+  useEffect(() => {
+    if (route.params?.selectedLocation) {
+      const { latitude, longitude, branchName, branchId } = route.params.selectedLocation;
+      setCoords({
+        latitude: Number(latitude),
+        longitude: Number(longitude),
+        title: branchName || 'Sucursal Seleccionada',
+        description: branchId || 'Ubicación activa'
+      });
+      setLoadingMap(false);
+    }
+  }, [route.params?.selectedLocation]);
+
+  useEffect(() => {
+    const locationsRef = collection(db, 'branches_locations');
+    const q = query(locationsRef, orderBy('createdAt', 'desc'), limit(1));
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        if (!snapshot.empty && !route.params?.selectedLocation) {
+          const docData = snapshot.docs[0].data();
+          setCoords({
+            latitude: Number(docData.latitude),
+            longitude: Number(docData.longitude),
+            title: docData.branchName || 'Super Selectos',
+            description: docData.branchId || 'Sucursal'
+          });
+        }
+        setLoadingMap(false);
+      },
+      (error) => {
+        console.error('Error al escuchar Firebase:', error);
+        setLoadingMap(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [route.params?.selectedLocation]);
 
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
 
-        {/* Header con Menú Hamburguesa, Saludo e Icono de Perfil */}
+        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Perfil')}>
             <FontAwesome5 name="user" size={18} color="#021024" />
@@ -87,7 +164,7 @@ export default function InicioReceptor({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* Botones de Acción Rápida */}
+        {/* Action Buttons */}
         <View style={styles.actionButtonsContainer}>
           <TouchableOpacity
             style={styles.actionButton}
@@ -104,6 +181,7 @@ export default function InicioReceptor({ navigation }) {
             <MaterialIcons name="qr-code-scanner" size={24} color="#021024" />
             <Text style={styles.actionText}>Scan Code</Text>
           </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.actionButton}
             onPress={() => navigation.navigate('AllTransactions')}
@@ -113,16 +191,56 @@ export default function InicioReceptor({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* Mapa de Google */}
+        {/* Map Container con Botón de Expansión */}
         <View style={styles.mapCard}>
-          <MapView
-            provider={PROVIDER_GOOGLE}
-            style={styles.map}
-            initialRegion={initialRegion}
-          >
-            <Marker coordinate={{ latitude: 13.69294, longitude: -89.21819 }} title="San Salvador" />
-          </MapView>
+          {loadingMap ? (
+            <View style={styles.mapLoader}>
+              <ActivityIndicator size="small" color="#021024" />
+            </View>
+          ) : (
+            <>
+              <WebView
+                ref={webViewRef}
+                originWhitelist={['*']}
+                source={{ html: mapHtml }}
+                style={styles.map}
+              />
+              <TouchableOpacity
+                style={styles.expandButton}
+                onPress={() => setIsMapModalVisible(true)}
+              >
+                <Ionicons name="expand" size={18} color="#021024" />
+              </TouchableOpacity>
+            </>
+          )}
         </View>
+
+        {/* Modal de Mapa Fullscreen */}
+        <Modal
+          visible={isMapModalVisible}
+          animationType="slide"
+          onRequestClose={() => setIsMapModalVisible(false)}
+        >
+          <SafeAreaView style={styles.fullMapContainer}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setIsMapModalVisible(false)}
+              >
+                <Ionicons name="close" size={24} color="#021024" />
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>Ubicación de Sucursal</Text>
+              <View style={{ width: 36 }} />
+            </View>
+
+            <WebView
+              ref={modalWebViewRef}
+              originWhitelist={['*']}
+              source={{ html: mapHtml }}
+              style={styles.fullMap}
+            />
+          </SafeAreaView>
+        </Modal>
 
         {/* Resumen por Categorías */}
         <View style={styles.card}>
@@ -158,7 +276,7 @@ export default function InicioReceptor({ navigation }) {
           </View>
         </View>
 
-        {/* Lista Deslizable de Gastos Recientes */}
+        {/* Gastos Recientes */}
         <Text style={styles.sectionTitle}>Recent Spending</Text>
         <FlatList
           data={RECENT_SPENDING}
@@ -199,14 +317,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 20,
-  },
-  iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: '#1E293B',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   headerTextContainer: {
     flex: 1,
@@ -252,14 +362,65 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   mapCard: {
-    height: 160,
+    height: 180,
     borderRadius: 24,
     overflow: 'hidden',
     marginBottom: 18,
+    backgroundColor: '#E2E8F0',
+    position: 'relative',
+  },
+  mapLoader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   map: {
     width: '100%',
     height: '100%',
+  },
+  expandButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: '#FFFFFF',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+  },
+  fullMapContainer: {
+    flex: 1,
+    backgroundColor: '#021B42',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#021B42',
+  },
+  closeButton: {
+    backgroundColor: '#FFFFFF',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  fullMap: {
+    flex: 1,
   },
   card: {
     backgroundColor: '#FFFFFF',
@@ -372,22 +533,5 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
     color: '#021024',
-  },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 60,
-    backgroundColor: '#021024',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: '#1E293B',
-  },
-  navItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
