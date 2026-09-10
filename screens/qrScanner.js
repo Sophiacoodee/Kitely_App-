@@ -63,7 +63,7 @@ export default function QRScannerScreen({ navigation }) {
       <View style={styles.scannerFrame}>
         <View style={styles.qrContainer}>
           <CameraView
-            style={StyleSheet.absoluteFillObject}
+            style={[StyleSheet.absoluteFillObject, styles.qrContainer]}
             enableTorch={flash}
             barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
             onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
