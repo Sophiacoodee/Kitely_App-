@@ -95,14 +95,7 @@ export default function AllTransactions({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={[styles.headerBar, isTablet && styles.headerBarTablet]}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
         <Text style={styles.title}>All the transactions</Text>
-        <View style={{ width: 24 }} />
       </View>
 
       <View style={styles.content}>
@@ -228,7 +221,7 @@ const styles = StyleSheet.create({
   headerBar: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
     paddingHorizontal: 20,
     paddingTop: 15,
     paddingBottom: 20,
@@ -237,9 +230,6 @@ const styles = StyleSheet.create({
     maxWidth: 600,
     width: "100%",
     alignSelf: "center",
-  },
-  backButton: {
-    padding: 4,
   },
   title: {
     color: "#FFFFFF",

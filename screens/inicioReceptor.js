@@ -1,10 +1,15 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from 'react';
+=======
+import React, { useState, useCallback } from 'react';
+>>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+<<<<<<< HEAD
   Dimensions,
   FlatList,
   ActivityIndicator,
@@ -12,13 +17,29 @@ import {
   SafeAreaView
 } from 'react-native';
 import { WebView } from 'react-native-webview';
+=======
+  FlatList,
+  Image,
+  useWindowDimensions,
+  Platform,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+>>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
 import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { auth, db } from '../firebase/config';
+import { doc, getDoc } from 'firebase/firestore';
 
+<<<<<<< HEAD
 import { db } from '../firebase/config';
 import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 
 const { width } = Dimensions.get('window');
 
+=======
+>>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
 const RECENT_SPENDING = [
   {
     id: '1',
@@ -28,7 +49,7 @@ const RECENT_SPENDING = [
     date: 'Today 10:24 a.m.',
     icon: 'cart-outline',
     iconBg: '#DCFCE7',
-    iconColor: '#16A34A'
+    iconColor: '#16A34A',
   },
   {
     id: '2',
@@ -38,7 +59,7 @@ const RECENT_SPENDING = [
     date: 'Yesterday 4:15 p.m.',
     icon: 'medical-outline',
     iconBg: '#FEF3C7',
-    iconColor: '#D97706'
+    iconColor: '#D97706',
   },
   {
     id: '3',
@@ -48,7 +69,7 @@ const RECENT_SPENDING = [
     date: '12 Aug 2:30 p.m.',
     icon: 'construct-outline',
     iconBg: '#E0E7FF',
-    iconColor: '#4F46E5'
+    iconColor: '#4F46E5',
   },
   {
     id: '4',
@@ -58,10 +79,11 @@ const RECENT_SPENDING = [
     date: '10 Aug 7:10 p.m.',
     icon: 'film-outline',
     iconBg: '#FCE7F3',
-    iconColor: '#DB2777'
-  }
+    iconColor: '#DB2777',
+  },
 ];
 
+<<<<<<< HEAD
 export default function InicioReceptor({ route, navigation }) {
   const webViewRef = useRef(null);
   const modalWebViewRef = useRef(null);
@@ -69,6 +91,52 @@ export default function InicioReceptor({ route, navigation }) {
   const [isMapModalVisible, setIsMapModalVisible] = useState(false);
 
   const [coords, setCoords] = useState({
+=======
+export default function InicioReceptor({ navigation }) {
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  const [profileImage, setProfileImage] = useState(null);
+  const [fullName, setFullName] = useState('');
+
+  // Cálculo de escala responsiva básica dinámicamente según la pantalla
+  const actionButtonWidth = (windowWidth - 40 - 24) / 3;
+
+  useFocusEffect(
+    useCallback(() => {
+      loadUserData();
+    }, [])
+  );
+
+  const loadUserData = async () => {
+    try {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const savedImage = await AsyncStorage.getItem(
+          `@user_profile_image_${currentUser.uid}`
+        );
+        if (savedImage) {
+          setProfileImage(savedImage);
+        } else {
+          setProfileImage(null);
+        }
+
+        const docRef = doc(db, 'Usuarios', currentUser.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const userData = docSnap.data();
+          const firstName = (userData.nombre || currentUser.displayName || '').split(' ')[0];
+          setFullName(firstName);
+        } else if (currentUser.displayName) {
+          setFullName(currentUser.displayName.split(' ')[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Error al cargar datos del usuario:', error);
+    }
+  };
+
+  const initialRegion = {
+>>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
     latitude: 13.69294,
     longitude: -89.21819,
     title: 'Super Selectos',
@@ -143,23 +211,48 @@ export default function InicioReceptor({ route, navigation }) {
   }, [route.params?.selectedLocation]);
 
   return (
+<<<<<<< HEAD
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
 
+=======
+    <SafeAreaView style={styles.container}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { minHeight: windowHeight },
+        ]}
+      >
+>>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Perfil')}>
-            <FontAwesome5 name="user" size={18} color="#021024" />
+          <TouchableOpacity
+            style={styles.avatarButton}
+            onPress={() => navigation.navigate('Perfil')}
+            activeOpacity={0.8}
+          >
+            {profileImage ? (
+              <Image source={{ uri: profileImage }} style={styles.avatarImage} />
+            ) : (
+              <FontAwesome5 name="user" size={18} color="#021024" />
+            )}
           </TouchableOpacity>
 
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>Hello, Sandra!</Text>
-            <Text style={styles.headerSubtitle}>
+            <Text style={styles.headerTitle} numberOfLines={1}>
+              Hello, {fullName !== '' ? fullName : 'User'}!
+            </Text>
+            <Text style={styles.headerSubtitle} numberOfLines={1}>
               Transparent remittances, stronger connections.
             </Text>
           </View>
 
-          <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Settings')}>
+          <TouchableOpacity
+            style={styles.avatarButton}
+            onPress={() => navigation.navigate('Settings')}
+            activeOpacity={0.8}
+          >
             <Ionicons name="settings-outline" size={22} color="#021024" />
           </TouchableOpacity>
         </View>
@@ -167,30 +260,34 @@ export default function InicioReceptor({ route, navigation }) {
         {/* Action Buttons */}
         <View style={styles.actionButtonsContainer}>
           <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => navigation.navigate("FamilyTransmitter")}
+            style={[styles.actionButton, { width: actionButtonWidth }]}
+            onPress={() => navigation.navigate('FamilyTransmitter')}
+            activeOpacity={0.8}
           >
             <FontAwesome5 name="users" size={20} color="#021024" />
-            <Text style={styles.actionText}>Senders</Text>
+            <Text style={styles.actionText} numberOfLines={1}>Senders</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => navigation.navigate("QRScanner")}
+            style={[styles.actionButton, { width: actionButtonWidth }]}
+            onPress={() => navigation.navigate('QRScanner')}
+            activeOpacity={0.8}
           >
             <MaterialIcons name="qr-code-scanner" size={24} color="#021024" />
-            <Text style={styles.actionText}>Scan Code</Text>
+            <Text style={styles.actionText} numberOfLines={1}>Scan Code</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.actionButton}
+            style={[styles.actionButton, { width: actionButtonWidth }]}
             onPress={() => navigation.navigate('AllTransactions')}
+            activeOpacity={0.8}
           >
             <MaterialIcons name="history" size={24} color="#021024" />
-            <Text style={styles.actionText}>History</Text>
+            <Text style={styles.actionText} numberOfLines={1}>History</Text>
           </TouchableOpacity>
         </View>
 
+<<<<<<< HEAD
         {/* Map Container con Botón de Expansión */}
         <View style={styles.mapCard}>
           {loadingMap ? (
@@ -213,6 +310,20 @@ export default function InicioReceptor({ route, navigation }) {
               </TouchableOpacity>
             </>
           )}
+=======
+        {/* Mapa */}
+        <View style={[styles.mapCard, { height: Math.max(140, windowHeight * 0.2) }]}>
+          <MapView
+            provider={PROVIDER_GOOGLE}
+            style={styles.map}
+            initialRegion={initialRegion}
+          >
+            <Marker
+              coordinate={{ latitude: 13.69294, longitude: -89.21819 }}
+              title="San Salvador"
+            />
+          </MapView>
+>>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
         </View>
 
         {/* Modal de Mapa Fullscreen */}
@@ -254,21 +365,21 @@ export default function InicioReceptor({ route, navigation }) {
             <View style={styles.legendContainer}>
               <View style={styles.legendItem}>
                 <View style={[styles.dot, { backgroundColor: '#805AD5' }]} />
-                <Text style={styles.legendLabel}>Food</Text>
+                <Text style={styles.legendLabel} numberOfLines={1}>Food</Text>
                 <Text style={styles.legendPercent}>64%</Text>
                 <Text style={styles.legendAmount}>$42.00</Text>
               </View>
 
               <View style={styles.legendItem}>
                 <View style={[styles.dot, { backgroundColor: '#ECC94B' }]} />
-                <Text style={styles.legendLabel}>Medicine</Text>
+                <Text style={styles.legendLabel} numberOfLines={1}>Medicine</Text>
                 <Text style={styles.legendPercent}>11%</Text>
                 <Text style={styles.legendAmount}>$16.00</Text>
               </View>
 
               <View style={styles.legendItem}>
                 <View style={[styles.dot, { backgroundColor: '#00D2A0' }]} />
-                <Text style={styles.legendLabel}>Construction</Text>
+                <Text style={styles.legendLabel} numberOfLines={1}>Construction</Text>
                 <Text style={styles.legendPercent}>25%</Text>
                 <Text style={styles.legendAmount}>$258.00</Text>
               </View>
@@ -288,17 +399,16 @@ export default function InicioReceptor({ route, navigation }) {
                 <Ionicons name={item.icon} size={22} color={item.iconColor} />
               </View>
               <View style={styles.spendingInfo}>
-                <Text style={styles.spendingTitle}>{item.title}</Text>
-                <Text style={styles.spendingSubtitle}>{item.subtitle}</Text>
-                <Text style={styles.spendingDate}>{item.date}</Text>
+                <Text style={styles.spendingTitle} numberOfLines={1}>{item.title}</Text>
+                <Text style={styles.spendingSubtitle} numberOfLines={1}>{item.subtitle}</Text>
+                <Text style={styles.spendingDate} numberOfLines={1}>{item.date}</Text>
               </View>
               <Text style={styles.spendingAmount}>{item.amount}</Text>
             </View>
           )}
         />
-
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -309,14 +419,18 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 80,
+    paddingTop: Platform.OS === 'android' ? 12 : 0,
+    paddingBottom: 40,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 20,
+<<<<<<< HEAD
+=======
+    marginTop: 10,
+>>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
   },
   headerTextContainer: {
     flex: 1,
@@ -333,26 +447,38 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   avatarButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
   actionButtonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 18,
+    gap: 12,
   },
   actionButton: {
-    width: (width - 64) / 3,
     height: 85,
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 6,
+    paddingHorizontal: 4,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
   actionText: {
     fontSize: 11,
@@ -362,6 +488,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   mapCard: {
+<<<<<<< HEAD
     height: 180,
     borderRadius: 24,
     overflow: 'hidden',
@@ -373,6 +500,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+=======
+    width: '100%',
+    borderRadius: 24,
+    overflow: 'hidden',
+    marginBottom: 18,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+>>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
   },
   map: {
     width: '100%',
@@ -427,6 +565,11 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 18,
     marginBottom: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
   },
   cardHeader: {
     fontSize: 16,
@@ -502,6 +645,11 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
     alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
   },
   iconBox: {
     width: 42,
@@ -513,6 +661,7 @@ const styles = StyleSheet.create({
   },
   spendingInfo: {
     flex: 1,
+    marginRight: 8,
   },
   spendingTitle: {
     fontSize: 14,
@@ -534,4 +683,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#021024',
   },
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85

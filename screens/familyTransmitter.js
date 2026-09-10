@@ -9,7 +9,6 @@ import {
   Image,
   Alert,
   Modal,
-  useWindowDimensions,
   SafeAreaView,
   Platform,
   StatusBar,
@@ -20,29 +19,26 @@ const INITIAL_BENEFICIARIES = [
   {
     id: '1',
     name: 'Lucia Pocasangre',
-    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150',
+    avatar: 'https://tse3.mm.bing.net/th/id/OIP._qjHrR7e96-I0mshLsmOvgHaE7?r=0&rs=1&pid=ImgDetMain&o=7&rm=3',
   },
   {
     id: '2',
     name: 'Alan Martinez',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+    avatar: 'https://www.shutterstock.com/image-photo/young-latin-man-making-selfie-600nw-1385281145.jpg',
   },
   {
     id: '3',
     name: 'Mariana Munguia',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+    avatar: 'https://m.media-amazon.com/images/M/MV5BMjEzMzEwNTk1OV5BMl5BanBnXkFtZTgwNTU1MzI3MjE@._V1_QL75_UX216_.jpg',
   },
   {
     id: '4',
     name: 'Moises Rivas',
-    avatar: 'https://healthyceleb.com/wp-content/uploads/2020/04/Fernanfloo-in-a-selfie-in-October-2018.jpg',
+    avatar: 'https://media.istockphoto.com/id/1183945946/pt/foto/headshot-portrait-of-happy-mid-adult-hispanic-businessman.jpg?s=612x612&w=0&k=20&c=-nsGHWZgtQI6FVFrHMQ7NOgMCqYglUBbF-nHIZcRe2o=',
   },
 ];
 
 export default function BeneficiariesScreen({ navigation }) {
-  const { width } = useWindowDimensions();
-  const isTablet = width >= 600;
-
   const [searchQuery, setSearchQuery] = useState('');
   const [beneficiaries, setBeneficiaries] = useState(INITIAL_BENEFICIARIES);
 
@@ -97,23 +93,13 @@ export default function BeneficiariesScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#021B42" />
-      <View style={[styles.mainContainer, isTablet && styles.tabletContainer]}>
+      <View style={styles.mainContainer}>
         
         {/* Header */}
         <View style={styles.header}>
-          <View style={styles.headerTitleContainer}>
-            <TouchableOpacity 
-              style={styles.backButton} 
-              onPress={() => navigation.goBack()}
-              activeOpacity={0.7}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
-            <View>
-              <Text style={styles.headerTitle}>My family</Text>
-              <Text style={styles.headerSubtitle}>Your beneficiaries</Text>
-            </View>
+          <View>
+            <Text style={styles.headerTitle}>My family</Text>
+            <Text style={styles.headerSubtitle}>Your beneficiaries</Text>
           </View>
 
           <TouchableOpacity 
@@ -226,10 +212,6 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
   },
-  tabletContainer: {
-    maxWidth: 550,
-    alignSelf: 'center',
-  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -237,13 +219,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginTop: 15,
     marginBottom: 20,
-  },
-  headerTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  backButton: {
-    marginRight: 12,
   },
   headerTitle: {
     fontSize: 22,
@@ -364,7 +339,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 44,
     borderRadius: 12,
-    justifycontent: 'center',
+    justifyContent: 'center',
     alignItems: 'center',
     marginHorizontal: 6,
   },

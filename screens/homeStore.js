@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { useState, useRef } from 'react';
+=======
+import React, { useState, useCallback } from 'react';
+>>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
 import {
   StyleSheet,
   Text,
@@ -6,20 +10,42 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
+<<<<<<< HEAD
   Alert,
   Modal,
+=======
+  Image,
+>>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import dayjs from 'dayjs';
 import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+<<<<<<< HEAD
 import { db } from '../firebase/config';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+=======
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
+import { auth, db } from '../firebase/config';
+import { doc, getDoc } from 'firebase/firestore';
+>>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
 
 const { width } = Dimensions.get('window');
 
+const CATEGORY_ICONS = {
+  Food: 'shopping-cart',
+  Medicine: 'medical-services',
+  Education: 'school',
+  Entertainment: 'movie',
+  Construction: 'build',
+  'Pet supplies': 'pets',
+  Clothes: 'checkroom',
+};
+
 export default function HomeStoreScreen({ navigation }) {
   const expirationDate = dayjs('2026-08-14').format('DD MMM, YYYY');
+<<<<<<< HEAD
   const webViewRef = useRef(null);
   const modalWebViewRef = useRef(null);
 
@@ -29,6 +55,55 @@ export default function HomeStoreScreen({ navigation }) {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isMapModalVisible, setIsMapModalVisible] = useState(false);
+=======
+  const [activeCategories, setActiveCategories] = useState([]);
+  const [profileImage, setProfileImage] = useState(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadAuthorizedCategories();
+      loadUserData();
+    }, [])
+  );
+
+  const loadUserData = async () => {
+    try {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const savedImage = await AsyncStorage.getItem(
+          `@user_profile_image_${currentUser.uid}`
+        );
+        if (savedImage) {
+          setProfileImage(savedImage);
+        } else {
+          setProfileImage(null);
+        }
+      }
+    } catch (error) {
+      console.error('Error al cargar la foto de perfil:', error);
+    }
+  };
+
+  const loadAuthorizedCategories = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('@user_categories');
+      if (saved !== null) {
+        const parsed = JSON.parse(saved);
+        const enabledOnly = parsed.filter((cat) => cat.enabled);
+        setActiveCategories(enabledOnly);
+      } else {
+        setActiveCategories([
+          { name: 'Food', enabled: true },
+          { name: 'Medicine', enabled: true },
+          { name: 'Education', enabled: true },
+          { name: 'Entertainment', enabled: true },
+        ]);
+      }
+    } catch (e) {
+      console.error('Error al cargar categorías en la pantalla principal', e);
+    }
+  };
+>>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
 
   const recentActivities = [
     { id: '1', title: 'Redirection - Food', subtitle: 'Register 02 • Ticket #1042', amount: '+$25.00', time: 'Today 10:24 a.m.', status: 'Completed', icon: 'shopping-cart' },
@@ -119,7 +194,11 @@ export default function HomeStoreScreen({ navigation }) {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Perfil')}>
-            <FontAwesome5 name="user" size={18} color="#021024" />
+            {profileImage ? (
+              <Image source={{ uri: profileImage }} style={styles.avatarImage} />
+            ) : (
+              <FontAwesome5 name="user" size={18} color="#021024" />
+            )}
           </TouchableOpacity>
           <View style={styles.headerTextContainer}>
             <Text style={styles.greeting}>Super Selectos - Escalón</Text>
@@ -131,7 +210,14 @@ export default function HomeStoreScreen({ navigation }) {
         </View>
 
         {/* Balance Card */}
+<<<<<<< HEAD
         <TouchableOpacity style={styles.balanceCard} onPress={() => navigation.navigate("BalanceDiario")}>
+=======
+        <TouchableOpacity
+          style={styles.balanceCard}
+          onPress={() => navigation.navigate('BalanceDiario')}
+        >
+>>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
           <View style={styles.balanceInfo}>
             <Text style={styles.balanceLabel}>Available Register Balance</Text>
             <Text style={styles.balanceAmount}>$250.00</Text>
@@ -139,7 +225,11 @@ export default function HomeStoreScreen({ navigation }) {
           </View>
         </TouchableOpacity>
 
+<<<<<<< HEAD
         {/* Map Container */}
+=======
+        {/* Mapa */}
+>>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
         <View style={styles.mapContainer}>
           <WebView
             ref={webViewRef}
@@ -161,6 +251,7 @@ export default function HomeStoreScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
+<<<<<<< HEAD
         {/* Fullscreen Map Modal */}
         <Modal visible={isMapModalVisible} animationType="slide" onRequestClose={() => setIsMapModalVisible(false)}>
           <SafeAreaView style={styles.fullMapContainer}>
@@ -189,9 +280,21 @@ export default function HomeStoreScreen({ navigation }) {
 
         <TouchableOpacity onPress={() => navigation.navigate("AuthorizedCategories")}>
           <Text style={styles.sectionTitle}>Authorized Categories</Text>
+=======
+        {/* Botón de Authorized Categories */}
+        <TouchableOpacity
+          style={styles.categoriesHeaderButton}
+          activeOpacity={0.7}
+          onPress={() => navigation.navigate('AuthorizedCategories')}
+        >
+          <Text style={styles.categoriesButtonText}>Authorized Categories</Text>
+          <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
+>>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
         </TouchableOpacity>
 
+        {/* Grilla de categorías */}
         <View style={styles.gridContainer}>
+<<<<<<< HEAD
           <TouchableOpacity style={styles.categoryCard}>
             <MaterialIcons name="shopping-cart" size={28} color="#021B42" />
             <Text style={styles.categoryText}>Food</Text>
@@ -208,6 +311,18 @@ export default function HomeStoreScreen({ navigation }) {
             <MaterialIcons name="movie" size={28} color="#021B42" />
             <Text style={styles.categoryText}>Entertainment</Text>
           </TouchableOpacity>
+=======
+          {activeCategories.map((item) => (
+            <View key={item.name} style={styles.categoryCard}>
+              <MaterialIcons
+                name={CATEGORY_ICONS[item.name] || 'category'}
+                size={28}
+                color="#021B42"
+              />
+              <Text style={styles.categoryText}>{item.name}</Text>
+            </View>
+          ))}
+>>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
         </View>
 
         {/* Activity */}
@@ -238,6 +353,7 @@ export default function HomeStoreScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+<<<<<<< HEAD
   container: { flex: 1, backgroundColor: '#021B42' },
   scrollContent: { paddingBottom: 30 },
   header: { paddingHorizontal: 20, paddingTop: 15, paddingBottom: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
@@ -276,4 +392,193 @@ const styles = StyleSheet.create({
   activityAmount: { fontSize: 15, fontWeight: 'bold', color: '#55C900' },
   activityTime: { fontSize: 11, color: '#6c757d', marginTop: 3 },
   activityStatus: { fontSize: 11, fontWeight: 'bold', color: '#55C900', marginTop: 2 },
+=======
+  container: {
+    flex: 1,
+    backgroundColor: '#021B42',
+  },
+  scrollContent: {
+    paddingBottom: 30,
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 15,
+    paddingBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  avatarButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+  },
+  headerTextContainer: {
+    flex: 1,
+    marginHorizontal: 12,
+  },
+  greeting: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  subGreeting: {
+    color: '#a0aab8',
+    fontSize: 12,
+    marginTop: 2,
+  },
+  balanceCard: {
+    backgroundColor: '#ffffff',
+    marginHorizontal: 20,
+    borderRadius: 20,
+    padding: 20,
+    marginTop: 5,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+  },
+  balanceInfo: {
+    width: '100%',
+  },
+  balanceLabel: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#021B42',
+  },
+  balanceAmount: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#021B42',
+    marginVertical: 4,
+  },
+  expiryText: {
+    fontSize: 12,
+    color: '#6c757d',
+  },
+  mapContainer: {
+    height: 150,
+    marginHorizontal: 20,
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginTop: 15,
+  },
+  map: {
+    width: '100%',
+    height: '100%',
+  },
+  categoriesHeaderButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    marginHorizontal: 20,
+    marginTop: 22,
+    marginBottom: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  categoriesButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginHorizontal: 20,
+    marginTop: 22,
+    marginBottom: 12,
+  },
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    paddingHorizontal: 20,
+  },
+  categoryCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 14,
+    width: (width - 70) / 4,
+    height: 85,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 2,
+  },
+  categoryText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#021B42',
+    marginTop: 6,
+    textAlign: 'center',
+  },
+  activityCard: {
+    backgroundColor: '#ffffff',
+    marginHorizontal: 20,
+    borderRadius: 16,
+    padding: 14,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  activityLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    paddingRight: 8,
+  },
+  cartIconBg: {
+    backgroundColor: '#EEFAD8',
+    padding: 10,
+    borderRadius: 12,
+  },
+  activityDetails: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  activityTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#021B42',
+  },
+  activitySubtitle: {
+    fontSize: 12,
+    color: '#6c757d',
+    marginTop: 3,
+  },
+  activityRight: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  activityAmount: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#55C900',
+  },
+  activityTime: {
+    fontSize: 11,
+    color: '#6c757d',
+    marginTop: 3,
+  },
+  activityStatus: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: '#55C900',
+    marginTop: 2,
+  },
+>>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
 });

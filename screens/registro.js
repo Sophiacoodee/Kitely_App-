@@ -3,15 +3,17 @@ import React, { useState } from "react";
 import {
   Alert,
   Image,
-  StyleSheet,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
+  Platform,
 } from "react-native";
-import Svg, { Path, Polygon } from "react-native-svg";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { auth, db } from "../firebase/config";
 import styles from "./styleRegistro";
 
@@ -22,8 +24,14 @@ const CustomInput = ({
   onChangeText,
   icon,
   keyboardType = "default",
+  editable = true,
+  onPress,
 }) => (
-  <View style={styles.inputContainer}>
+  <TouchableOpacity
+    activeOpacity={onPress ? 0.7 : 1}
+    onPress={onPress}
+    style={styles.inputContainer}
+  >
     <Ionicons name={icon} size={20} color="#021533" />
     <TextInput
       style={styles.input}
@@ -33,19 +41,39 @@ const CustomInput = ({
       value={value}
       onChangeText={onChangeText}
       keyboardType={keyboardType}
+      editable={editable && !onPress}
+      pointerEvents={onPress ? "none" : "auto"}
     />
-  </View>
+  </TouchableOpacity>
 );
 
 export default function RegistroScreen({ navigation }) {
   const [fullName, setFullName] = useState("");
   const [idNumber, setIdNumber] = useState("");
+  const [dob, setDob] = useState("");
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [country, setCountry] = useState("El Salvador");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const handleDateChange = (event, date) => {
+    setShowDatePicker(Platform.OS === "ios");
+    if (date) {
+      setSelectedDate(date);
+      const formattedDate = date.toISOString().split("T")[0]; // YYYY-MM-DD
+      setDob(formattedDate);
+    }
+  };
+
   const handleRegister = async () => {
-   
-    if (!fullName.trim() || !idNumber.trim() || !email.trim() || !password) {
+    if (
+      !fullName.trim() ||
+      !idNumber.trim() ||
+      !dob.trim() ||
+      !email.trim() ||
+      !password
+    ) {
       Alert.alert("Incomplete Fields", "Please fill in all fields.");
       return;
     }
@@ -55,15 +83,19 @@ export default function RegistroScreen({ navigation }) {
       return;
     }
 
-
     if (!/[A-Z]/.test(password)) {
-      Alert.alert("Invalid Password", "Password must contain at least one uppercase letter.");
+      Alert.alert(
+        "Invalid Password",
+        "Password must contain at least one uppercase letter."
+      );
       return;
     }
 
-    
     if (!/[$#/&?@!]/.test(password)) {
-      Alert.alert("Invalid Password", "Password must contain at least one special character.");
+      Alert.alert(
+        "Invalid Password",
+        "Password must contain at least one special character."
+      );
       return;
     }
 
@@ -78,9 +110,22 @@ export default function RegistroScreen({ navigation }) {
       await setDoc(doc(db, "Usuarios", user.uid), {
         nombre: fullName,
         identidad: idNumber,
+        fechaNacimiento: dob,
+        pais: country,
         correo: email,
         uid: user.uid,
       });
+
+      await AsyncStorage.setItem(
+        "@user_data",
+        JSON.stringify({
+          fullName,
+          idNumber,
+          dob,
+          country,
+          email,
+        })
+      );
 
       Alert.alert("Success!", "User registered successfully.");
 
@@ -103,121 +148,170 @@ export default function RegistroScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-
       <View style={styles.topSection}>
         <Image
           source={require("../assets/KITELY.png")}
           style={styles.logo}
+          resizeMode="contain"
         />
       </View>
 
       <View style={styles.whitePanel}>
-        <View style={styles.content}>
-          <Text style={styles.title}>Create your account</Text>
-          <Text style={styles.subtitle}>
-            Send and receive support{"\n"}with purpose.
-          </Text>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles.content}>
+            <Text style={styles.title}>Create your account</Text>
+            <Text style={styles.subtitle}>
+              Send and receive support{"\n"}with purpose.
+            </Text>
 
-          <View style={styles.fieldContainer}>
-            <CustomInput
-              icon="person"
-              placeholder="Enter your complete name"
-              value={fullName}
-              onChangeText={setFullName}
-            />
-          </View>
+            {/* Full Name */}
+            <View style={styles.fieldContainer}>
+              <CustomInput
+                icon="person"
+                placeholder="Enter your complete name"
+                value={fullName}
+                onChangeText={setFullName}
+              />
+            </View>
 
-          <View style={styles.fieldContainer}>
-            <CustomInput
-              icon="card-outline"
-              placeholder="Enter your identity number"
-              value={idNumber}
-              onChangeText={setIdNumber}
-              keyboardType="numeric"
-            />
-          </View>
+            {/* Identity Number */}
+            <View style={styles.fieldContainer}>
+              <CustomInput
+                icon="card-outline"
+                placeholder="Enter your identity number"
+                value={idNumber}
+                onChangeText={setIdNumber}
+                keyboardType="numeric"
+              />
+            </View>
 
-          <View style={styles.fieldContainer}>
-            <CustomInput
-              icon="mail"
-              placeholder="Enter your gmail or username"
-              value={email}
-              onChangeText={setEmail}
-            />
-          </View>
+            {/* Date of Birth con Calendario */}
+            <View style={styles.fieldContainer}>
+              <CustomInput
+                icon="calendar-outline"
+                placeholder="Select date of birth"
+                value={dob}
+                editable={false}
+                onPress={() => setShowDatePicker(true)}
+              />
+              {showDatePicker && (
+                <DateTimePicker
+                  value={selectedDate}
+                  mode="date"
+                  display={Platform.OS === "ios" ? "spinner" : "default"}
+                  onChange={handleDateChange}
+                  maximumDate={new Date()}
+                />
+              )}
+            </View>
 
-          <View style={styles.fieldContainer}>
-            <CustomInput
-              icon="lock-closed"
-              placeholder="Enter password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={true}
-            />
-          </View>
+            {/* Country Selector */}
+            <View style={styles.fieldContainer}>
+              <Text
+                style={{
+                  fontSize: 13,
+                  color: "#021533",
+                  marginBottom: 6,
+                  fontWeight: "600",
+                }}
+              >
+                Select Country
+              </Text>
+              <View
+                style={{ flexDirection: "row", justifyContent: "space-between" }}
+              >
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    marginRight: 6,
+                    paddingVertical: 12,
+                    borderRadius: 10,
+                    borderWidth: 1,
+                    borderColor:
+                      country === "El Salvador" ? "#021533" : "#D1D5DB",
+                    backgroundColor:
+                      country === "El Salvador" ? "#021533" : "#F3F4F6",
+                    alignItems: "center",
+                  }}
+                  onPress={() => setCountry("El Salvador")}
+                >
+                  <Text
+                    style={{
+                      color: country === "El Salvador" ? "#FFFFFF" : "#374151",
+                      fontWeight: "600",
+                      fontSize: 14,
+                    }}
+                  >
+                    {"\uD83C\uDDF8\uD83C\uDDFB"} El Salvador
+                  </Text>
+                </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={handleRegister}>
-            <Text style={styles.buttonText}>Sign up</Text>
-          </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    marginLeft: 6,
+                    paddingVertical: 12,
+                    borderRadius: 10,
+                    borderWidth: 1,
+                    borderColor:
+                      country === "United States" ? "#021533" : "#D1D5DB",
+                    backgroundColor:
+                      country === "United States" ? "#021533" : "#F3F4F6",
+                    alignItems: "center",
+                  }}
+                  onPress={() => setCountry("United States")}
+                >
+                  <Text
+                    style={{
+                      color:
+                        country === "United States" ? "#FFFFFF" : "#374151",
+                      fontWeight: "600",
+                      fontSize: 14,
+                    }}
+                  >
+                    {"\uD83C\uDDFA\uD83C\uDDF8"} United States
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
 
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Already have an account? </Text>
-            <TouchableOpacity onPress={() => navigation && navigation.navigate("Login")}>
-              <Text style={styles.signUp}>Log in</Text>
+            {/* Email */}
+            <View style={styles.fieldContainer}>
+              <CustomInput
+                icon="mail"
+                placeholder="Enter your email"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+              />
+            </View>
+
+            {/* Password */}
+            <View style={styles.fieldContainer}>
+              <CustomInput
+                icon="lock-closed"
+                placeholder="Enter password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={true}
+              />
+            </View>
+
+            {/* Submit Button */}
+            <TouchableOpacity style={styles.button} onPress={handleRegister}>
+              <Text style={styles.buttonText}>Sign up</Text>
             </TouchableOpacity>
+
+            <View style={styles.footer}>
+              <Text style={styles.footerText}>Already have an account? </Text>
+              <TouchableOpacity
+                onPress={() => navigation && navigation.navigate("Login")}
+              >
+                <Text style={styles.signUp}>Log in</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-
-        {/* Bottom screen design */}
-        <View style={styles.decoration} pointerEvents="none">
-          <Svg
-            width="100%"
-            height="125"
-            viewBox="0 0 400 125"
-            style={styles.wave}
-          >
-            <Path
-              d="M0 72 C75 67 125 83 190 82 C275 80 325 50 400 10 L400 125 L0 125 Z"
-              fill="#D8D4FF"
-            />
-            <Path
-              d="M0 91 C75 86 125 101 190 100 C275 98 325 69 400 28 L400 125 L0 125 Z"
-              fill="#BDB7F5"
-            />
-          </Svg>
-
-          <Svg
-            width="100"
-            height="120"
-            viewBox="0 0 95 120"
-            style={styles.kite}
-          >
-            <Polygon
-              points="48,10 72,32 50,55 27,32"
-              fill="none"
-              stroke="#55A605"
-              strokeWidth="3"
-            />
-            <Path
-              d="M48 10 L50 55"
-              fill="none"
-              stroke="#55A605"
-              strokeWidth="3"
-            />
-            <Path
-              d="M50 55 C55 68 51 75 42 82 C32 89 23 86 16 94 C10 101 13 108 7 116"
-              fill="none"
-              stroke="#55A605"
-              strokeWidth="3"
-            />
-            <Polygon
-              points="17,89 27,97 23,108 13,101 14,92"
-              fill="none"
-              stroke="#55A605"
-              strokeWidth="2.5"
-            />
-          </Svg>
-        </View>
+        </ScrollView>
       </View>
     </View>
   );

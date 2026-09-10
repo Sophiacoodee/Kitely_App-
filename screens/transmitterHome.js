@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,13 +6,17 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
-  FlatList
+  FlatList,
+  Image
 } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { auth, db } from '../firebase/config';
+import { doc, getDoc } from 'firebase/firestore';
 
 const { width } = Dimensions.get('window');
 
-// Lista deslizable de transacciones enviadas
 const RECENT_TRANSACTIONS = [
   {
     id: '1',
@@ -49,6 +53,44 @@ const RECENT_TRANSACTIONS = [
 ];
 
 export default function TransmitterHome({ navigation }) {
+  const [profileImage, setProfileImage] = useState(null);
+  const [fullName, setFullName] = useState('');
+
+  useFocusEffect(
+    useCallback(() => {
+      loadUserData();
+    }, [])
+  );
+
+  const loadUserData = async () => {
+    try {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const savedImage = await AsyncStorage.getItem(
+          `@user_profile_image_${currentUser.uid}`
+        );
+        if (savedImage) {
+          setProfileImage(savedImage);
+        } else {
+          setProfileImage(null);
+        }
+
+        const docRef = doc(db, 'Usuarios', currentUser.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const userData = docSnap.data();
+          const firstName = (userData.nombre || currentUser.displayName || '').split(' ')[0];
+          setFullName(firstName);
+        } else if (currentUser.displayName) {
+          setFullName(currentUser.displayName.split(' ')[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Error al cargar datos del usuario:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
@@ -56,11 +98,17 @@ export default function TransmitterHome({ navigation }) {
         {/* Encabezado con Perfil y Ajustes */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Perfil')}>
-            <FontAwesome5 name="user" size={18} color="#021024" />
+            {profileImage ? (
+              <Image source={{ uri: profileImage }} style={styles.avatarImage} />
+            ) : (
+              <FontAwesome5 name="user" size={18} color="#021024" />
+            )}
           </TouchableOpacity>
 
           <View style={styles.headerTextContainer}>
-            <Text style={styles.headerTitle}>Hello, Emiliano!</Text>
+            <Text style={styles.headerTitle}>
+              Hello, {fullName !== '' ? fullName : 'User'}!
+            </Text>
             <Text style={styles.headerSubtitle}>
               Transparent remittances, stronger connections.
             </Text>
@@ -102,7 +150,6 @@ export default function TransmitterHome({ navigation }) {
             <Ionicons name="time" size={24} color="#021024" />
             <Text style={styles.actionText}>History</Text>
           </TouchableOpacity>
-
         </View>
 
         {/* Resumen por Categorías */}
@@ -182,14 +229,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 20,
   },
-  iconButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: '#1E293B',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   headerTextContainer: {
     flex: 1,
     marginHorizontal: 12,
@@ -205,12 +244,17 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   avatarButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
   },
   balanceCard: {
     backgroundColor: 'transparent',
