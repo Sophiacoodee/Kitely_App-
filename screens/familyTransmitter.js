@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 44,
     borderRadius: 12,
-    justify.content: 'center',
+    justifycontent: 'center',
     alignItems: 'center',
     marginHorizontal: 6,
   },
