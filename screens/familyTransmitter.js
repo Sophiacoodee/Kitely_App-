@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,9 +9,6 @@ import {
   Image,
   Alert,
   Modal,
-  SafeAreaView,
-  Platform,
-  StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -19,22 +16,22 @@ const INITIAL_BENEFICIARIES = [
   {
     id: '1',
     name: 'Lucia Pocasangre',
-    avatar: 'https://tse3.mm.bing.net/th/id/OIP._qjHrR7e96-I0mshLsmOvgHaE7?r=0&rs=1&pid=ImgDetMain&o=7&rm=3',
+    avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150',
   },
   {
     id: '2',
     name: 'Alan Martinez',
-    avatar: 'https://www.shutterstock.com/image-photo/young-latin-man-making-selfie-600nw-1385281145.jpg',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
   },
   {
     id: '3',
     name: 'Mariana Munguia',
-    avatar: 'https://m.media-amazon.com/images/M/MV5BMjEzMzEwNTk1OV5BMl5BanBnXkFtZTgwNTU1MzI3MjE@._V1_QL75_UX216_.jpg',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
   },
   {
     id: '4',
     name: 'Moises Rivas',
-    avatar: 'https://media.istockphoto.com/id/1183945946/pt/foto/headshot-portrait-of-happy-mid-adult-hispanic-businessman.jpg?s=612x612&w=0&k=20&c=-nsGHWZgtQI6FVFrHMQ7NOgMCqYglUBbF-nHIZcRe2o=',
+    avatar: 'https://healthyceleb.com/wp-content/uploads/2020/04/Fernanfloo-in-a-selfie-in-October-2018.jpg',
   },
 ];
 
@@ -45,6 +42,32 @@ export default function BeneficiariesScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [newName, setNewName] = useState('');
   const [newAvatar, setNewAvatar] = useState('');
+
+  useEffect(() => {
+    loadBeneficiaries();
+  });
+
+  const loadBeneficiaries = async () => {
+    try {
+      const storedData = await AsyncStorage.getItem(STORAGE_KEY);
+      if (storedData !== null) {
+        setBeneficiaries(JSON.parse(storedData));
+      } else {
+        setBeneficiaries(INITIAL_BENEFICIARIES);
+      }
+    } catch (error) {
+      console.log("Error cargando beneficiarios");
+      setBeneficiaries(INITIAL_BENEFICIARIES);
+    }
+  }
+
+  const saveBeneficiaries = async (newList) => {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newList));
+    } catch (error) {
+      console.log("Error guardando beneficiarios");
+    }
+  }
 
   const filteredBeneficiaries = beneficiaries.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -63,9 +86,11 @@ export default function BeneficiariesScreen({ navigation }) {
           text: 'Delete',
           style: 'destructive',
           onPress: () => {
-            setBeneficiaries((list) =>
-              list.filter((item) => item.id !== id)
+            const updatedList = setBeneficiaries((list) =>
+              beneficiaries.filter((item) => item.id !== id)
             );
+            setBeneficiaries(updatedList);
+            saveBeneficiaries(updatedList);
           },
         },
       ]
@@ -84,6 +109,10 @@ export default function BeneficiariesScreen({ navigation }) {
       avatar: newAvatar.trim() || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150',
     };
 
+    const updatedList = [newBeneficiary, ...beneficiaries];
+    setBeneficiaries(updatedList);
+    saveBeneficiaries(updatedList);
+
     setBeneficiaries([newBeneficiary, ...beneficiaries]);
     setNewName('');
     setNewAvatar('');
@@ -91,69 +120,63 @@ export default function BeneficiariesScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#021B42" />
-      <View style={styles.mainContainer}>
-        
-        {/* Header */}
-        <View style={styles.header}>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <View style={styles.headerTitleContainer}>
+
           <View>
-            <Text style={styles.headerTitle}>My family</Text>
-            <Text style={styles.headerSubtitle}>Your beneficiaries</Text>
+            <Text style={styles.headerTitle}>My family</Text>
+            <Text style={styles.headerSubtitle}>Your beneficiaries</Text>
           </View>
-
-          <TouchableOpacity 
-            style={styles.addButton}
-            activeOpacity={0.8}
-            onPress={() => setModalVisible(true)}
-          >
-            <Ionicons name="add" size={20} color="#FFFFFF" />
-            <Text style={styles.addButtonText}>Add</Text>
-          </TouchableOpacity>
         </View>
 
-        {/* Buscador */}
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search a beneficiary"
-            placeholderTextColor="#94A3B8"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          <Ionicons name="search-outline" size={20} color="#021024" />
-        </View>
-
-        {/* Lista de Beneficiarios */}
-        <FlatList
-          data={filteredBeneficiaries}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContent}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No beneficiaries found</Text>
-            </View>
-          }
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Image source={{ uri: item.avatar }} style={styles.avatar} />
-              <Text style={styles.nameText}>{item.name}</Text>
-
-              <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={() => handleDelete(item.id)}
-              >
-                <Ionicons name="trash-outline" size={22} color="#021024" />
-              </TouchableOpacity>
-
-              <Ionicons name="chevron-forward" size={20} color="#021024" />
-            </View>
-          )}
-        />
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => setModalVisible(true)}
+        >
+          <Ionicons name="add" size={20} color="#FFFFFF" />
+          <Text style={styles.addButtonText}>Add</Text>
+        </TouchableOpacity>
       </View>
 
-      {/* Modal para agregar beneficiario */}
+      {/* SEARCH BAR */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search a beneficiary"
+          placeholderTextColor="#94A3B8"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        <Ionicons name="search-outline" size={20} color="#021024" />
+      </View>
+
+      {/* BENEFICIARIES LIST */}
+      <FlatList
+        data={filteredBeneficiaries}
+        keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>No beneficiaries found</Text>
+        }
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Image source={{ uri: item.avatar }} style={styles.avatar} />
+            <Text style={styles.nameText}>{item.name}</Text>
+
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => handleDelete(item.id)}
+            >
+              <Ionicons name="trash-outline" size={23} color="#021024" />
+            </TouchableOpacity>
+
+            <Ionicons name="chevron-forward" size={20} color="#021024" />
+          </View>
+        )}
+      />
+
       <Modal
         animationType="slide"
         transparent={true}
@@ -162,7 +185,7 @@ export default function BeneficiariesScreen({ navigation }) {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Add Beneficiary</Text>
+            <Text style={styles.modalTitle}>Add Beneficiary</Text>
 
             <TextInput
               style={styles.modalInput}
@@ -198,7 +221,7 @@ export default function BeneficiariesScreen({ navigation }) {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -206,19 +229,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#021B42',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-  },
-  mainContainer: {
-    flex: 1,
-    width: '100%',
+    paddingTop: 50,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    marginTop: 15,
     marginBottom: 20,
+    marginLeft: 20,
+  },
+  headerTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    marginRight: 12,
   },
   headerTitle: {
     fontSize: 22,
@@ -262,7 +288,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 20,
-    paddingBottom: 40,
+    paddingBottom: 90,
   },
   card: {
     flexDirection: 'row',
@@ -288,13 +314,33 @@ const styles = StyleSheet.create({
     padding: 8,
     marginRight: 4,
   },
-  emptyContainer: {
-    paddingVertical: 40,
-    alignItems: 'center',
-  },
   emptyText: {
-    color: '#94A3B8',
-    fontSize: 15,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginTop: 30,
+    fontSize: 16,
+  },
+  bottomNav: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 60,
+    backgroundColor: '#021024',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: '#1E293B',
+  },
+  navItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    marginTop: 2,
   },
   modalOverlay: {
     flex: 1,
@@ -305,7 +351,6 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: '100%',
-    maxWidth: 400,
     backgroundColor: '#021024',
     borderRadius: 20,
     padding: 20,
