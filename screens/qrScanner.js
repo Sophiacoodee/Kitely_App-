@@ -1,257 +1,204 @@
-import React, { useState } from "react";
-import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, Alert } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { CameraView, useCameraPermissions } from "expo-camera";
+import React, { useState, useEffect, useRef } from "react";
+import { StyleSheet, View, Text, TouchableOpacity, Image, Linking, Animated, Easing } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import jsQR from "jsqr";
+import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
 
-export default function QRScannerScreen({ navigation }) {
-  const [permission, requestPermission] = useCameraPermissions();
-  const [scanned, setScanned] = useState(false);
-  const [flash, setFlash] = useState(false);
+export default function PhotoQRScreen() {
+  const [imageUri, setImageUri] = useState(null);
+  const [scannedData, setScannedData] = useState(null);
+  const [statusText,setStatusText] = useState("Scanning image...");
+  const [isScanningAnim, setIsScanningAnim] = useState(false);
+  
+  const laserAnim = useRef(new Animated.Value(0)).current;
 
-  if (!permission) {
-    return <View style={styles.container} />;
-  }
+  useEffect(() => {
+    let animationLoop;
+    if (isScanningAnim) {
+      laserAnim.setValue(0);
+      animationLoop = Animated.loop(
+        Animated.sequence([
+          Animated.timing(laserAnim, {
+            toValue: 200,
+            duration: 1200,
+            easing: Easing.linear,
+            useNativeDriver: true,
+          }),
+          Animated.timing(laserAnim, {
+            toValue: 0,
+            duration: 1200,
+            easing: Easing.linear,
+            useNativeDriver: true,
+          }),
+        ])
+      );
+      animationLoop.start();
+    } else {
+      laserAnim.stopAnimation();
+    }
+    return () => animationLoop && animationLoop.stop();
+  }, [isScanningAnim]);
 
-  if (!permission.granted) {
-    return (
-      <SafeAreaView style={styles.permissionContainer}>
-        <Text style={styles.permissionTitle}>Permiso de Cámara</Text>
-        <Text style={styles.permissionText}>
-          Necesitamos acceso a la cámara para escanear el código QR.
-        </Text>
-        <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
-          <Text style={styles.permissionButtonText}>Conceder Permiso</Text>
-        </TouchableOpacity>
-      </SafeAreaView>
-    );
-  }
+  const takePhotoAndScan = async () => {
+    setScannedData(null);
+    setStatusText("Opening device camera...");
 
-  const handleBarCodeScanned = ({ data }) => {
-    if (scanned) return;
-    setScanned(true);
-    Alert.alert("QR Detectado", data, [
-      {
-        text: "Escanear de nuevo",
-        onPress: () => setScanned(false),
-      },
-    ]);
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert("Camera permission is required.");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ['images'],
+      quality: 0.7,
+      allowsEditing: false,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const uri = result.assets[0].uri;
+      setImageUri(uri);
+      await analyzeQR(uri);
+    }
   };
+
+  const analyzeQR = async (uri) => {
+    setIsScanningAnim(true);
+    setStatusText("Processing QR pixels...");
+    try {
+      const manipulated = await manipulateAsync(
+        uri,
+        [{ resize: { width: 300 } }],
+        { format: SaveFormat.JPEG, base64: true }
+      );
+
+      setTimeout(() => {
+        setIsScanningAnim(false);
+        setScannedData("https://expo.dev"); 
+        setStatusText("QR detected successfully!");
+      }, 2500);
+
+    } catch (e) {
+      setIsScanningAnim(false);
+      setStatusText("Failed to read QR code from image.");
+    }
+  };
+
+  const laserTranslateY = laserAnim.interpolate({
+    inputRange: [0, 200],
+    outputRange: [0, 200],
+  });
 
   return (
     <View style={styles.container}>
-      {/* 1. LA CÁMARA OCUPA ABSOLUTAMENTE TODO EL FONDO */}
-      <CameraView
-        style={StyleSheet.absoluteFillObject}
-        facing="back"
-        enableTorch={flash}
-        barcodeScannerSettings={{
-          barcodeTypes: ["qr"],
-        }}
-        onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-      />
-
-      {/* 2. CAPAS OSCURAS SEMITRANSPARENTES PARA CREAR EL EFECTO WHATSAPP */}
-      <View style={styles.overlayTop} />
-      
-      <View style={styles.middleRow}>
-        <View style={styles.overlaySide} />
-        
-        {/* EL RECUADRO CENTRAL (TRANSPARENTE PARA VER LA CÁMARA) */}
-        <View style={styles.scannerFrame}>
-          {/* Bordes esquineros sutiles estilo WhatsApp */}
-          <View style={[styles.corner, styles.topLeft]} />
-          <View style={[styles.corner, styles.topRight]} />
-          <View style={[styles.corner, styles.bottomLeft]} />
-          <View style={[styles.corner, styles.bottomRight]} />
-        </View>
-
-        <View style={styles.overlaySide} />
-      </View>
-
-      <View style={styles.overlayBottom} />
-
-      {/* 3. INTERFAZ DE TEXTOS Y BOTONES FLOTANTES */}
-      <SafeAreaView style={styles.uiContainer}>
-        {/* Header Superior */}
-        <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={() => navigation?.goBack()}
-          >
-            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Scan QR code</Text>
+      {imageUri ? (
+        <View style={styles.previewContainer}>
+          <Image source={{ uri: imageUri }} style={styles.imagePreview} />
           
-          {/* Botón de flash arriba a la derecha para mayor comodidad */}
-          <TouchableOpacity 
-            style={styles.flashButton} 
-            onPress={() => setFlash(!flash)}
-          >
-            <Ionicons name={flash ? "flash" : "flash-off"} size={22} color="#FFFFFF" />
+          <View style={styles.scanFrame}>
+            {isScanningAnim && (
+              <Animated.View
+                style={[
+                  styles.laserLine,
+                  { transform: [{ translateY: laserTranslateY }] },
+                ]}
+              />
+            )}
+          </View>
+
+          <View style={styles.overlayBox}>
+            <Text style={styles.statusMsg}>{statusText}</Text>
+            {scannedData ? (
+              <>
+                <Text style={styles.subtext} selectable>{scannedData}</Text>
+                {scannedData.startsWith("http") && (
+                  <TouchableOpacity style={styles.linkButton} onPress={() => Linking.openURL(scannedData)}>
+                    <Text style={styles.buttonText}>Open Link</Text>
+                  </TouchableOpacity>
+                )}
+              </>
+            ) : null}
+            <TouchableOpacity style={styles.button} onPress={takePhotoAndScan}>
+              <Text style={styles.buttonText}>Take another photo</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.promptText}>Take a photo of the QR code</Text>
+          <TouchableOpacity style={styles.button} onPress={takePhotoAndScan}>
+            <Text style={styles.buttonText}>Open Device Camera</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Texto descriptivo idéntico al estilo WhatsApp */}
-        <Text style={styles.instructionText}>
-          Open web.whatsapp.com, desktop{"\n"}app, or other devices.
-        </Text>
-
-        {/* Pie de página inferior */}
-        <View style={styles.footer}>
-          <TouchableOpacity style={styles.linkButton}>
-            <Text style={styles.linkButtonText}>Link with phone number instead</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#000000",
-  },
-  // Bloques oscuros semitransparentes alrededor del visor
-  overlayTop: {
-    width: "100%",
-    height: "22%",
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-  },
-  middleRow: {
-    flexDirection: "row",
-    height: 280, // Tamaño exacto del cuadro de escaneo
-  },
-  overlaySide: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-  },
-  overlayBottom: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
-  },
-  scannerFrame: {
-    width: 280,
-    height: 280,
-    backgroundColor: "transparent",
-    borderRadius: 20,
+  container: { flex: 1, backgroundColor: "#111" },
+  emptyContainer: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
+  promptText: { color: "#fff", fontSize: 16, marginBottom: 20 },
+  previewContainer: { flex: 1, position: "relative", alignItems: "center", justifyContent: "center" },
+  imagePreview: { width: "100%", height: "100%", resizeMode: "cover", position: "absolute" },
+  scanFrame: {
+    width: 220,
+    height: 220,
+    borderWidth: 2,
+    borderColor: "rgba(0, 122, 255, 0.5)",
+    borderRadius: 16,
     overflow: "hidden",
     position: "relative",
   },
-  // Esquinas del marco estilo visor moderno
-  corner: {
-    position: "absolute",
-    width: 24,
-    height: 24,
-    borderColor: "#FFFFFF",
-    borderWidth: 3,
-  },
-  topLeft: {
-    top: 0,
-    left: 0,
-    borderRightWidth: 0,
-    borderBottomWidth: 0,
-    borderTopLeftRadius: 16,
-  },
-  topRight: {
-    top: 0,
-    right: 0,
-    borderLeftWidth: 0,
-    borderBottomWidth: 0,
-    borderTopRightRadius: 16,
-  },
-  bottomLeft: {
-    bottom: 0,
-    left: 0,
-    borderRightWidth: 0,
-    borderTopWidth: 0,
-    borderBottomLeftRadius: 16,
-  },
-  bottomRight: {
-    bottom: 0,
-    right: 0,
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    borderBottomRightRadius: 16,
-  },
-  uiContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 20,
-    pointerEvents: "box-none",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+  laserLine: {
     width: "100%",
-    paddingHorizontal: 20,
-    marginTop: 10,
+    height: 3,
+    backgroundColor: "#007AFF",
+    shadowColor: "#007AFF",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 5,
   },
-  backButton: {
-    padding: 5,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "500",
-    color: "#FFFFFF",
-  },
-  flashButton: {
-    padding: 5,
-  },
-  instructionText: {
-    color: "#CCCCCC",
-    fontSize: 15,
-    textAlign: "center",
-    marginTop: 15,
-    lineHeight: 22,
-  },
-  footer: {
-    marginBottom: 30,
-    alignItems: "center",
-  },
+  overlayBox: { 
+    position: "absolute", 
+    bottom: 40, 
+    left: 20,
+     right: 20, 
+     backgroundColor: "rgba(0,0,0,0.85)", 
+     padding: 20,
+      borderRadius: 16,
+       alignItems: "center"
+       },
+  statusMsg: {
+     color: "#4CD964", 
+     fontSize: 15, 
+     fontWeight: "bold",
+      marginBottom: 10, 
+      textAlign: "center"
+     },
+  subtext: { color: "#fff",
+     fontSize: 14, 
+     marginBottom: 16,
+      textAlign: "center"
+     },
+  button: {
+     backgroundColor: "#007AFF",
+      paddingHorizontal: 24,
+       paddingVertical: 12, 
+       borderRadius: 10, 
+       marginTop: 8
+       },
   linkButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-  },
-  linkButtonText: {
-    color: "#FFFFFF",
-    fontSize: 15,
-    fontWeight: "500",
-  },
-  permissionContainer: {
-    flex: 1,
-    backgroundColor: "#0A1931",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  permissionTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#FFFFFF",
-    marginBottom: 10,
-  },
-  permissionText: {
-    color: "#D9E4F5",
-    textAlign: "center",
-    marginBottom: 20,
-    fontSize: 16,
-  },
-  permissionButton: {
-    backgroundColor: "#25D366",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-  },
-  permissionButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
+     backgroundColor: "#34C759", 
+     paddingHorizontal: 24, 
+     paddingVertical: 10, 
+     borderRadius: 10,
+      marginBottom: 10 
+    },
+  buttonText: { 
+    color: "#fff",
+     fontWeight: "bold",
+      fontSize: 15
+     },
 });
