@@ -1,45 +1,25 @@
-<<<<<<< HEAD
-import React, { useState, useEffect, useRef } from 'react';
-=======
-import React, { useState, useCallback } from 'react';
->>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-<<<<<<< HEAD
-  Dimensions,
-  FlatList,
-  ActivityIndicator,
-  Modal,
-  SafeAreaView
-} from 'react-native';
-import { WebView } from 'react-native-webview';
-=======
   FlatList,
   Image,
   useWindowDimensions,
   Platform,
+  Modal,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
->>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
+import { WebView } from 'react-native-webview';
 import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth, db } from '../firebase/config';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
 
-<<<<<<< HEAD
-import { db } from '../firebase/config';
-import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
-
-const { width } = Dimensions.get('window');
-
-=======
->>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
 const RECENT_SPENDING = [
   {
     id: '1',
@@ -83,21 +63,23 @@ const RECENT_SPENDING = [
   },
 ];
 
-<<<<<<< HEAD
 export default function InicioReceptor({ route, navigation }) {
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  const [profileImage, setProfileImage] = useState(null);
+  const [fullName, setFullName] = useState('');
+  
   const webViewRef = useRef(null);
   const modalWebViewRef = useRef(null);
   const [loadingMap, setLoadingMap] = useState(true);
   const [isMapModalVisible, setIsMapModalVisible] = useState(false);
 
   const [coords, setCoords] = useState({
-=======
-export default function InicioReceptor({ navigation }) {
-  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
-  const [profileImage, setProfileImage] = useState(null);
-  const [fullName, setFullName] = useState('');
+    latitude: 13.69294,
+    longitude: -89.21819,
+    title: 'Super Selectos',
+    description: 'Branch',
+  });
 
-  // Cálculo de escala responsiva básica dinámicamente según la pantalla
   const actionButtonWidth = (windowWidth - 40 - 24) / 3;
 
   useFocusEffect(
@@ -131,17 +113,9 @@ export default function InicioReceptor({ navigation }) {
         }
       }
     } catch (error) {
-      console.error('Error al cargar datos del usuario:', error);
+      console.error('Error loading user data:', error);
     }
   };
-
-  const initialRegion = {
->>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
-    latitude: 13.69294,
-    longitude: -89.21819,
-    title: 'Super Selectos',
-    description: 'Sucursal'
-  });
 
   const mapHtml = `
     <!DOCTYPE html>
@@ -171,17 +145,17 @@ export default function InicioReceptor({ navigation }) {
   `;
 
   useEffect(() => {
-    if (route.params?.selectedLocation) {
+    if (route?.params?.selectedLocation) {
       const { latitude, longitude, branchName, branchId } = route.params.selectedLocation;
       setCoords({
         latitude: Number(latitude),
         longitude: Number(longitude),
-        title: branchName || 'Sucursal Seleccionada',
-        description: branchId || 'Ubicación activa'
+        title: branchName || 'Selected Branch',
+        description: branchId || 'Active location',
       });
       setLoadingMap(false);
     }
-  }, [route.params?.selectedLocation]);
+  }, [route?.params?.selectedLocation]);
 
   useEffect(() => {
     const locationsRef = collection(db, 'branches_locations');
@@ -190,32 +164,27 @@ export default function InicioReceptor({ navigation }) {
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        if (!snapshot.empty && !route.params?.selectedLocation) {
+        if (!snapshot.empty && !route?.params?.selectedLocation) {
           const docData = snapshot.docs[0].data();
           setCoords({
             latitude: Number(docData.latitude),
             longitude: Number(docData.longitude),
             title: docData.branchName || 'Super Selectos',
-            description: docData.branchId || 'Sucursal'
+            description: docData.branchId || 'Branch',
           });
         }
         setLoadingMap(false);
       },
       (error) => {
-        console.error('Error al escuchar Firebase:', error);
+        console.error('Error listening to Firebase:', error);
         setLoadingMap(false);
       }
     );
 
     return () => unsubscribe();
-  }, [route.params?.selectedLocation]);
+  }, [route?.params?.selectedLocation]);
 
   return (
-<<<<<<< HEAD
-    <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-
-=======
     <SafeAreaView style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -224,7 +193,6 @@ export default function InicioReceptor({ navigation }) {
           { minHeight: windowHeight },
         ]}
       >
->>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
@@ -287,9 +255,8 @@ export default function InicioReceptor({ navigation }) {
           </TouchableOpacity>
         </View>
 
-<<<<<<< HEAD
-        {/* Map Container con Botón de Expansión */}
-        <View style={styles.mapCard}>
+        {/* Map Container */}
+        <View style={[styles.mapCard, { height: Math.max(160, windowHeight * 0.22) }]}>
           {loadingMap ? (
             <View style={styles.mapLoader}>
               <ActivityIndicator size="small" color="#021024" />
@@ -310,23 +277,9 @@ export default function InicioReceptor({ navigation }) {
               </TouchableOpacity>
             </>
           )}
-=======
-        {/* Mapa */}
-        <View style={[styles.mapCard, { height: Math.max(140, windowHeight * 0.2) }]}>
-          <MapView
-            provider={PROVIDER_GOOGLE}
-            style={styles.map}
-            initialRegion={initialRegion}
-          >
-            <Marker
-              coordinate={{ latitude: 13.69294, longitude: -89.21819 }}
-              title="San Salvador"
-            />
-          </MapView>
->>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
         </View>
 
-        {/* Modal de Mapa Fullscreen */}
+        {/* Fullscreen Map Modal */}
         <Modal
           visible={isMapModalVisible}
           animationType="slide"
@@ -340,7 +293,7 @@ export default function InicioReceptor({ navigation }) {
               >
                 <Ionicons name="close" size={24} color="#021024" />
               </TouchableOpacity>
-              <Text style={styles.modalTitle}>Ubicación de Sucursal</Text>
+              <Text style={styles.modalTitle}>Branch Location</Text>
               <View style={{ width: 36 }} />
             </View>
 
@@ -353,7 +306,7 @@ export default function InicioReceptor({ navigation }) {
           </SafeAreaView>
         </Modal>
 
-        {/* Resumen por Categorías */}
+        {/* Spending by Category */}
         <View style={styles.card}>
           <Text style={styles.cardHeader}>Spending by Category</Text>
           <View style={styles.chartRow}>
@@ -387,7 +340,7 @@ export default function InicioReceptor({ navigation }) {
           </View>
         </View>
 
-        {/* Gastos Recientes */}
+        {/* Recent Spending */}
         <Text style={styles.sectionTitle}>Recent Spending</Text>
         <FlatList
           data={RECENT_SPENDING}
@@ -427,10 +380,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 20,
-<<<<<<< HEAD
-=======
     marginTop: 10,
->>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
   },
   headerTextContainer: {
     flex: 1,
@@ -488,29 +438,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   mapCard: {
-<<<<<<< HEAD
-    height: 180,
+    width: '100%',
     borderRadius: 24,
     overflow: 'hidden',
     marginBottom: 18,
     backgroundColor: '#E2E8F0',
     position: 'relative',
-  },
-  mapLoader: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-=======
-    width: '100%',
-    borderRadius: 24,
-    overflow: 'hidden',
-    marginBottom: 18,
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 4,
->>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
+  },
+  mapLoader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   map: {
     width: '100%',
@@ -683,8 +626,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#021024',
   },
-<<<<<<< HEAD
 });
-=======
-});
->>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
