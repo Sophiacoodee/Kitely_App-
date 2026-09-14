@@ -21,7 +21,6 @@ const CATEGORIES_DATA = [
   { id: 'construction', name: 'Construction', icon: 'construct-sharp' },
 ];
 
-// Límite máximo de dinero permitido
 const MAX_AMOUNT = 3000;
 
 export default function CategoriesScreen({ navigation }) {
@@ -36,18 +35,14 @@ export default function CategoriesScreen({ navigation }) {
     }
   };
 
-  // Manejador del texto para prevenir letras, signos negativos o múltiples puntos
   const handleAmountChange = (text) => {
-    // Reemplaza comas por puntos y elimina cualquier caracter que no sea número o punto decimal
     let cleanedText = text.replace(',', '.').replace(/[^0-9.]/g, '');
 
-    // Evita ingresar múltiples puntos decimales
     const parts = cleanedText.split('.');
     if (parts.length > 2) {
       cleanedText = `${parts[0]}.${parts.slice(1).join('')}`;
     }
 
-    // Limita la cantidad a 2 decimales
     if (parts[1] && parts[1].length > 2) {
       cleanedText = `${parts[0]}.${parts[1].slice(0, 2)}`;
     }
@@ -56,13 +51,11 @@ export default function CategoriesScreen({ navigation }) {
   };
 
   const handleContinue = () => {
-    // 1. Validar categorías seleccionadas
     if (selectedCategories.length === 0) {
       Alert.alert('Attention', 'Please select at least one category.');
       return;
     }
 
-    // 2. Validar campo vacío o solo espacios
     if (!amount || amount.trim() === '') {
       Alert.alert('Attention', 'Please enter an amount.');
       return;
@@ -70,13 +63,11 @@ export default function CategoriesScreen({ navigation }) {
 
     const numericAmount = parseFloat(amount);
 
-    // 3. Validar si es un número válido y mayor a 0
     if (isNaN(numericAmount) || numericAmount <= 0) {
       Alert.alert('Attention', 'Please enter a valid amount greater than $0.00.');
       return;
     }
 
-    // 4. Validar límite máximo de dinero
     if (numericAmount > MAX_AMOUNT) {
       Alert.alert(
         'Limit Exceeded',
@@ -85,7 +76,8 @@ export default function CategoriesScreen({ navigation }) {
       return;
     }
 
-    navigation.navigate('TransmitterHome', {
+    // Navega a la pantalla Transaction enviando los datos reales
+    navigation.navigate('Transaction', {
       selectedCategories,
       amount: numericAmount.toFixed(2),
     });
@@ -94,12 +86,10 @@ export default function CategoriesScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.mainWrapper}>
-        {/* Sección Deslizable (Categorías) */}
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          {/* Header */}
           <View style={styles.header}>
             <View>
               <Text style={styles.headerTitle}>Categories</Text>
@@ -109,7 +99,6 @@ export default function CategoriesScreen({ navigation }) {
             </View>
           </View>
 
-          {/* Grilla de Selección de Categorías */}
           <View style={styles.gridContainer}>
             {CATEGORIES_DATA.map((item) => {
               const isSelected = selectedCategories.includes(item.id);
@@ -140,7 +129,7 @@ export default function CategoriesScreen({ navigation }) {
             })}
           </View>
         </ScrollView>
-        
+
         <View style={styles.overlayAmountSection}>
           <Text style={styles.amountLabel}>Amount</Text>
           <Text style={styles.amountSublabel}>
@@ -161,7 +150,6 @@ export default function CategoriesScreen({ navigation }) {
             <Text style={styles.currencyCode}>USD</Text>
           </View>
 
-          {/* Botón Continuar */}
           <TouchableOpacity
             style={styles.continueButton}
             onPress={handleContinue}
@@ -207,7 +195,7 @@ const styles = StyleSheet.create({
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justify: 'space-between',
   },
   categoryCard: {
     width: '48%',
@@ -232,7 +220,7 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: 11,
-    justifyContent: 'center',
+    justify: 'center',
     alignItems: 'center',
   },
   categoryName: {

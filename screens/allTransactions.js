@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -13,69 +13,46 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import dayjs from "dayjs";
+import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { db } from "./firebaseConfig"; // Ajusta la ruta a tu firebaseConfig si está en otra carpeta
 
 function getIconoPorCategoria(categoria) {
-  switch (categoria) {
-    case "Groceries":
-      return "cart-outline";
-    case "Medicine":
-      return "medkit-outline";
-    case "Construction":
-      return "hammer-outline";
-    default:
-      return "pricetag-outline";
-  }
+  if (!categoria) return "pricetag-outline";
+  const catLower = categoria.toLowerCase();
+  if (catLower.includes("groceries")) return "cart-outline";
+  if (catLower.includes("health") || catLower.includes("medicine")) return "medkit-outline";
+  if (catLower.includes("construction")) return "hammer-outline";
+  if (catLower.includes("clothing")) return "shirt-outline";
+  if (catLower.includes("house")) return "home-outline";
+  if (catLower.includes("education")) return "school-outline";
+  return "pricetag-outline";
 }
 
-const INITIAL_TRANSACTIONS = [
-  {
-    id: "1",
-    name: "Walmart",
-    category: "Groceries",
-    location: "San Salvador",
-    time: "10:24 am",
-    amount: "$25.00",
-    date: "2026-05-22",
-  },
-  {
-    id: "2",
-    name: "Farmacia Don Bosco",
-    category: "Medicine",
-    location: "San Salvador",
-    time: "10:45 am",
-    amount: "$25.00",
-    date: "2026-05-22",
-  },
-  {
-    id: "3",
-    name: "Maxi Despensa",
-    category: "Groceries",
-    location: "San Salvador",
-    time: "4:30 pm",
-    amount: "$25.00",
-    date: "2026-05-22",
-  },
-  {
-    id: "4",
-    name: "Vidrí",
-    category: "Construction",
-    location: "San Salvador",
-    time: "2:15 pm",
-    amount: "$25.00",
-    date: "2026-05-22",
-  },
-];
-
-const CATEGORIES = ["All", "Groceries", "Medicine", "Construction"];
+const CATEGORIES = ["All", "Groceries", "Health", "Clothing", "House", "Education", "Construction"];
 
 export default function AllTransactions({ navigation }) {
   const { width } = useWindowDimensions();
   const isTablet = width >= 600;
 
-  const [selectedDate, setSelectedDate] = useState(new Date("2026-05-22"));
+  const [transactions, setTransactions] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [showFilterModal, setShowFilterModal] = useState(false);
+
+  // Escuchar la base de datos de Firebase en tiempo real
+  useEffect(() => {
+    const q = query(collection(db, "transactions"), orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const docs = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setTransactions(docs);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleDateChange = (event, date) => {
     setShowDatePicker(Platform.OS === "ios");
@@ -84,11 +61,14 @@ export default function AllTransactions({ navigation }) {
     }
   };
 
-  const filteredTransactions = INITIAL_TRANSACTIONS.filter((item) => {
+  const filteredTransactions = transactions.filter((item) => {
     const matchesCategory =
-      selectedCategory === "All" || item.category === selectedCategory;
+      selectedCategory === "All" ||
+      (item.category && item.category.toLowerCase().includes(selectedCategory.toLowerCase()));
+    
     const matchesDate =
       item.date === dayjs(selectedDate).format("YYYY-MM-DD");
+
     return matchesCategory && matchesDate;
   });
 
@@ -99,9 +79,7 @@ export default function AllTransactions({ navigation }) {
       </View>
 
       <View style={styles.content}>
-        <View
-          style={[styles.mainWrapper, isTablet && styles.mainWrapperTablet]}
-        >
+        <View style={[styles.mainWrapper, isTablet && styles.mainWrapperTablet]}>
           <View style={styles.historyHeader}>
             <Text style={styles.history}>
               History {selectedCategory !== "All" && `(${selectedCategory})`}
@@ -146,9 +124,9 @@ export default function AllTransactions({ navigation }) {
                   </View>
 
                   <View style={styles.info}>
-                    <Text style={styles.name}>{transaction.name}</Text>
+                    <Text style={styles.name}>{transaction.name || "Walmart"}</Text>
                     <Text style={styles.details}>
-                      {transaction.category} - {transaction.location}
+                      {transaction.category} - {transaction.location || "San Salvador"}
                     </Text>
                     <Text style={styles.time}>{transaction.time}</Text>
                   </View>

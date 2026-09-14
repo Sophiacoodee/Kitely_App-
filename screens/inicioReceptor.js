@@ -1,45 +1,36 @@
-<<<<<<< HEAD
-import React, { useState, useEffect, useRef } from 'react';
-=======
-import React, { useState, useCallback } from 'react';
->>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-<<<<<<< HEAD
   Dimensions,
   FlatList,
   ActivityIndicator,
   Modal,
-  SafeAreaView
-} from 'react-native';
-import { WebView } from 'react-native-webview';
-=======
-  FlatList,
   Image,
   useWindowDimensions,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
->>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
+import { WebView } from 'react-native-webview';
 import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth, db } from '../firebase/config';
-import { doc, getDoc } from 'firebase/firestore';
-
-<<<<<<< HEAD
-import { db } from '../firebase/config';
-import { collection, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  collection,
+  onSnapshot,
+  query,
+  orderBy,
+  limit,
+} from 'firebase/firestore';
 
 const { width } = Dimensions.get('window');
 
-=======
->>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
 const RECENT_SPENDING = [
   {
     id: '1',
@@ -83,21 +74,21 @@ const RECENT_SPENDING = [
   },
 ];
 
-<<<<<<< HEAD
 export default function InicioReceptor({ route, navigation }) {
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const webViewRef = useRef(null);
   const modalWebViewRef = useRef(null);
   const [loadingMap, setLoadingMap] = useState(true);
   const [isMapModalVisible, setIsMapModalVisible] = useState(false);
-
-  const [coords, setCoords] = useState({
-=======
-export default function InicioReceptor({ navigation }) {
-  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const [profileImage, setProfileImage] = useState(null);
   const [fullName, setFullName] = useState('');
+  const [coords, setCoords] = useState({
+    latitude: 13.69294,
+    longitude: -89.21819,
+    title: 'Super Selectos',
+    description: 'Sucursal',
+  });
 
-  // Cálculo de escala responsiva básica dinámicamente según la pantalla
   const actionButtonWidth = (windowWidth - 40 - 24) / 3;
 
   useFocusEffect(
@@ -136,12 +127,11 @@ export default function InicioReceptor({ navigation }) {
   };
 
   const initialRegion = {
->>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
     latitude: 13.69294,
     longitude: -89.21819,
     title: 'Super Selectos',
     description: 'Sucursal'
-  });
+  };
 
   const mapHtml = `
     <!DOCTYPE html>
@@ -157,14 +147,16 @@ export default function InicioReceptor({ navigation }) {
       <body>
         <div id="map"></div>
         <script>
-          const map = L.map('map').setView([${coords.latitude}, ${coords.longitude}], 14);
+          const map = L.map('map').setView([${coords?.latitude ?? initialRegion.latitude}, ${coords?.longitude ?? initialRegion.longitude}], 14);
           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '© OpenStreetMap'
           }).addTo(map);
 
-          const marker = L.marker([${coords.latitude}, ${coords.longitude}]).addTo(map);
-          marker.bindPopup("<b>${coords.title}</b><br>${coords.description}").openPopup();
+          const marker = L.marker([${coords?.latitude ?? initialRegion.latitude}, ${coords?.longitude ?? initialRegion.longitude}]).addTo(map);
+          const popupTitle = ${JSON.stringify((coords?.title ?? initialRegion.title) || 'Super Selectos')};
+          const popupDescription = ${JSON.stringify((coords?.description ?? initialRegion.description) || 'Sucursal')};
+          marker.bindPopup('<b>' + popupTitle + '</b><br>' + popupDescription).openPopup();
         </script>
       </body>
     </html>
@@ -211,11 +203,6 @@ export default function InicioReceptor({ navigation }) {
   }, [route.params?.selectedLocation]);
 
   return (
-<<<<<<< HEAD
-    <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-
-=======
     <SafeAreaView style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -224,7 +211,6 @@ export default function InicioReceptor({ navigation }) {
           { minHeight: windowHeight },
         ]}
       >
->>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
@@ -287,7 +273,6 @@ export default function InicioReceptor({ navigation }) {
           </TouchableOpacity>
         </View>
 
-<<<<<<< HEAD
         {/* Map Container con Botón de Expansión */}
         <View style={styles.mapCard}>
           {loadingMap ? (
@@ -310,20 +295,6 @@ export default function InicioReceptor({ navigation }) {
               </TouchableOpacity>
             </>
           )}
-=======
-        {/* Mapa */}
-        <View style={[styles.mapCard, { height: Math.max(140, windowHeight * 0.2) }]}>
-          <MapView
-            provider={PROVIDER_GOOGLE}
-            style={styles.map}
-            initialRegion={initialRegion}
-          >
-            <Marker
-              coordinate={{ latitude: 13.69294, longitude: -89.21819 }}
-              title="San Salvador"
-            />
-          </MapView>
->>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
         </View>
 
         {/* Modal de Mapa Fullscreen */}
@@ -427,10 +398,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 20,
-<<<<<<< HEAD
-=======
     marginTop: 10,
->>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
   },
   headerTextContainer: {
     flex: 1,
@@ -488,29 +456,23 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   mapCard: {
-<<<<<<< HEAD
     height: 180,
     borderRadius: 24,
     overflow: 'hidden',
     marginBottom: 18,
     backgroundColor: '#E2E8F0',
     position: 'relative',
-  },
-  mapLoader: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-=======
-    width: '100%',
-    borderRadius: 24,
-    overflow: 'hidden',
-    marginBottom: 18,
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 4,
->>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85
+  },
+  mapLoader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
   },
   map: {
     width: '100%',
@@ -683,8 +645,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#021024',
   },
-<<<<<<< HEAD
 });
-=======
-});
->>>>>>> e0bfca9f79fa11e12f863ed3b72262db03677e85

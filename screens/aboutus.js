@@ -9,6 +9,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 
+
 export default function AboutUsScreen() {
   const { width } = useWindowDimensions();
   const isTablet = width >= 600;
@@ -27,8 +28,8 @@ export default function AboutUsScreen() {
               source={require('../assets/kitelyBR.png')}
               style={[styles.logoImage, isTablet && styles.logoImageTablet]}
               resizeMode="contain"
-            />
-          </View>
+            /> 
+          </View>  
 
           <Text style={styles.headerTitle}>About us</Text>
 

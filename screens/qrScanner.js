@@ -6,7 +6,6 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 export default function QRScannerScreen({ navigation }) {
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
-  const [result, setResult] = useState("");
   const [flash, setFlash] = useState(false);
 
   if (!permission) {
@@ -15,187 +14,244 @@ export default function QRScannerScreen({ navigation }) {
 
   if (!permission.granted) {
     return (
-      <SafeAreaView style={[styles.container, { justifyContent: "center" }]}>
-        <Text style={styles.title}>Permission required</Text>
-        <Text style={[styles.subtitle, { textAlign: "center", marginBottom: 20 }]}>
-          We need access to the camera to scan the QR code.
+      <SafeAreaView style={styles.permissionContainer}>
+        <Text style={styles.permissionTitle}>Permiso de Cámara</Text>
+        <Text style={styles.permissionText}>
+          Necesitamos acceso a la cámara para escanear el código QR.
         </Text>
-        <TouchableOpacity style={styles.iconButton} onPress={requestPermission}>
-          <Ionicons name="camera-outline" size={28} color="#FFFFFF" />
+        <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
+          <Text style={styles.permissionButtonText}>Conceder Permiso</Text>
         </TouchableOpacity>
       </SafeAreaView>
     );
   }
 
-  const handleBarCodeScanned = ({ type, data }) => {
+  const handleBarCodeScanned = ({ data }) => {
+    if (scanned) return;
     setScanned(true);
-    setResult(data);
-
-    console.log("Tipo: ", type);
-    console.log("Codigo QR: ", data);
-
-    Alert.alert("QR Code Scanned", `Result: ${data}`, [
+    Alert.alert("QR Detectado", data, [
       {
-        text: "Escanear nuevamente",
-        onPress: () => {
-          setScanned(false);
-          setResult("");
-        },
+        text: "Escanear de nuevo",
+        onPress: () => setScanned(false),
       },
     ]);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+      {/* 1. LA CÁMARA OCUPA ABSOLUTAMENTE TODO EL FONDO */}
+      <CameraView
+        style={StyleSheet.absoluteFillObject}
+        facing="back"
+        enableTorch={flash}
+        barcodeScannerSettings={{
+          barcodeTypes: ["qr"],
+        }}
+        onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+      />
 
-      <View style={styles.headerContainer}>
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={() => navigation && navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-
-        <Text style={styles.title}>Scan Your QR code</Text>
-        <Text style={styles.subtitle}>Center the QR code inside the frame</Text>
-      </View>
-
-      <View style={styles.scannerFrame}>
-        <View style={styles.qrContainer}>
-          <CameraView
-            style={StyleSheet.absoluteFillObject}
-            enableTorch={flash}
-            barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
-            onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-          />
-
-          <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-            <View style={[styles.corner, styles.topLeft]} />
-            <View style={[styles.corner, styles.topRight]} />
-            <View style={[styles.corner, styles.bottomLeft]} />
-            <View style={[styles.corner, styles.bottomRight]} />
-          </View>
+      {/* 2. CAPAS OSCURAS SEMITRANSPARENTES PARA CREAR EL EFECTO WHATSAPP */}
+      <View style={styles.overlayTop} />
+      
+      <View style={styles.middleRow}>
+        <View style={styles.overlaySide} />
+        
+        {/* EL RECUADRO CENTRAL (TRANSPARENTE PARA VER LA CÁMARA) */}
+        <View style={styles.scannerFrame}>
+          {/* Bordes esquineros sutiles estilo WhatsApp */}
+          <View style={[styles.corner, styles.topLeft]} />
+          <View style={[styles.corner, styles.topRight]} />
+          <View style={[styles.corner, styles.bottomLeft]} />
+          <View style={[styles.corner, styles.bottomRight]} />
         </View>
+
+        <View style={styles.overlaySide} />
       </View>
 
-      <View style={styles.footerContainer}>
-        <TouchableOpacity 
-          style={styles.iconButton} 
-          onPress={() => setFlash(!flash)}
-        >
-          <Ionicons 
-            name={flash ? "flash" : "flash-off"} 
-            size={28} 
-            color="#FFFFFF" 
-          />
-        </TouchableOpacity>
+      <View style={styles.overlayBottom} />
 
-        <TouchableOpacity 
-          style={styles.iconButton} 
-          onPress={() => {
-            setScanned(false);
-            setResult("");
-          }}
-        >
-          <Ionicons name="camera-outline" size={32} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+      {/* 3. INTERFAZ DE TEXTOS Y BOTONES FLOTANTES */}
+      <SafeAreaView style={styles.uiContainer}>
+        {/* Header Superior */}
+        <View style={styles.header}>
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={() => navigation?.goBack()}
+          >
+            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Scan QR code</Text>
+          
+          {/* Botón de flash arriba a la derecha para mayor comodidad */}
+          <TouchableOpacity 
+            style={styles.flashButton} 
+            onPress={() => setFlash(!flash)}
+          >
+            <Ionicons name={flash ? "flash" : "flash-off"} size={22} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Texto descriptivo idéntico al estilo WhatsApp */}
+        <Text style={styles.instructionText}>
+          Open web.whatsapp.com, desktop{"\n"}app, or other devices.
+        </Text>
+
+        {/* Pie de página inferior */}
+        <View style={styles.footer}>
+          <TouchableOpacity style={styles.linkButton}>
+            <Text style={styles.linkButtonText}>Link with phone number instead</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0A1931",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 40,
+    backgroundColor: "#000000",
   },
-  headerContainer: {
-    alignItems: "center",
-    padding: 20,
+  // Bloques oscuros semitransparentes alrededor del visor
+  overlayTop: {
     width: "100%",
+    height: "22%",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
   },
-  backButton: {
-    position: "absolute",
-    left: 20,
-    top: 20,
+  middleRow: {
+    flexDirection: "row",
+    height: 280, // Tamaño exacto del cuadro de escaneo
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#FFFFFF",
-    marginBottom: 8,
+  overlaySide: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
   },
-  subtitle: {
-    marginTop: 8,
-    fontSize: 16,
-    color: "#D9E4F5",
+  overlayBottom: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
   },
   scannerFrame: {
     width: 280,
     height: 280,
-    borderRadius: 28,
-    backgroundColor: "rgba(255,255,255,0.04)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  qrContainer: {
-    width: 220,
-    height: 220,
-    borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.25)",
-    borderRadius: 22,
-    alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
+    backgroundColor: "transparent",
+    borderRadius: 20,
     overflow: "hidden",
+    position: "relative",
   },
+  // Esquinas del marco estilo visor moderno
   corner: {
     position: "absolute",
-    width: 22,
-    height: 22,
-    borderColor: "#7DD3FC",
-    borderWidth: 4,
+    width: 24,
+    height: 24,
+    borderColor: "#FFFFFF",
+    borderWidth: 3,
   },
   topLeft: {
     top: 0,
     left: 0,
     borderRightWidth: 0,
     borderBottomWidth: 0,
+    borderTopLeftRadius: 16,
   },
   topRight: {
     top: 0,
     right: 0,
     borderLeftWidth: 0,
     borderBottomWidth: 0,
+    borderTopRightRadius: 16,
   },
   bottomLeft: {
     bottom: 0,
     left: 0,
     borderRightWidth: 0,
     borderTopWidth: 0,
+    borderBottomLeftRadius: 16,
   },
   bottomRight: {
     bottom: 0,
     right: 0,
     borderLeftWidth: 0,
     borderTopWidth: 0,
+    borderBottomRightRadius: 16,
   },
-  footerContainer: {
+  uiContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 20,
+    pointerEvents: "box-none",
+  },
+  header: {
     flexDirection: "row",
-    justifyContent: "center",
     alignItems: "center",
-    marginTop: 16,
+    justifyContent: "space-between",
+    width: "100%",
+    paddingHorizontal: 20,
+    marginTop: 10,
   },
-  iconButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: "rgba(255,255,255,0.08)",
+  backButton: {
+    padding: 5,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "500",
+    color: "#FFFFFF",
+  },
+  flashButton: {
+    padding: 5,
+  },
+  instructionText: {
+    color: "#CCCCCC",
+    fontSize: 15,
+    textAlign: "center",
+    marginTop: 15,
+    lineHeight: 22,
+  },
+  footer: {
+    marginBottom: 30,
+    alignItems: "center",
+  },
+  linkButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  linkButtonText: {
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "500",
+  },
+  permissionContainer: {
+    flex: 1,
+    backgroundColor: "#0A1931",
     justifyContent: "center",
     alignItems: "center",
-    marginHorizontal: 20,
+    padding: 20,
+  },
+  permissionTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    marginBottom: 10,
+  },
+  permissionText: {
+    color: "#D9E4F5",
+    textAlign: "center",
+    marginBottom: 20,
+    fontSize: 16,
+  },
+  permissionButton: {
+    backgroundColor: "#25D366",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  permissionButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

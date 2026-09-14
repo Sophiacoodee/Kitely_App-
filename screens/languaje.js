@@ -7,6 +7,10 @@ import {
   SafeAreaView,
   Image,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import i18n from '../i18n';
+
+const LANGUAGE_KEY = '@app_language';
 
 const LANGUAGES = [
   {
@@ -26,12 +30,17 @@ const LANGUAGES = [
 export default function LanguageSelectionScreen({ navigation }) {
   const [selectedLanguage, setSelectedLanguage] = useState('en');
 
-  const handleSelect = () => {
+
+
+
+  const handleSelect = async () => {
+    await i18n.changeLanguage(selectedLanguage);
+    await AsyncStorage.setItem(LANGUAGE_KEY, selectedLanguage);
+
     if (navigation) {
       navigation.goBack();
     }
   };
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>

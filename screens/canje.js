@@ -10,9 +10,11 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function CanjeExitosoScreen({ navigation }) {
+export default function CanjeExitosoScreen({ route, navigation }) {
   const { width } = useWindowDimensions();
   const isTablet = width >= 600;
+
+  const { amount = '25.00', category = 'Groceries', date = 'May 08, 2026' } = route?.params || {};
 
   return (
     <SafeAreaView style={styles.container}>
@@ -45,7 +47,7 @@ export default function CanjeExitosoScreen({ navigation }) {
                 <Ionicons name="pricetag-outline" size={22} color="#1F2937" />
                 <Text style={styles.label}>Amount</Text>
               </View>
-              <Text style={styles.value}>$25.00</Text>
+              <Text style={styles.value}>${amount}</Text>
             </View>
 
             <View style={styles.rowItem}>
@@ -53,7 +55,7 @@ export default function CanjeExitosoScreen({ navigation }) {
                 <Ionicons name="grid-outline" size={22} color="#1F2937" />
                 <Text style={styles.label}>Category</Text>
               </View>
-              <Text style={styles.value}>Groceries</Text>
+              <Text style={styles.value}>{category}</Text>
             </View>
 
             <View style={styles.rowItem}>
@@ -61,7 +63,7 @@ export default function CanjeExitosoScreen({ navigation }) {
                 <Ionicons name="calendar-outline" size={22} color="#1F2937" />
                 <Text style={styles.label}>Date</Text>
               </View>
-              <Text style={styles.value}>May 08, 2026</Text>
+              <Text style={styles.value}>{date}</Text>
             </View>
 
             <TouchableOpacity 
@@ -75,7 +77,7 @@ export default function CanjeExitosoScreen({ navigation }) {
             <TouchableOpacity 
               style={styles.linkButton} 
               activeOpacity={0.6}
-              onPress={() => navigation?.navigate('TransmitterHome')}
+              onPress={() => navigation?.navigate('CategoryTransmitter')}
             >
               <Text style={styles.linkText}>Back to home</Text>
             </TouchableOpacity>

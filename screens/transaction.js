@@ -1,14 +1,56 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "./firebaseConfig"; // Ajusta la ruta a tu firebaseConfig si está en otra carpeta
 
-export default function Transaction({ navigation }) {
+export default function Transaction({ route, navigation }) {
+  const { selectedCategories = ['groceries'], amount = '0.00' } = route.params || {};
+  const [loading, setLoading] = useState(false);
+
+  // Formatear categorías para mostrar en pantalla
+  const displayCategory = selectedCategories.map(
+    (cat) => cat.charAt(0).toUpperCase() + cat.slice(1)
+  ).join(', ');
+
+  const handleConfirmTransaction = async () => {
+    setLoading(true);
+    try {
+      const now = new Date();
+      const dateStr = now.toISOString().split('T')[0];
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).toLowerCase();
+
+      // Guardar en Firestore
+      await addDoc(collection(db, "transactions"), {
+        category: displayCategory || "Groceries",
+        name: "Super Selectos",
+        location: "San Salvador",
+        amount: `$${amount}`,
+        date: dateStr,
+        time: timeStr,
+        createdAt: serverTimestamp(),
+      });
+
+      setLoading(false);
+      // Navegar a Canje tras guardar
+      navigation.navigate("Canje", {
+        amount,
+        category: displayCategory,
+        date: dateStr,
+      });
+    } catch (error) {
+      setLoading(false);
+      console.error("Error al guardar transacción:", error);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -24,7 +66,7 @@ export default function Transaction({ navigation }) {
 
         <View style={styles.inputBox}>
           <Ionicons name="cart-outline" size={20} color="#021533" style={styles.icon} />
-          <Text style={styles.inputText}>Groceries</Text>
+          <Text style={styles.inputText}>{displayCategory}</Text>
           <TouchableOpacity>
             <Ionicons name="close-outline" size={20} color="#9AA5AD" />
           </TouchableOpacity>
@@ -36,7 +78,7 @@ export default function Transaction({ navigation }) {
           <View style={styles.receiverImage}>
             <Ionicons name="person" size={18} color="#FFFFFF" />
           </View>
-          <Text style={styles.inputText}>Name</Text>
+          <Text style={styles.inputText}>Super Selectos</Text>
           <TouchableOpacity>
             <Ionicons name="close-outline" size={20} color="#9AA5AD" />
           </TouchableOpacity>
@@ -45,15 +87,20 @@ export default function Transaction({ navigation }) {
         <Text style={styles.sectionTitle}>Amount (USD)</Text>
 
         <View style={styles.amountBox}>
-          <Text style={styles.amount}>$250</Text>
+          <Text style={styles.amount}>${amount}</Text>
           <Text style={styles.currency}>USD</Text>
         </View>
 
         <TouchableOpacity
           style={styles.continueButton}
-          onPress={() => navigation.navigate("Canje")}
+          onPress={handleConfirmTransaction}
+          disabled={loading}
         >
-          <Text style={styles.continueText}>Continue</Text>
+          {loading ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <Text style={styles.continueText}>Continue</Text>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -65,24 +112,20 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#021B42",
   },
-
   header: {
     alignItems: "center",
     paddingTop: 20,
   },
-
   title: {
     color: "#FFFFFF",
     fontSize: 22,
     fontWeight: "700",
   },
-
   paperPlane: {
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 30,
   },
-
   card: {
     flex: 1,
     backgroundColor: "#0A2E63",
@@ -91,14 +134,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 22,
     paddingTop: 28,
   },
-
   sectionTitle: {
     color: "#FFFFFF",
     fontSize: 15,
     fontWeight: "500",
     marginBottom: 8,
   },
-
   inputBox: {
     height: 55,
     backgroundColor: "#FFFFFF",
@@ -108,18 +149,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     marginBottom: 20,
   },
-
   icon: {
     marginRight: 10,
   },
-
   inputText: {
     flex: 1,
     fontSize: 15,
     color: "#021533",
     fontStyle: "italic",
   },
-
   receiverImage: {
     width: 32,
     height: 32,
@@ -129,7 +167,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 10,
   },
-
   amountBox: {
     height: 55,
     backgroundColor: "#FFFFFF",
@@ -140,19 +177,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 30,
   },
-
   amount: {
     fontSize: 16,
     color: "#021533",
     fontStyle: "italic",
   },
-
   currency: {
     fontSize: 14,
     color: "#9AA5AD",
     fontWeight: "600",
   },
-
   continueButton: {
     height: 56,
     backgroundColor: "#55C900",
@@ -161,7 +195,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: 25,
   },
-
   continueText: {
     color: "#FFFFFF",
     fontSize: 16,
