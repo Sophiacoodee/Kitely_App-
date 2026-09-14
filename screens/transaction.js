@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "./firebaseConfig"; // Ajusta la ruta a tu firebaseConfig si está en otra carpeta
+import { db } from "../firebase/config";
 
 export default function Transaction({ route, navigation }) {
   const { selectedCategories = ['groceries'], amount = '0.00' } = route.params || {};
