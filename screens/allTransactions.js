@@ -14,8 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import dayjs from "dayjs";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
-import { db } from "./firebaseConfig"; // Ajusta la ruta a tu firebaseConfig si está en otra carpeta
-
+import { db } from "../firebase/config";
 function getIconoPorCategoria(categoria) {
   if (!categoria) return "pricetag-outline";
   const catLower = categoria.toLowerCase();
