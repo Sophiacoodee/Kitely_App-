@@ -8,9 +8,11 @@ import {
   ScrollView,
   useWindowDimensions,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 
 export default function AboutUsScreen() {
+const { t, i18n } = useTranslation();
   const { width } = useWindowDimensions();
   const isTablet = width >= 600;
 
@@ -31,15 +33,12 @@ export default function AboutUsScreen() {
             /> 
           </View>  
 
-          <Text style={styles.headerTitle}>About us</Text>
+          <Text style={styles.headerTitle}>{t('aboutUs.title')}</Text>
 
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>Our Mission</Text>
+            <Text style={styles.cardTitle}>{t('aboutUs.missionTitle')}</Text>
             <Text style={styles.cardBody}>
-              We transform the traditional remittance model in El Salvador by
-              offering a transparent and secure platform. We make sure that the
-              effort of those sending money from abroad turns into direct
-              well-being through exchanges in key areas.
+              {t('aboutUs.missionBody')}
             </Text>
           </View>
 

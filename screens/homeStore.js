@@ -18,6 +18,7 @@ import { auth, db } from '../firebase/config';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
@@ -32,6 +33,7 @@ const CATEGORY_ICONS = {
 };
 
 export default function HomeStoreScreen({ navigation }) {
+  const { t } = useTranslation();
   const expirationDate = dayjs('2026-08-14').format('DD MMM, YYYY');
   const webViewRef = useRef(null);
   const modalWebViewRef = useRef(null);
@@ -91,10 +93,10 @@ export default function HomeStoreScreen({ navigation }) {
   };
 
   const recentActivities = [
-    { id: '1', title: 'Redirection - Food', subtitle: 'Register 02 • Ticket #1042', amount: '+$25.00', time: 'Today 10:24 a.m.', status: 'Completed', icon: 'shopping-cart' },
-    { id: '2', title: 'Redirection - Medicine', subtitle: 'Register 01 • Ticket #1038', amount: '+$12.50', time: 'Yesterday 4:15 p.m.', status: 'Completed', icon: 'medical-services' },
-    { id: '3', title: 'Redirection - Food', subtitle: 'Register 04 • Ticket #1012', amount: '+$45.00', time: '10 Aug 2:30 p.m.', status: 'Completed', icon: 'shopping-cart' },
-    { id: '4', title: 'Redirection - Entertainment', subtitle: 'Register 03 • Ticket #0998', amount: '+$18.00', time: '08 Aug 11:10 a.m.', status: 'Completed', icon: 'movie' },
+    { id: '1', title: t('homeStore.activities.act1.title'), subtitle: t('homeStore.activities.act1.subtitle'), amount: '+$25.00', time: t('homeStore.activities.act1.time'), status: t('homeStore.statusCompleted'), icon: 'shopping-cart' },
+    { id: '2', title: t('homeStore.activities.act2.title'), subtitle: t('homeStore.activities.act2.subtitle'), amount: '+$12.50', time: t('homeStore.activities.act2.time'), status: t('homeStore.statusCompleted'), icon: 'medical-services' },
+    { id: '3', title: t('homeStore.activities.act3.title'), subtitle: t('homeStore.activities.act3.subtitle'), amount: '+$45.00', time: t('homeStore.activities.act3.time'), status: t('homeStore.statusCompleted'), icon: 'shopping-cart' },
+    { id: '4', title: t('homeStore.activities.act4.title'), subtitle: t('homeStore.activities.act4.subtitle'), amount: '+$18.00', time: t('homeStore.activities.act4.time'), status: t('homeStore.statusCompleted'), icon: 'movie' },
   ];
 
   const mapHtml = `
@@ -162,11 +164,11 @@ export default function HomeStoreScreen({ navigation }) {
         createdAt: serverTimestamp(),
       });
 
-      Alert.alert('¡Éxito!', 'Ubicación guardada en Firebase correctamente.');
+      Alert.alert(t('homeStore.alertSuccessTitle'), t('homeStore.alertSuccessMessage'));
       setIsMapModalVisible(false);
     } catch (error) {
       console.error('Error al guardar:', error);
-      Alert.alert('Error', 'No se pudo guardar la ubicación.');
+      Alert.alert(t('homeStore.alertErrorTitle'), t('homeStore.alertErrorMessage'));
     } finally {
       setIsSaving(false);
     }
@@ -186,8 +188,8 @@ export default function HomeStoreScreen({ navigation }) {
             )}
           </TouchableOpacity>
           <View style={styles.headerTextContainer}>
-            <Text style={styles.greeting}>Super Selectos - Escalón</Text>
-            <Text style={styles.subGreeting}>Authorized Branch • ID: #4082</Text>
+            <Text style={styles.greeting}>{t('homeStore.branchName')}</Text>
+            <Text style={styles.subGreeting}>{t('homeStore.subGreeting')}</Text>
           </View>
           <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Settings')}>
             <Ionicons name="settings-outline" size={22} color="#021024" />
@@ -197,9 +199,9 @@ export default function HomeStoreScreen({ navigation }) {
         {/* Balance Card */}
         <TouchableOpacity style={styles.balanceCard} activeOpacity={0.9} onPress={() => navigation.navigate('BalanceDiario')}>
           <View style={styles.balanceInfo}>
-            <Text style={styles.balanceLabel}>Available Register Balance</Text>
+            <Text style={styles.balanceLabel}>{t('homeStore.balanceLabel')}</Text>
             <Text style={styles.balanceAmount}>$250.00</Text>
-            <Text style={styles.expiryText}>Cut-off date: {expirationDate}</Text>
+            <Text style={styles.expiryText}>{t('homeStore.cutoffDate', { date: expirationDate })}</Text>
           </View>
         </TouchableOpacity>
 
@@ -221,7 +223,7 @@ export default function HomeStoreScreen({ navigation }) {
             disabled={isSaving}
           >
             <Ionicons name="save-outline" size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
-            <Text style={styles.saveLocationText}>{isSaving ? 'Guardando...' : 'Guardar ubicación'}</Text>
+            <Text style={styles.saveLocationText}>{isSaving ? t('homeStore.saving') : t('homeStore.saveLocation')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -232,7 +234,7 @@ export default function HomeStoreScreen({ navigation }) {
               <TouchableOpacity style={styles.closeButton} onPress={() => setIsMapModalVisible(false)}>
                 <Ionicons name="close" size={24} color="#021024" />
               </TouchableOpacity>
-              <Text style={styles.modalTitle}>Seleccionar Ubicación</Text>
+              <Text style={styles.modalTitle}>{t('homeStore.selectLocationTitle')}</Text>
               <View style={{ width: 36 }} />
             </View>
 
@@ -246,7 +248,7 @@ export default function HomeStoreScreen({ navigation }) {
 
             <TouchableOpacity style={styles.fullMapSaveButton} onPress={handleSaveLocation} disabled={isSaving}>
               <Ionicons name="save-outline" size={18} color="#FFFFFF" style={{ marginRight: 8 }} />
-              <Text style={styles.fullMapSaveText}>{isSaving ? 'Guardando...' : 'Confirmar y Guardar Ubicación'}</Text>
+              <Text style={styles.fullMapSaveText}>{isSaving ? t('homeStore.saving') : t('homeStore.confirmSaveLocation')}</Text>
             </TouchableOpacity>
           </SafeAreaView>
         </Modal>
@@ -257,7 +259,7 @@ export default function HomeStoreScreen({ navigation }) {
           activeOpacity={0.7}
           onPress={() => navigation.navigate('AuthorizedCategories')}
         >
-          <Text style={styles.categoriesButtonText}>Authorized Categories</Text>
+          <Text style={styles.categoriesButtonText}>{t('homeStore.authorizedCategoriesButton')}</Text>
           <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
         </TouchableOpacity>
 
@@ -265,19 +267,19 @@ export default function HomeStoreScreen({ navigation }) {
         <View style={styles.gridContainer}>
           <TouchableOpacity style={styles.categoryCard}>
             <MaterialIcons name="shopping-cart" size={28} color="#021B42" />
-            <Text style={styles.categoryText}>Food</Text>
+            <Text style={styles.categoryText}>{t('homeStore.categories.Food')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.categoryCard}>
             <MaterialIcons name="medical-services" size={28} color="#021B42" />
-            <Text style={styles.categoryText}>Medicine</Text>
+            <Text style={styles.categoryText}>{t('homeStore.categories.Medicine')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.categoryCard}>
             <MaterialIcons name="school" size={28} color="#021B42" />
-            <Text style={styles.categoryText}>Education</Text>
+            <Text style={styles.categoryText}>{t('homeStore.categories.Education')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.categoryCard}>
             <MaterialIcons name="movie" size={28} color="#021B42" />
-            <Text style={styles.categoryText}>Entertainment</Text>
+            <Text style={styles.categoryText}>{t('homeStore.categories.Entertainment')}</Text>
           </TouchableOpacity>
           
           {activeCategories.map((item) => (
@@ -293,7 +295,7 @@ export default function HomeStoreScreen({ navigation }) {
         </View>
 
         {/* Activity Section */}
-        <Text style={styles.sectionTitle}>Branch Recent Activity</Text>
+        <Text style={styles.sectionTitle}>{t('homeStore.recentActivityTitle')}</Text>
 
         {recentActivities.map((item) => (
           <View key={item.id} style={styles.activityCard}>

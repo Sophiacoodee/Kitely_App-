@@ -18,6 +18,7 @@ import { WebView } from 'react-native-webview';
 import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 import { auth, db } from '../firebase/config';
 import {
   doc,
@@ -34,7 +35,8 @@ const { width } = Dimensions.get('window');
 const RECENT_SPENDING = [
   {
     id: '1',
-    title: 'Super Selectos - Food',
+    titleKey: 'food',
+    storeName: 'Super Selectos',
     subtitle: 'Ticket #1042 • Register 02',
     amount: '-$42.00',
     date: 'Today 10:24 a.m.',
@@ -44,7 +46,8 @@ const RECENT_SPENDING = [
   },
   {
     id: '2',
-    title: 'Farmacia San Nicolás',
+    titleKey: 'medicine',
+    storeName: 'Farmacia San Nicolás',
     subtitle: 'Ticket #1038 • Register 01',
     amount: '-$16.00',
     date: 'Yesterday 4:15 p.m.',
@@ -54,7 +57,8 @@ const RECENT_SPENDING = [
   },
   {
     id: '3',
-    title: 'Vidrí - Construction',
+    titleKey: 'construction',
+    storeName: 'Vidrí',
     subtitle: 'Ticket #0992 • Register 04',
     amount: '-$258.00',
     date: '12 Aug 2:30 p.m.',
@@ -64,7 +68,8 @@ const RECENT_SPENDING = [
   },
   {
     id: '4',
-    title: 'Cine Madero',
+    titleKey: 'entertainment', // o la llave que prefieras para Cine Madero
+    storeName: 'Cine Madero',
     subtitle: 'Ticket #0950 • Register 01',
     amount: '-$18.50',
     date: '10 Aug 7:10 p.m.',
@@ -75,6 +80,7 @@ const RECENT_SPENDING = [
 ];
 
 export default function InicioReceptor({ route, navigation }) {
+  const { t } = useTranslation();
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const webViewRef = useRef(null);
   const modalWebViewRef = useRef(null);
@@ -85,8 +91,8 @@ export default function InicioReceptor({ route, navigation }) {
   const [coords, setCoords] = useState({
     latitude: 13.69294,
     longitude: -89.21819,
-    title: 'Super Selectos',
-    description: 'Sucursal',
+    title: t('inicioReceptor.defaultSucursalTitle', { defaultValue: 'Super Selectos' }),
+    description: t('inicioReceptor.defaultSucursal', { defaultValue: 'Sucursal' }),
   });
 
   const actionButtonWidth = (windowWidth - 40 - 24) / 3;
@@ -129,8 +135,8 @@ export default function InicioReceptor({ route, navigation }) {
   const initialRegion = {
     latitude: 13.69294,
     longitude: -89.21819,
-    title: 'Super Selectos',
-    description: 'Sucursal'
+    title: t('inicioReceptor.defaultSucursalTitle', { defaultValue: 'Super Selectos' }),
+    description: t('inicioReceptor.defaultSucursal', { defaultValue: 'Sucursal' }),
   };
 
   const mapHtml = `
@@ -168,8 +174,8 @@ export default function InicioReceptor({ route, navigation }) {
       setCoords({
         latitude: Number(latitude),
         longitude: Number(longitude),
-        title: branchName || 'Sucursal Seleccionada',
-        description: branchId || 'Ubicación activa'
+        title: branchName || t('inicioReceptor.selectedBranch', { defaultValue: 'Sucursal Seleccionada' }),
+        description: branchId || t('inicioReceptor.activeLocation', { defaultValue: 'Ubicación activa' }),
       });
       setLoadingMap(false);
     }
@@ -187,8 +193,8 @@ export default function InicioReceptor({ route, navigation }) {
           setCoords({
             latitude: Number(docData.latitude),
             longitude: Number(docData.longitude),
-            title: docData.branchName || 'Super Selectos',
-            description: docData.branchId || 'Sucursal'
+            title: docData.branchName || t('inicioReceptor.defaultSucursalTitle', { defaultValue: 'Super Selectos' }),
+            description: docData.branchId || t('inicioReceptor.defaultSucursal', { defaultValue: 'Sucursal' }),
           });
         }
         setLoadingMap(false);
@@ -227,10 +233,10 @@ export default function InicioReceptor({ route, navigation }) {
 
           <View style={styles.headerTextContainer}>
             <Text style={styles.headerTitle} numberOfLines={1}>
-              Hello, {fullName !== '' ? fullName : 'User'}!
+              {t('inicioReceptor.hello')}, {fullName !== '' ? fullName : t('inicioReceptor.userFallback')}!
             </Text>
             <Text style={styles.headerSubtitle} numberOfLines={1}>
-              Transparent remittances, stronger connections.
+              {t('inicioReceptor.subtitle')}
             </Text>
           </View>
 
@@ -251,7 +257,9 @@ export default function InicioReceptor({ route, navigation }) {
             activeOpacity={0.8}
           >
             <FontAwesome5 name="users" size={20} color="#021024" />
-            <Text style={styles.actionText} numberOfLines={1}>Senders</Text>
+            <Text style={styles.actionText} numberOfLines={1}>
+              {t('inicioReceptor.senders')}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -260,7 +268,9 @@ export default function InicioReceptor({ route, navigation }) {
             activeOpacity={0.8}
           >
             <MaterialIcons name="qr-code-scanner" size={24} color="#021024" />
-            <Text style={styles.actionText} numberOfLines={1}>Scan Code</Text>
+            <Text style={styles.actionText} numberOfLines={1}>
+              {t('inicioReceptor.scanCode')}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -269,7 +279,9 @@ export default function InicioReceptor({ route, navigation }) {
             activeOpacity={0.8}
           >
             <MaterialIcons name="history" size={24} color="#021024" />
-            <Text style={styles.actionText} numberOfLines={1}>History</Text>
+            <Text style={styles.actionText} numberOfLines={1}>
+              {t('inicioReceptor.history')}
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -311,7 +323,9 @@ export default function InicioReceptor({ route, navigation }) {
               >
                 <Ionicons name="close" size={24} color="#021024" />
               </TouchableOpacity>
-              <Text style={styles.modalTitle}>Ubicación de Sucursal</Text>
+              <Text style={styles.modalTitle}>
+                {t('inicioReceptor.modalTitle')}
+              </Text>
               <View style={{ width: 36 }} />
             </View>
 
@@ -326,7 +340,9 @@ export default function InicioReceptor({ route, navigation }) {
 
         {/* Resumen por Categorías */}
         <View style={styles.card}>
-          <Text style={styles.cardHeader}>Spending by Category</Text>
+          <Text style={styles.cardHeader}>
+            {t('inicioReceptor.spendingByCategory')}
+          </Text>
           <View style={styles.chartRow}>
             <View style={styles.pieContainer}>
               <View style={[styles.pieSegment, { backgroundColor: '#00D2A0' }]} />
@@ -336,21 +352,27 @@ export default function InicioReceptor({ route, navigation }) {
             <View style={styles.legendContainer}>
               <View style={styles.legendItem}>
                 <View style={[styles.dot, { backgroundColor: '#805AD5' }]} />
-                <Text style={styles.legendLabel} numberOfLines={1}>Food</Text>
+                <Text style={styles.legendLabel} numberOfLines={1}>
+                  {t('inicioReceptor.food')}
+                </Text>
                 <Text style={styles.legendPercent}>64%</Text>
                 <Text style={styles.legendAmount}>$42.00</Text>
               </View>
 
               <View style={styles.legendItem}>
                 <View style={[styles.dot, { backgroundColor: '#ECC94B' }]} />
-                <Text style={styles.legendLabel} numberOfLines={1}>Medicine</Text>
+                <Text style={styles.legendLabel} numberOfLines={1}>
+                  {t('inicioReceptor.medicine')}
+                </Text>
                 <Text style={styles.legendPercent}>11%</Text>
                 <Text style={styles.legendAmount}>$16.00</Text>
               </View>
 
               <View style={styles.legendItem}>
                 <View style={[styles.dot, { backgroundColor: '#00D2A0' }]} />
-                <Text style={styles.legendLabel} numberOfLines={1}>Construction</Text>
+                <Text style={styles.legendLabel} numberOfLines={1}>
+                  {t('inicioReceptor.construction')}
+                </Text>
                 <Text style={styles.legendPercent}>25%</Text>
                 <Text style={styles.legendAmount}>$258.00</Text>
               </View>
@@ -359,7 +381,9 @@ export default function InicioReceptor({ route, navigation }) {
         </View>
 
         {/* Gastos Recientes */}
-        <Text style={styles.sectionTitle}>Recent Spending</Text>
+        <Text style={styles.sectionTitle}>
+          {t('inicioReceptor.recentSpending')}
+        </Text>
         <FlatList
           data={RECENT_SPENDING}
           keyExtractor={(item) => item.id}
@@ -370,9 +394,15 @@ export default function InicioReceptor({ route, navigation }) {
                 <Ionicons name={item.icon} size={22} color={item.iconColor} />
               </View>
               <View style={styles.spendingInfo}>
-                <Text style={styles.spendingTitle} numberOfLines={1}>{item.title}</Text>
-                <Text style={styles.spendingSubtitle} numberOfLines={1}>{item.subtitle}</Text>
-                <Text style={styles.spendingDate} numberOfLines={1}>{item.date}</Text>
+                <Text style={styles.spendingTitle} numberOfLines={1}>
+                  {item.storeName} — {t(`inicioReceptor.${item.titleKey}`)}
+                </Text>
+                <Text style={styles.spendingSubtitle} numberOfLines={1}>
+                  {item.subtitle}
+                </Text>
+                <Text style={styles.spendingDate} numberOfLines={1}>
+                  {item.date}
+                </Text>
               </View>
               <Text style={styles.spendingAmount}>{item.amount}</Text>
             </View>

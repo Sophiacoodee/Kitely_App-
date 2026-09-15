@@ -8,30 +8,28 @@ import {
   Image,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import i18n from '../i18n';
+import { useTranslation } from 'react-i18next'; 
 
 const LANGUAGE_KEY = '@app_language';
 
 const LANGUAGES = [
   {
     id: 'es',
-    name: 'Spanish',
-    subtext: 'Spanish (El Salvador)',
+    nameKey: 'spanishName',
+    subtextKey: 'spanishSub',
     flag: 'https://flagcdn.com/w160/sv.png',
   },
   {
     id: 'en',
-    name: 'English',
-    subtext: 'English (United States)',
+    nameKey: 'englishName',
+    subtextKey: 'englishSub',
     flag: 'https://flagcdn.com/w160/us.png',
   },
 ];
 
 export default function LanguageSelectionScreen({ navigation }) {
-  const [selectedLanguage, setSelectedLanguage] = useState('en');
-
-
-
+  const { i18n, t } = useTranslation(); 
+  const [selectedLanguage, setSelectedLanguage] = useState(i18n.language || 'en');
 
   const handleSelect = async () => {
     await i18n.changeLanguage(selectedLanguage);
@@ -41,13 +39,14 @@ export default function LanguageSelectionScreen({ navigation }) {
       navigation.goBack();
     }
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.textContainer}>
-          <Text style={styles.title}>Language</Text>
+          <Text style={styles.title}>{t('language.title')}</Text>
           <Text style={styles.subtitle}>
-            The language you choose{'\n'}will be used throughout the app
+            {t('language.subtitle')}
           </Text>
         </View>
 
@@ -73,8 +72,12 @@ export default function LanguageSelectionScreen({ navigation }) {
                   resizeMode="cover"
                 />
                 <View style={styles.languageTextContainer}>
-                  <Text style={styles.languageTitle}>{lang.name}</Text>
-                  <Text style={styles.languageSubtitle}>{lang.subtext}</Text>
+                  <Text style={styles.languageTitle}>
+                    {t(`language.${lang.nameKey}`)}
+                  </Text>
+                  <Text style={styles.languageSubtitle}>
+                    {t(`language.${lang.subtextKey}`)}
+                  </Text>
                 </View>
               </TouchableOpacity>
             );
@@ -86,7 +89,9 @@ export default function LanguageSelectionScreen({ navigation }) {
           activeOpacity={0.8}
           onPress={handleSelect}
         >
-          <Text style={styles.selectButtonText}>Select</Text>
+          <Text style={styles.selectButtonText}>
+            {t('language.apply', { defaultValue: 'Apply' })}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

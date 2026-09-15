@@ -16,11 +16,13 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTranslation } from "react-i18next";
 
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/config";
 
 export default function PersonalInformationScreen({ navigation }) {
+  const { t } = useTranslation();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [idNumber, setIdNumber] = useState("");
@@ -91,8 +93,8 @@ export default function PersonalInformationScreen({ navigation }) {
 
     if (status !== "granted") {
       Alert.alert(
-        "Permiso denegado",
-        "Se requieren permisos para acceder a tu galería."
+        t("personalInformation.permissionDeniedTitle"),
+        t("personalInformation.permissionDeniedMessage")
       );
       return;
     }
@@ -147,7 +149,7 @@ export default function PersonalInformationScreen({ navigation }) {
             >
               <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>Personal Information</Text>
+            <Text style={styles.headerTitle}>{t("personalInformation.title")}</Text>
             <View style={styles.headerPlaceholder} />
           </View>
 
@@ -171,63 +173,63 @@ export default function PersonalInformationScreen({ navigation }) {
             </TouchableOpacity>
 
             <Text style={styles.userNameText}>
-              {fullName !== "" ? fullName : "User"}
+              {fullName !== "" ? fullName : t("personalInformation.userFallback")}
             </Text>
           </View>
 
           {/* Formulario de Solo Lectura */}
           <View style={styles.form}>
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Full name</Text>
+              <Text style={styles.label}>{t("personalInformation.fullName")}</Text>
               <TextInput
                 style={[styles.input, styles.disabledInput]}
                 value={fullName}
                 editable={false}
-                placeholder="not provided"
+                placeholder={t("personalInformation.placeholder")}
                 placeholderTextColor="#94A3B8"
               />
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email</Text>
+              <Text style={styles.label}>{t("personalInformation.email")}</Text>
               <TextInput
                 style={[styles.input, styles.disabledInput]}
                 value={email}
                 editable={false}
-                placeholder="not provided"
+                placeholder={t("personalInformation.placeholder")}
                 placeholderTextColor="#94A3B8"
               />
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Identity number</Text>
+              <Text style={styles.label}>{t("personalInformation.idNumber")}</Text>
               <TextInput
                 style={[styles.input, styles.disabledInput]}
                 value={idNumber}
                 editable={false}
-                placeholder="not provided"
+                placeholder={t("personalInformation.placeholder")}
                 placeholderTextColor="#94A3B8"
               />
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Date of birth</Text>
+              <Text style={styles.label}>{t("personalInformation.dob")}</Text>
               <TextInput
                 style={[styles.input, styles.disabledInput]}
                 value={dob}
                 editable={false}
-                placeholder="not provided"
+                placeholder={t("personalInformation.placeholder")}
                 placeholderTextColor="#94A3B8"
               />
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Country</Text>
+              <Text style={styles.label}>{t("personalInformation.country")}</Text>
               <TextInput
                 style={[styles.input, styles.disabledInput]}
                 value={country}
                 editable={false}
-                placeholder="not provided"
+                placeholder={t("personalInformation.placeholder")}
                 placeholderTextColor="#94A3B8"
               />
             </View>

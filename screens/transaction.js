@@ -10,12 +10,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase/config";
+import { useTranslation } from "react-i18next";
 
 export default function Transaction({ route, navigation }) {
+  const { t } = useTranslation();
   const { selectedCategories = ['groceries'], amount = '0.00' } = route.params || {};
   const [loading, setLoading] = useState(false);
 
-  // Formatear categorías para mostrar en pantalla
   const displayCategory = selectedCategories.map(
     (cat) => cat.charAt(0).toUpperCase() + cat.slice(1)
   ).join(', ');
@@ -27,7 +28,6 @@ export default function Transaction({ route, navigation }) {
       const dateStr = now.toISOString().split('T')[0];
       const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).toLowerCase();
 
-      // Guardar en Firestore
       await addDoc(collection(db, "transactions"), {
         category: displayCategory || "Groceries",
         name: "Super Selectos",
@@ -39,7 +39,6 @@ export default function Transaction({ route, navigation }) {
       });
 
       setLoading(false);
-      // Navegar a Canje tras guardar
       navigation.navigate("Canje", {
         amount,
         category: displayCategory,
@@ -54,7 +53,7 @@ export default function Transaction({ route, navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Transaction</Text>
+        <Text style={styles.title}>{t('transaction.headerTitle')}</Text>
       </View>
 
       <View style={styles.paperPlane}>
@@ -62,7 +61,7 @@ export default function Transaction({ route, navigation }) {
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Categories you chose</Text>
+        <Text style={styles.sectionTitle}>{t('transaction.sectionCategories')}</Text>
 
         <View style={styles.inputBox}>
           <Ionicons name="cart-outline" size={20} color="#021533" style={styles.icon} />
@@ -72,7 +71,7 @@ export default function Transaction({ route, navigation }) {
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.sectionTitle}>Receiver</Text>
+        <Text style={styles.sectionTitle}>{t('transaction.sectionReceiver')}</Text>
 
         <View style={styles.inputBox}>
           <View style={styles.receiverImage}>
@@ -84,11 +83,11 @@ export default function Transaction({ route, navigation }) {
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.sectionTitle}>Amount (USD)</Text>
+        <Text style={styles.sectionTitle}>{t('transaction.sectionAmount')}</Text>
 
         <View style={styles.amountBox}>
           <Text style={styles.amount}>${amount}</Text>
-          <Text style={styles.currency}>USD</Text>
+          <Text style={styles.currency}>{t('transaction.currency')}</Text>
         </View>
 
         <TouchableOpacity
@@ -99,7 +98,7 @@ export default function Transaction({ route, navigation }) {
           {loading ? (
             <ActivityIndicator color="#FFFFFF" />
           ) : (
-            <Text style={styles.continueText}>Continue</Text>
+            <Text style={styles.continueText}>{t('transaction.continue')}</Text>
           )}
         </TouchableOpacity>
       </View>

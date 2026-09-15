@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 export default function RoleSelectionScreen({ navigation }) {
+  const { t } = useTranslation();
   const [selectedRole, setSelectedRole] = useState(null);
 
   const handleContinue = () => {
@@ -19,7 +21,7 @@ export default function RoleSelectionScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.topHeader}>
-        <Text style={styles.headerTitle}>Please select your role to continue</Text>
+        <Text style={styles.headerTitle}>{t('roleSelection.headerTitle')}</Text>
       </View>
 
       <View style={styles.whitePanel}>
@@ -32,8 +34,8 @@ export default function RoleSelectionScreen({ navigation }) {
             <MaterialCommunityIcons name="send" size={28} color="#FFFFFF" />
           </View>
           <View style={styles.textContainer}>
-            <Text style={styles.cardTitle}>Sender</Text>
-            <Text style={styles.cardSubtitle}>Send remittances to your relatives</Text>
+            <Text style={styles.cardTitle}>{t('roleSelection.senderTitle')}</Text>
+            <Text style={styles.cardSubtitle}>{t('roleSelection.senderSubtitle')}</Text>
           </View>
         </TouchableOpacity>
 
@@ -46,8 +48,8 @@ export default function RoleSelectionScreen({ navigation }) {
             <MaterialCommunityIcons name="account-arrow-left" size={30} color="#FFFFFF" />
           </View>
           <View style={styles.textContainer}>
-            <Text style={styles.cardTitle}>Receiver</Text>
-            <Text style={styles.cardSubtitle}>Get remittances transparently</Text>
+            <Text style={styles.cardTitle}>{t('roleSelection.receiverTitle')}</Text>
+            <Text style={styles.cardSubtitle}>{t('roleSelection.receiverSubtitle')}</Text>
           </View>
         </TouchableOpacity>
 
@@ -60,8 +62,8 @@ export default function RoleSelectionScreen({ navigation }) {
             <FontAwesome5 name="store" size={24} color="#FFFFFF" />
           </View>
           <View style={styles.textContainer}>
-            <Text style={styles.cardTitle}>Store</Text>
-            <Text style={styles.cardSubtitle}>Records the redeemed remittances</Text>
+            <Text style={styles.cardTitle}>{t('roleSelection.storeTitle')}</Text>
+            <Text style={styles.cardSubtitle}>{t('roleSelection.storeSubtitle')}</Text>
           </View>
         </TouchableOpacity>
 
@@ -70,7 +72,7 @@ export default function RoleSelectionScreen({ navigation }) {
           onPress={handleContinue}
           disabled={!selectedRole}
         >
-          <Text style={styles.buttonText}>Continue</Text>
+          <Text style={styles.buttonText}>{t('roleSelection.continue')}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -129,7 +131,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: '#021B42',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignmentItems: 'center',
     marginRight: 16,
   },
   textContainer: {

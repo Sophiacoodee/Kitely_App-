@@ -1,0 +1,401 @@
+{
+  "aboutUs": {
+    "title": "About us",
+    "missionTitle": "Our Mission",
+    "missionBody": "We transform the traditional remittance model in El Salvador by offering a transparent and secure platform. We make sure that the effort of those sending money from abroad turns into direct well-being through exchanges in key areas."
+  },
+  "allTransactions": {
+    "headerTitle": "All the transactions",
+    "historyTitle": "History",
+    "completed": "Completed",
+    "emptyText": "No transactions found for this date.",
+    "modalTitle": "Filter by Category",
+    "categories": {
+      "all": "All",
+      "groceries": "Groceries",
+      "health": "Health",
+      "clothing": "Clothing",
+      "house": "House",
+      "education": "Education",
+      "construction": "Construction"
+    }
+  },
+  "authorizedCategories": {
+    "title": "Authorized Categories",
+    "subtitle": "Choose the categories you want\nto allow for transactions",
+    "saveChanges": "Save changes",
+    "errorTitle": "Error",
+    "errorSaveMessage": "Could not save changes",
+    "list": {
+      "food": "Food",
+      "medicine": "Medicine",
+      "education": "Education",
+      "entertainment": "Entertainment",
+      "construction": "Construction",
+      "petSupplies": "Pet supplies",
+      "clothes": "Clothes"
+    }
+  },
+  "balanceDiario": {
+    "headerTitulo": "Daily Balance",
+    "tarjetaTitulo": "Balance",
+    "tarjetaSubtitulo": "Today's running total",
+    "transactionsCompleted": "{{count}} transactions completed",
+    "verTodas": "View all transactions",
+    "days": {
+      "mon": "MON",
+      "tue": "TUE",
+      "wed": "WED",
+      "thu": "THU",
+      "fri": "FRI",
+      "sat": "SAT",
+      "sun": "SUN"
+    }
+  },
+  "canjeExitoso": {
+    "titleText": "Transaction Completed",
+    "placeLabel": "Place",
+    "amountLabel": "Amount",
+    "categoryLabel": "Category",
+    "dateLabel": "Date",
+    "viewDetails": "View details",
+    "backToHome": "Back to home"
+  },
+  "categoriesScreen": {
+    "headerTitle": "Categories",
+    "headerSubtitle": "Choose one or more categories",
+    "amountLabel": "Amount",
+    "amountSublabel": "You send (USD) - Max: ${{max}}",
+    "currencyCode": "USD",
+    "continueButton": "Continue",
+    "attentionTitle": "Attention",
+    "errorSelectCategory": "Please select at least one category.",
+    "errorEnterAmount": "Please enter an amount.",
+    "errorValidAmount": "Please enter a valid amount greater than $0.00.",
+    "limitExceededTitle": "Limit Exceeded",
+    "limitExceededMessage": "The maximum allowed amount per transaction is ${{max}}.",
+    "list": {
+      "groceries": "Groceries",
+      "health": "Health",
+      "clothing": "Clothing",
+      "house": "House",
+      "education": "Education",
+      "cleaning": "Cleaning",
+      "entertainment": "Entertainment",
+      "construction": "Construction"
+    }
+  },
+  "contactUs": {
+    "headerTitle": "Contact us"
+  },
+  "faceId": {
+    "titulo": "FACE ID",
+    "subtitulo": "Look at your phone to\nconfirm your identity",
+    "authenticating": "Authenticating...",
+    "tapToRetry": "Tap circle to retry Face ID",
+    "botonPinTexto": "Or enter your security PIN",
+    "hardwareUnavailableTitle": "Hardware Unavailable",
+    "hardwareUnavailableMessage": "Face ID is not available on this device.",
+    "requiredConfigTitle": "Required Configuration",
+    "requiredConfigMessage": "No biometric data is configured on this device.",
+    "usePin": "Use PIN",
+    "cancel": "Cancel",
+    "promptMessage": "Confirm your identity with Face ID",
+    "authFailedTitle": "Authentication failed",
+    "authFailedMessage": "Please try again.",
+    "authErrorTitle": "Authentication Error",
+    "authErrorMessage": "An error occurred during authentication. Please try again."
+  },
+  "beneficiaries": {
+    "headerTitle": "My family",
+    "headerSubtitle": "Your beneficiaries",
+    "addButton": "Add",
+    "searchPlaceholder": "Search a beneficiary",
+    "emptyText": "No beneficiaries found",
+    "modalTitle": "Add Beneficiary",
+    "fullNamePlaceholder": "Full Name",
+    "photoUrlPlaceholder": "Photo URL (Optional)",
+    "cancel": "Cancel",
+    "save": "Save",
+    "deleteTitle": "Delete Beneficiary",
+    "deleteMessage": "Are you sure you want to delete this beneficiary?",
+    "delete": "Delete",
+    "errorTitle": "Error",
+    "errorNameRequired": "Please enter a name for the beneficiary."
+  },
+  "forgotPassword": {
+    "title": "Forgot your password?",
+    "subtitle": "Enter your email address and we'll send you a link to recover it.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "Enter your email",
+    "sendButton": "Send link",
+    "or": "or",
+    "returnLogin": "Return to log in",
+    "errorTitle": "Error",
+    "errorEmailRequired": "Please enter your email address",
+    "successTitle": "Success",
+    "successMessage": "Check your email for instructions to reset your password"
+  },
+  "helpCenter": {
+    "headerTitle": "How can we\nhelp?",
+    "faqData": [
+      {
+        "category": "Sending a Remittance",
+        "question": "How do I send a remittance?",
+        "answer": "Choose \"Send\", select the category you want to support, choose a beneficiary, enter the amount, and confirm the transaction."
+      },
+      {
+        "question": "What categories can I choose from?",
+        "answer": "You can choose from categories such as Food, Education, Health, and Home & Essentials."
+      },
+      {
+        "question": "Can I choose who receives the remittance?",
+        "answer": "Yes. After selecting a category, you can choose one of your registered beneficiaries."
+      },
+      {
+        "question": "How do I choose the amount?",
+        "answer": "After selecting the category and beneficiary, enter the amount you want to send and review the transaction before confirming it."
+      },
+      {
+        "question": "Can I change the category after sending?",
+        "answer": "Once a transaction is confirmed and completed, the category cannot be changed. Please review all details before confirming."
+      }
+    ]
+  },
+  "homeStore": {
+    "branchName": "Super Selectos - Escalón",
+    "subGreeting": "Authorized Branch • ID: #4082",
+    "balanceLabel": "Available Register Balance",
+    "cutoffDate": "Cut-off date: {{date}}",
+    "saving": "Saving...",
+    "saveLocation": "Save location",
+    "selectLocationTitle": "Select Location",
+    "confirmSaveLocation": "Confirm & Save Location",
+    "authorizedCategoriesButton": "Authorized Categories",
+    "recentActivityTitle": "Branch Recent Activity",
+    "statusCompleted": "Completed",
+    "categories": {
+      "Food": "Food",
+      "Medicine": "Medicine",
+      "Education": "Education",
+      "Entertainment": "Entertainment"
+    },
+    "activities": {
+      "act1": {
+        "title": "Redirection - Food",
+        "subtitle": "Register 02 • Ticket #1042",
+        "time": "Today 10:24 a.m."
+      },
+      "act2": {
+        "title": "Redirection - Medicine",
+        "subtitle": "Register 01 • Ticket #1038",
+        "time": "Yesterday 4:15 p.m."
+      },
+      "act3": {
+        "title": "Redirection - Food",
+        "subtitle": "Register 04 • Ticket #1012",
+        "time": "10 Aug 2:30 p.m."
+      },
+      "act4": {
+        "title": "Redirection - Entertainment",
+        "subtitle": "Register 03 • Ticket #0998",
+        "time": "08 Aug 11:10 a.m."
+      }
+    },
+    "alertSuccessTitle": "Success!",
+    "alertSuccessMessage": "Location saved to Firebase properly.",
+    "alertErrorTitle": "Error",
+    "alertErrorMessage": "Could not save location."
+  },
+  "inicioReceptor": {
+    "hello": "Hello",
+    "userFallback": "User",
+    "subtitle": "Transparent remittances, stronger connections.",
+    "senders": "Senders",
+    "scanCode": "Scan Code",
+    "history": "History",
+    "modalTitle": "Branch Location",
+    "spendingByCategory": "Spending by Category",
+    "food": "Food",
+    "medicine": "Medicine",
+    "construction": "Construction",
+    "recentSpending": "Recent Spending",
+    "defaultSucursal": "Branch",
+    "defaultSucursalTitle": "Super Selectos",
+    "activeLocation": "Active location",
+    "selectedBranch": "Selected Branch"
+  },
+  "language": {
+    "title": "Language",
+    "subtitle": "The language you choose\nwill be used throughout the app",
+    "apply": "Apply",
+    "spanishName": "Spanish",
+    "spanishSub": "Spanish (El Salvador)",
+    "englishName": "English",
+    "englishSub": "English (United States)"
+  },
+  "login": {
+    "incompleteTitle": "Incomplete Fields",
+    "incompleteMsg": "Please enter both email and password.",
+    "welcome": "Welcome!",
+    "loginFailedTitle": "Login Failed",
+    "loginFailedMsg": "Invalid email or password. Please try again.",
+    "invalidEmailTitle": "Invalid Email",
+    "invalidEmailMsg": "Please enter a valid email address.",
+    "title": "Welcome Back",
+    "subtitle": "Sign in to continue using Kitely.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "Enter your email",
+    "passLabel": "Password",
+    "passPlaceholder": "Enter password",
+    "forgotPass": "Forgot password?",
+    "loginButton": "Log in",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up"
+  },
+  "metodoPago": {
+    "title": "Payment",
+    "cardholderLabel": "Cardholder's name",
+    "cardholderPlaceholder": "Name on card",
+    "cardNumberLabel": "Card Number",
+    "cardNumberPlaceholder": "•••• •••• •••• ••••",
+    "expireDateLabel": "Expire Date",
+    "expireDatePlaceholder": "MM/YY",
+    "cvvLabel": "CVV",
+    "cvvPlaceholder": "123",
+    "continue": "Continue"
+  },
+  "perfil": {
+    "defaultName": "Profile",
+    "subtitle": "Manage your account",
+    "personalInfoTitle": "Personal information",
+    "personalInfoSubtitle": "View your information",
+    "paymentMethodsTitle": "Payment methods",
+    "paymentMethodsSubtitle": "Manage your cards and accounts",
+    "helpTitle": "Help",
+    "helpSubtitle": "Go to support",
+    "aboutTitle": "About Kitely",
+    "aboutSubtitle": "App version 1.00"
+  },
+  "personalInformation": {
+    "title": "Personal Information",
+    "permissionDeniedTitle": "Permission denied",
+    "permissionDeniedMessage": "Permissions are required to access your gallery.",
+    "userFallback": "User",
+    "fullName": "Full name",
+    "email": "Email",
+    "idNumber": "Identity number",
+    "dob": "Date of birth",
+    "country": "Country",
+    "placeholder": "not provided"
+  },
+  "pin": {
+    "title": "Enter your PIN",
+    "subtitle": "Enter your security PIN"
+  },
+  "qrScanner": {
+    "cameraRequired": "Camera permission is required.",
+    "openingCamera": "Opening device camera...",
+    "scanningImage": "Scanning image...",
+    "processingPixels": "Processing QR pixels...",
+    "detected": "QR detected successfully!",
+    "failed": "Failed to read QR code from image.",
+    "openLink": "Open Link",
+    "takeAnother": "Take another photo",
+    "prompt": "Take a photo of the QR code",
+    "openCameraBtn": "Open Device Camera"
+  },
+  "register": {
+    "incompleteFields": "Incomplete Fields",
+    "fillAll": "Please fill in all fields.",
+    "invalidName": "Invalid Name",
+    "nameLetters": "Name must only contain letters.",
+    "invalidPassword": "Invalid Password",
+    "passwordUppercase": "Password must contain at least one uppercase letter.",
+    "passwordSpecial": "Password must contain at least one special character.",
+    "success": "Success!",
+    "userRegistered": "User registered successfully.",
+    "emailExists": "Email Exists",
+    "emailAlreadyInUse": "This email is already registered.",
+    "invalidEmailTitle": "Invalid Email",
+    "invalidEmailText": "The email entered is not valid.",
+    "weakPasswordTitle": "Weak Password",
+    "weakPasswordText": "Password must be at least 6 characters long.",
+    "error": "Error",
+    "title": "Create your account",
+    "subtitle": "Send and receive support\nwith purpose.",
+    "placeholderName": "Enter your complete name",
+    "placeholderId": "Enter your identity number",
+    "placeholderDob": "Select date of birth",
+    "selectCountry": "Select Country",
+    "countrySalvador": "🇸🇻 El Salvador",
+    "countryUSA": "🇺🇸 United States",
+    "placeholderEmail": "Enter your email",
+    "placeholderPassword": "Enter password",
+    "signUp": "Sign up",
+    "haveAccount": "Already have an account? ",
+    "logIn": "Log in"
+  },
+  "roleSelection": {
+    "headerTitle": "Please select your role to continue",
+    "senderTitle": "Sender",
+    "senderSubtitle": "Send remittances to your relatives",
+    "receiverTitle": "Receiver",
+    "receiverSubtitle": "Get remittances transparently",
+    "storeTitle": "Store",
+    "storeSubtitle": "Records the redeemed remittances",
+    "continue": "Continue"
+  },
+  "settings": {
+    "headerTitle": "Settings",
+    "headerSubtitle": "Customize your experience",
+    "sectionAccount": "Account",
+    "personalInfo": "Personal information",
+    "beneficiaries": "Beneficiaries",
+    "sectionPreferences": "Preferences",
+    "language": "Language",
+    "notifications": "Notifications",
+    "sectionHelp": "Help",
+    "helpCenter": "Help center",
+    "contactSupport": "Contact support"
+  },
+  "transactionDetail": {
+    "headerTitle": "Transaction details",
+    "amountLabel": "Amount",
+    "statusLabel": "Status",
+    "statusInProgress": "In progress",
+    "statusCompleted": "Completed",
+    "statusFailed": "Failed"
+  },
+  "transaction": {
+    "headerTitle": "Transaction",
+    "sectionCategories": "Categories you chose",
+    "sectionReceiver": "Receiver",
+    "sectionAmount": "Amount (USD)",
+    "currency": "USD",
+    "continue": "Continue"
+  },
+  "canje": {
+    "completedText": "Transaction Completed",
+    "placeLabel": "Place",
+    "amountLabel": "Amount",
+    "categoryLabel": "Category",
+    "dateLabel": "Date",
+    "viewDetails": "View details",
+    "backHome": "Back to home"
+  },
+  "transmitterHome": {
+    "greeting": "Hello, {{name}}!",
+    "fallbackUser": "User",
+    "subtitle": "Transparent remittances, stronger connections.",
+    "balanceLabel": "Available Balance",
+    "sendRemittance": "Send\nRemittance",
+    "beneficiaries": "Beneficiaries",
+    "history": "History",
+    "categoryFood": "Food",
+    "categoryMedicine": "Medicine",
+    "categoryConstruction": "Construction",
+    "spendingTitle": "Spending by Category",
+    "statusCompleted": "Completed"
+  }
+}

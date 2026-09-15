@@ -14,6 +14,7 @@ import {
   StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 const INITIAL_BENEFICIARIES = [
   {
@@ -39,6 +40,7 @@ const INITIAL_BENEFICIARIES = [
 ];
 
 export default function BeneficiariesScreen({ navigation }) {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [beneficiaries, setBeneficiaries] = useState(INITIAL_BENEFICIARIES);
 
@@ -52,15 +54,15 @@ export default function BeneficiariesScreen({ navigation }) {
 
   const handleDelete = (id) => {
     Alert.alert(
-      'Delete Beneficiary',
-      'Are you sure you want to delete this beneficiary?',
+      t('beneficiaries.deleteTitle'),
+      t('beneficiaries.deleteMessage'),
       [
         {
-          text: 'Cancel',
+          text: t('beneficiaries.cancel'),
           style: 'cancel',
         },
         {
-          text: 'Delete',
+          text: t('beneficiaries.delete'),
           style: 'destructive',
           onPress: () => {
             setBeneficiaries((list) =>
@@ -74,7 +76,7 @@ export default function BeneficiariesScreen({ navigation }) {
 
   const handleAddBeneficiary = () => {
     if (!newName.trim()) {
-      Alert.alert('Error', 'Please enter a name for the beneficiary.');
+      Alert.alert(t('beneficiaries.errorTitle'), t('beneficiaries.errorNameRequired'));
       return;
     }
 
@@ -98,8 +100,8 @@ export default function BeneficiariesScreen({ navigation }) {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.headerTitle}>My family</Text>
-            <Text style={styles.headerSubtitle}>Your beneficiaries</Text>
+            <Text style={styles.headerTitle}>{t('beneficiaries.headerTitle')}</Text>
+            <Text style={styles.headerSubtitle}>{t('beneficiaries.headerSubtitle')}</Text>
           </View>
 
           <TouchableOpacity 
@@ -108,7 +110,7 @@ export default function BeneficiariesScreen({ navigation }) {
             onPress={() => setModalVisible(true)}
           >
             <Ionicons name="add" size={20} color="#FFFFFF" />
-            <Text style={styles.addButtonText}>Add</Text>
+            <Text style={styles.addButtonText}>{t('beneficiaries.addButton')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -116,7 +118,7 @@ export default function BeneficiariesScreen({ navigation }) {
         <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
-            placeholder="Search a beneficiary"
+            placeholder={t('beneficiaries.searchPlaceholder')}
             placeholderTextColor="#94A3B8"
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -132,7 +134,7 @@ export default function BeneficiariesScreen({ navigation }) {
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No beneficiaries found</Text>
+              <Text style={styles.emptyText}>{t('beneficiaries.emptyText')}</Text>
             </View>
           }
           renderItem={({ item }) => (
@@ -162,11 +164,11 @@ export default function BeneficiariesScreen({ navigation }) {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Add Beneficiary</Text>
+            <Text style={styles.modalTitle}>{t('beneficiaries.modalTitle')}</Text>
 
             <TextInput
               style={styles.modalInput}
-              placeholder="Full Name"
+              placeholder={t('beneficiaries.fullNamePlaceholder')}
               placeholderTextColor="#94A3B8"
               value={newName}
               onChangeText={setNewName}
@@ -174,7 +176,7 @@ export default function BeneficiariesScreen({ navigation }) {
 
             <TextInput
               style={styles.modalInput}
-              placeholder="Photo URL (Optional)"
+              placeholder={t('beneficiaries.photoUrlPlaceholder')}
               placeholderTextColor="#94A3B8"
               value={newAvatar}
               onChangeText={setNewAvatar}
@@ -185,14 +187,14 @@ export default function BeneficiariesScreen({ navigation }) {
                 style={[styles.modalButton, styles.cancelButton]}
                 onPress={() => setModalVisible(false)}
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text style={styles.cancelButtonText}>{t('beneficiaries.cancel')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[styles.modalButton, styles.saveButton]}
                 onPress={handleAddBeneficiary}
               >
-                <Text style={styles.saveButtonText}>Save</Text>
+                <Text style={styles.saveButtonText}>{t('beneficiaries.save')}</Text>
               </TouchableOpacity>
             </View>
           </View>

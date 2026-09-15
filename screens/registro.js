@@ -16,6 +16,7 @@ import { doc, setDoc } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { auth, db } from "../firebase/config";
 import styles from "./styleRegistro";
+import { useTranslation } from "react-i18next";
 
 const CustomInput = ({
   placeholder,
@@ -48,6 +49,7 @@ const CustomInput = ({
 );
 
 export default function RegistroScreen({ navigation }) {
+  const { t } = useTranslation();
   const [fullName, setFullName] = useState("");
   const [idNumber, setIdNumber] = useState("");
   const [dob, setDob] = useState("");
@@ -74,27 +76,27 @@ export default function RegistroScreen({ navigation }) {
       !email.trim() ||
       !password
     ) {
-      Alert.alert("Incomplete Fields", "Please fill in all fields.");
+      Alert.alert(t("register.incompleteFields"), t("register.fillAll"));
       return;
     }
 
     if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(fullName)) {
-      Alert.alert("Invalid Name", "Name must only contain letters.");
+      Alert.alert(t("register.invalidName"), t("register.nameLetters"));
       return;
     }
 
     if (!/[A-Z]/.test(password)) {
       Alert.alert(
-        "Invalid Password",
-        "Password must contain at least one uppercase letter."
+        t("register.invalidPassword"),
+        t("register.passwordUppercase")
       );
       return;
     }
 
     if (!/[$#/&?@!]/.test(password)) {
       Alert.alert(
-        "Invalid Password",
-        "Password must contain at least one special character."
+        t("register.invalidPassword"),
+        t("register.passwordSpecial")
       );
       return;
     }
@@ -127,21 +129,21 @@ export default function RegistroScreen({ navigation }) {
         })
       );
 
-      Alert.alert("Success!", "User registered successfully.");
+      Alert.alert(t("register.success"), t("register.userRegistered"));
 
       if (navigation) navigation.navigate("Login");
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
-        Alert.alert("Email Exists", "This email is already registered.");
+        Alert.alert(t("register.emailExists"), t("register.emailAlreadyInUse"));
       } else if (error.code === "auth/invalid-email") {
-        Alert.alert("Invalid Email", "The email entered is not valid.");
+        Alert.alert(t("register.invalidEmailTitle"), t("register.invalidEmailText"));
       } else if (error.code === "auth/weak-password") {
         Alert.alert(
-          "Weak Password",
-          "Password must be at least 6 characters long."
+          t("register.weakPasswordTitle"),
+          t("register.weakPasswordText")
         );
       } else {
-        Alert.alert("Error", error.message);
+        Alert.alert(t("register.error"), error.message);
       }
     }
   };
@@ -159,16 +161,16 @@ export default function RegistroScreen({ navigation }) {
       <View style={styles.whitePanel}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.content}>
-            <Text style={styles.title}>Create your account</Text>
+            <Text style={styles.title}>{t("register.title")}</Text>
             <Text style={styles.subtitle}>
-              Send and receive support{"\n"}with purpose.
+              {t("register.subtitle")}
             </Text>
 
             {/* Full Name */}
             <View style={styles.fieldContainer}>
               <CustomInput
                 icon="person"
-                placeholder="Enter your complete name"
+                placeholder={t("register.placeholderName")}
                 value={fullName}
                 onChangeText={setFullName}
               />
@@ -178,7 +180,7 @@ export default function RegistroScreen({ navigation }) {
             <View style={styles.fieldContainer}>
               <CustomInput
                 icon="card-outline"
-                placeholder="Enter your identity number"
+                placeholder={t("register.placeholderId")}
                 value={idNumber}
                 onChangeText={setIdNumber}
                 keyboardType="numeric"
@@ -189,7 +191,7 @@ export default function RegistroScreen({ navigation }) {
             <View style={styles.fieldContainer}>
               <CustomInput
                 icon="calendar-outline"
-                placeholder="Select date of birth"
+                placeholder={t("register.placeholderDob")}
                 value={dob}
                 editable={false}
                 onPress={() => setShowDatePicker(true)}
@@ -215,7 +217,7 @@ export default function RegistroScreen({ navigation }) {
                   fontWeight: "600",
                 }}
               >
-                Select Country
+                {t("register.selectCountry")}
               </Text>
               <View
                 style={{ flexDirection: "row", justifyContent: "space-between" }}
@@ -242,7 +244,7 @@ export default function RegistroScreen({ navigation }) {
                       fontSize: 14,
                     }}
                   >
-                    {"\uD83C\uDDF8\uD83C\uDDFB"} El Salvador
+                    {t("register.countrySalvador")}
                   </Text>
                 </TouchableOpacity>
 
@@ -269,7 +271,7 @@ export default function RegistroScreen({ navigation }) {
                       fontSize: 14,
                     }}
                   >
-                    {"\uD83C\uDDFA\uD83C\uDDF8"} United States
+                    {t("register.countryUSA")}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -279,7 +281,7 @@ export default function RegistroScreen({ navigation }) {
             <View style={styles.fieldContainer}>
               <CustomInput
                 icon="mail"
-                placeholder="Enter your email"
+                placeholder={t("register.placeholderEmail")}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -290,7 +292,7 @@ export default function RegistroScreen({ navigation }) {
             <View style={styles.fieldContainer}>
               <CustomInput
                 icon="lock-closed"
-                placeholder="Enter password"
+                placeholder={t("register.placeholderPassword")}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={true}
@@ -299,15 +301,15 @@ export default function RegistroScreen({ navigation }) {
 
             {/* Submit Button */}
             <TouchableOpacity style={styles.button} onPress={handleRegister}>
-              <Text style={styles.buttonText}>Sign up</Text>
+              <Text style={styles.buttonText}>{t("register.signUp")}</Text>
             </TouchableOpacity>
 
             <View style={styles.footer}>
-              <Text style={styles.footerText}>Already have an account? </Text>
+              <Text style={styles.footerText}>{t("register.haveAccount")}</Text>
               <TouchableOpacity
                 onPress={() => navigation && navigation.navigate("Login")}
               >
-                <Text style={styles.signUp}>Log in</Text>
+                <Text style={styles.signUp}>{t("register.logIn")}</Text>
               </TouchableOpacity>
             </View>
           </View>

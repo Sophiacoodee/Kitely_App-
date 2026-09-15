@@ -11,10 +11,12 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as LocalAuthentication from "expo-local-authentication";
+import { useTranslation } from "react-i18next";
 
 export default function ConfirmacionFaceIdScreen({ navigation }) {
   const { width } = useWindowDimensions();
   const isTablet = width >= 600;
+  const { t } = useTranslation();
 
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
@@ -25,9 +27,9 @@ export default function ConfirmacionFaceIdScreen({ navigation }) {
       const hasHardware = await LocalAuthentication.hasHardwareAsync();
       if (!hasHardware) {
         Alert.alert(
-          "Hardware Unavailable",
-          "Face ID is not available on this device.",
-          [{ text: "Use PIN", onPress: () => navigation.navigate("....") }]
+          t('faceId.hardwareUnavailableTitle'),
+          t('faceId.hardwareUnavailableMessage'),
+          [{ text: t('faceId.usePin'), onPress: () => navigation.navigate("....") }]
         );
         return;
       }
@@ -35,29 +37,29 @@ export default function ConfirmacionFaceIdScreen({ navigation }) {
       const isEnrolled = await LocalAuthentication.isEnrolledAsync();
       if (!isEnrolled) {
         Alert.alert(
-          "Required Configuration",
-          "No biometric data is configured on this device.",
-          [{ text: "Use PIN", onPress: () => navigation.navigate("....") }]
+          t('faceId.requiredConfigTitle'),
+          t('faceId.requiredConfigMessage'),
+          [{ text: t('faceId.usePin'), onPress: () => navigation.navigate("....") }]
         );
         return;
       }
 
       const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: "Confirm your identity with Face ID",
-        fallbackLabel: "Use PIN",
-        cancelLabel: "Cancel",
+        promptMessage: t('faceId.promptMessage'),
+        fallbackLabel: t('faceId.usePin'),
+        cancelLabel: t('faceId.cancel'),
       });
 
       if (result.success) {
         navigation.navigate("....");
       } else {
-        Alert.alert("Authentication failed", "Please try again.");
+        Alert.alert(t('faceId.authFailedTitle'), t('faceId.authFailedMessage'));
       }
     } catch (error) {
       console.error("Error", error);
       Alert.alert(
-        "Authentication Error",
-        "An error occurred during authentication. Please try again."
+        t('faceId.authErrorTitle'),
+        t('faceId.authErrorMessage')
       );
     } finally {
       setIsAuthenticating(false);
@@ -72,9 +74,9 @@ export default function ConfirmacionFaceIdScreen({ navigation }) {
     <LinearGradient colors={["#021B42", "#061F4A"]} style={styles.container}>
       <View style={[styles.mainWrapper, isTablet && styles.mainWrapperTablet]}>
         <View style={styles.content}>
-          <Text style={styles.titulo}>FACE ID</Text>
+          <Text style={styles.titulo}>{t('faceId.titulo')}</Text>
           <Text style={styles.subtitulo}>
-            Look at your phone to{"\n"}confirm your identity
+            {t('faceId.subtitulo')}
           </Text>
 
           <TouchableOpacity
@@ -97,8 +99,8 @@ export default function ConfirmacionFaceIdScreen({ navigation }) {
           <View style={styles.buscandoContainer}>
             <Text style={styles.buscandoTexto}>
               {isAuthenticating
-                ? "Authenticating..."
-                : "Tap circle to retry Face ID"}
+                ? t('faceId.authenticating')
+                : t('faceId.tapToRetry')}
             </Text>
 
             {isAuthenticating && (
@@ -116,7 +118,7 @@ export default function ConfirmacionFaceIdScreen({ navigation }) {
             activeOpacity={0.8}
           >
             <Text style={styles.botonPinTexto}>
-              Or enter your security PIN
+              {t('faceId.botonPinTexto')}
             </Text>
           </TouchableOpacity>
         </View>

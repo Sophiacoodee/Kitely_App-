@@ -11,20 +11,22 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useTranslation } from "react-i18next";
 
 const INITIAL_CATEGORIES = [
-  { name: "Food", icon: "cart-outline", enabled: true },
-  { name: "Medicine", icon: "medical-outline", enabled: true },
-  { name: "Education", icon: "school-outline", enabled: true },
-  { name: "Entertainment", icon: "film-outline", enabled: true },
-  { name: "Construction", icon: "construct-outline", enabled: false },
-  { name: "Pet supplies", icon: "paw-outline", enabled: false },
-  { name: "Clothes", icon: "shirt-outline", enabled: true },
+  { name: "Food", icon: "cart-outline", enabled: true, translationKey: "food" },
+  { name: "Medicine", icon: "medical-outline", enabled: true, translationKey: "medicine" },
+  { name: "Education", icon: "school-outline", enabled: true, translationKey: "education" },
+  { name: "Entertainment", icon: "film-outline", enabled: true, translationKey: "entertainment" },
+  { name: "Construction", icon: "construct-outline", enabled: false, translationKey: "construction" },
+  { name: "Pet supplies", icon: "paw-outline", enabled: false, translationKey: "petSupplies" },
+  { name: "Clothes", icon: "shirt-outline", enabled: true, translationKey: "clothes" },
 ];
 
 export default function AuthorizedCategories({ navigation }) {
   const { width } = useWindowDimensions();
   const isTablet = width >= 600;
+  const { t } = useTranslation();
 
   const [categories, setCategories] = useState(INITIAL_CATEGORIES);
 
@@ -57,7 +59,7 @@ export default function AuthorizedCategories({ navigation }) {
       );
       navigation.navigate("HomeStore");
     } catch (e) {
-      Alert.alert("Error", "No se pudieron guardar los cambios");
+      Alert.alert(t('authorizedCategories.errorTitle'), t('authorizedCategories.errorSaveMessage'));
     }
   };
 
@@ -65,10 +67,9 @@ export default function AuthorizedCategories({ navigation }) {
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={[styles.headerWrapper, isTablet && styles.headerWrapperTablet]}>
-          <Text style={styles.title}>Authorized Categories</Text>
+          <Text style={styles.title}>{t('authorizedCategories.title')}</Text>
           <Text style={styles.subtitle}>
-            Choose the categories you want{"\n"}
-            to allow for transactions
+            {t('authorizedCategories.subtitle')}
           </Text>
         </View>
       </View>
@@ -86,7 +87,9 @@ export default function AuthorizedCategories({ navigation }) {
             <View style={styles.categoryRow} key={category.name}>
               <View style={styles.categoryInfo}>
                 <Ionicons name={category.icon} size={30} color="#021533" />
-                <Text style={styles.categoryName}>{category.name}</Text>
+                <Text style={styles.categoryName}>
+                  {t(`authorizedCategories.list.${category.translationKey}`, { defaultValue: category.name })}
+                </Text>
               </View>
 
               <Switch
@@ -105,7 +108,7 @@ export default function AuthorizedCategories({ navigation }) {
             style={styles.saveButton}
             onPress={handleSaveChanges}
           >
-            <Text style={styles.saveText}>Save changes</Text>
+            <Text style={styles.saveText}>{t('authorizedCategories.saveChanges')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

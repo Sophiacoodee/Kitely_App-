@@ -7,8 +7,10 @@ import {
   SafeAreaView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 export default function Pin({ navigation }) {
+  const { t } = useTranslation();
   const [pin, setPin] = useState("");
 
   const addNumber = (number) => {
@@ -21,7 +23,6 @@ export default function Pin({ navigation }) {
     setPin((prevPin) => prevPin.slice(0, -1));
   };
 
-  // Redirecciona automáticamente cuando se ingresan los 4 dígitos
   useEffect(() => {
     if (pin.length === 4) {
       const timer = setTimeout(() => {
@@ -38,8 +39,8 @@ export default function Pin({ navigation }) {
       <View style={styles.mainContent}>
         {/* HEADER */}
         <View style={styles.header}>
-          <Text style={styles.title}>Enter your PIN</Text>
-          <Text style={styles.subtitle}>Enter your security PIN</Text>
+          <Text style={styles.title}>{t("pin.title")}</Text>
+          <Text style={styles.subtitle}>{t("pin.subtitle")}</Text>
 
           {/* CÍRCULOS DEL PIN */}
           <View style={styles.dots}>
@@ -132,7 +133,7 @@ const styles = StyleSheet.create({
   },
   mainContent: {
     flex: 1,
-    justifyContent: "center", // Centra verticalmente todo el contenido en la pantalla
+    justifyContent: "center",
     alignItems: "stretch",
     paddingHorizontal: 25,
   },

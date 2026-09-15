@@ -1,6 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
 import {
   Alert,
   Image,
@@ -10,6 +9,7 @@ import {
   View,
 } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { useTranslation } from "react-i18next";
 import { auth } from "../firebase/config";
 import styles from "./styleLogin";
 
@@ -35,12 +35,16 @@ const CustomInput = ({
 );
 
 export default function LoginScreen({ navigation }) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
     if (!email.trim() || !password) {
-      Alert.alert("Incomplete Fields", "Please enter both email and password.");
+      Alert.alert(
+        t("login.incompleteTitle", { defaultValue: "Incomplete Fields" }),
+        t("login.incompleteMsg", { defaultValue: "Please enter both email and password." })
+      );
       return;
     }
 
@@ -52,7 +56,10 @@ export default function LoginScreen({ navigation }) {
       );
       const user = userCredential.user;
 
-      Alert.alert("Welcome back!", `Logged in as: ${user.email}`);
+      Alert.alert(
+        t("login.welcome", { defaultValue: "Welcome!" }),
+        `Logged in as: ${user.email}`
+      );
 
       if (navigation) navigation.replace("Selectrol");
     } catch (error) {
@@ -62,11 +69,14 @@ export default function LoginScreen({ navigation }) {
         error.code === "auth/invalid-credential"
       ) {
         Alert.alert(
-          "Login Failed",
-          "Invalid email or password. Please try again."
+          t("login.loginFailedTitle", { defaultValue: "Login Failed" }),
+          t("login.loginFailedMsg", { defaultValue: "Invalid email or password. Please try again." })
         );
       } else if (error.code === "auth/invalid-email") {
-        Alert.alert("Invalid Email", "Please enter a valid email address.");
+        Alert.alert(
+          t("login.invalidEmailTitle", { defaultValue: "Invalid Email" }),
+          t("login.invalidEmailMsg", { defaultValue: "Please enter a valid email address." })
+        );
       } else {
         Alert.alert("Error", error.message);
       }
@@ -84,26 +94,26 @@ export default function LoginScreen({ navigation }) {
 
       <View style={styles.whitePanel}>
         <View style={styles.content}>
-          <Text style={styles.title}>Welcome Back</Text>
+          <Text style={styles.title}>{t("login.title")}</Text>
           <Text style={styles.subtitle}>
-            Sign in to continue using Kitely.
+            {t("login.subtitle")}
           </Text>
 
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Email address</Text>
+            <Text style={styles.label}>{t("login.emailLabel")}</Text>
             <CustomInput
               icon="mail"
-              placeholder="Enter your email"
+              placeholder={t("login.emailPlaceholder")}
               value={email}
               onChangeText={setEmail}
             />
           </View>
 
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Password</Text>
+            <Text style={styles.label}>{t("login.passLabel")}</Text>
             <CustomInput
               icon="lock-closed"
-              placeholder="Enter password"
+              placeholder={t("login.passPlaceholder")}
               value={password}
               onChangeText={setPassword}
               secureTextEntry={true}
@@ -112,7 +122,7 @@ export default function LoginScreen({ navigation }) {
 
           <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
             <Text style={{ textAlign: "right", color: "#667085", marginTop: 3 }}>
-              Forgot password?
+              {t("login.forgotPass")}
             </Text>
           </TouchableOpacity>
           
@@ -120,15 +130,15 @@ export default function LoginScreen({ navigation }) {
             style={styles.button}
             onPress={handleLogin}
           >
-            <Text style={styles.buttonText}>Log in</Text>
+            <Text style={styles.buttonText}>{t("login.loginButton")}</Text>
           </TouchableOpacity>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Don't have an account?</Text>
+            <Text style={styles.footerText}>{t("login.noAccount")}</Text>
             <TouchableOpacity
               onPress={() => navigation && navigation.navigate("Registro")}
             >
-              <Text style={styles.signUp}>Sign up</Text>
+              <Text style={styles.signUp}>{t("login.signUp")}</Text>
             </TouchableOpacity>
           </View>
         </View>

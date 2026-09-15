@@ -7,15 +7,19 @@ import {
   ScrollView,
 } from 'react-native';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
-export default function PantallaExito({ navigation }) {
+export default function PantallaExito({ route, navigation }) {
+  const { t } = useTranslation();
+  const { amount = '25.00', category = 'Groceries', date = 'May 08, 2026' } = route?.params || {};
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.topSection}>
         <View style={styles.checkCircle}>
           <FontAwesome5 name="check" size={48} color="#FFFFFF" />
         </View>
-        <Text style={styles.completedText}>Transaction Completed</Text>
+        <Text style={styles.completedText}>{t('canje.completedText')}</Text>
       </View>
 
       <View style={styles.cardContainer}>
@@ -23,7 +27,7 @@ export default function PantallaExito({ navigation }) {
           <View style={styles.iconBox}>
             <MaterialCommunityIcons name="storefront-outline" size={26} color="#021024" />
           </View>
-          <Text style={styles.cardLabel}>Place</Text>
+          <Text style={styles.cardLabel}>{t('canje.placeLabel')}</Text>
           <Text style={styles.cardValue}>Super Selectos</Text>
         </View>
 
@@ -31,32 +35,38 @@ export default function PantallaExito({ navigation }) {
           <View style={styles.iconBox}>
             <FontAwesome5 name="tag" size={22} color="#021024" />
           </View>
-          <Text style={styles.cardLabel}>Amount</Text>
-          <Text style={styles.cardValue}>$25.00</Text>
+          <Text style={styles.cardLabel}>{t('canje.amountLabel')}</Text>
+          <Text style={styles.cardValue}>${amount}</Text>
         </View>
 
         <View style={styles.card}>
           <View style={styles.iconBox}>
             <MaterialCommunityIcons name="view-grid-outline" size={26} color="#021024" />
           </View>
-          <Text style={styles.cardLabel}>Category</Text>
-          <Text style={styles.cardValue}>Groceries</Text>
+          <Text style={styles.cardLabel}>{t('canje.categoryLabel')}</Text>
+          <Text style={styles.cardValue}>{category}</Text>
         </View>
 
         <View style={styles.card}>
           <View style={styles.iconBox}>
             <FontAwesome5 name="calendar-alt" size={24} color="#021024" />
           </View>
-          <Text style={styles.cardLabel}>Date</Text>
-          <Text style={styles.cardValue}>May 08, 2026</Text>
+          <Text style={styles.cardLabel}>{t('canje.dateLabel')}</Text>
+          <Text style={styles.cardValue}>{date}</Text>
         </View>
 
-        <TouchableOpacity style={styles.primaryButton}>
-          <Text style={styles.primaryButtonText}>View details</Text>
+        <TouchableOpacity 
+          style={styles.primaryButton}
+          onPress={() => navigation.navigate('TransactionDetail')}
+        >
+          <Text style={styles.primaryButtonText}>{t('canje.viewDetails')}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.secondaryButton}>
-          <Text style={styles.secondaryButtonText}>Back to home</Text>
+        <TouchableOpacity 
+          style={styles.secondaryButton}
+          onPress={() => navigation.navigate('HomeStore')}
+        >
+          <Text style={styles.secondaryButtonText}>{t('canje.backHome')}</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -133,7 +143,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     height: 52,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignmentItems: 'center',
     marginTop: 16,
   },
   primaryButtonText: {
@@ -144,7 +154,7 @@ const styles = StyleSheet.create({
   secondaryButton: {
     height: 50,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignmentItems: 'center',
     marginTop: 8,
   },
   secondaryButtonText: {

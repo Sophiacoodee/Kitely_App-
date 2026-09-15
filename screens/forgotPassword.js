@@ -16,18 +16,20 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../firebase/config";
+import { useTranslation } from "react-i18next";
 import styles from "./stylePassword";
 
 export default function ForgotPasswordScreen({ navigation }) {
   const { width } = useWindowDimensions();
   const isTablet = width >= 600;
+  const { t } = useTranslation();
 
   const [emailToReset, setEmailToReset] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSendCode = () => {
     if (!emailToReset.trim()) {
-      Alert.alert("Error", "Please enter your email address");
+      Alert.alert(t('forgotPassword.errorTitle'), t('forgotPassword.errorEmailRequired'));
       return;
     }
 
@@ -36,15 +38,15 @@ export default function ForgotPasswordScreen({ navigation }) {
     sendPasswordResetEmail(auth, emailToReset.trim())
       .then(() => {
         Alert.alert(
-          "Success",
-          "Check your email for instructions to reset your password"
+          t('forgotPassword.successTitle'),
+          t('forgotPassword.successMessage')
         );
         if (navigation) {
           navigation.navigate("Login");
         }
       })
       .catch((error) => {
-        Alert.alert("Error", error.message);
+        Alert.alert(t('forgotPassword.errorTitle'), error.message);
       })
       .finally(() => {
         setLoading(false);
@@ -70,19 +72,19 @@ export default function ForgotPasswordScreen({ navigation }) {
               <Ionicons name="lock-closed" size={60} color="#FFFFFF" />
             </View>
 
-            <Text style={styles.forgotTitle}>Forgot your password?</Text>
+            <Text style={styles.forgotTitle}>{t('forgotPassword.title')}</Text>
             <Text style={styles.forgotSubtitle}>
-              Enter your email address and we'll send you a link to recover it.
+              {t('forgotPassword.subtitle')}
             </Text>
 
             <View style={styles.fieldContainer}>
-              <Text style={styles.forgotLabel}>Email address</Text>
+              <Text style={styles.forgotLabel}>{t('forgotPassword.emailLabel')}</Text>
 
               <View style={styles.inputContainer}>
                 <Ionicons name="mail" size={18} color="#021533" />
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter your email"
+                  placeholder={t('forgotPassword.emailPlaceholder')}
                   placeholderTextColor="#A0A0A0"
                   value={emailToReset}
                   onChangeText={setEmailToReset}
@@ -105,13 +107,13 @@ export default function ForgotPasswordScreen({ navigation }) {
               {loading ? (
                 <ActivityIndicator color="#FFFFFF" size="small" />
               ) : (
-                <Text style={styles.forgotButtonText}>Send link</Text>
+                <Text style={styles.forgotButtonText}>{t('forgotPassword.sendButton')}</Text>
               )}
             </TouchableOpacity>
 
             <View style={styles.dividerContainer}>
               <View style={styles.line} />
-              <Text style={styles.orText}>or</Text>
+              <Text style={styles.orText}>{t('forgotPassword.or')}</Text>
               <View style={styles.line} />
             </View>
 
@@ -120,7 +122,7 @@ export default function ForgotPasswordScreen({ navigation }) {
               activeOpacity={0.7}
               disabled={loading}
             >
-              <Text style={styles.returnText}>Return to log in</Text>
+              <Text style={styles.returnText}>{t('forgotPassword.returnLogin')}</Text>
             </TouchableOpacity>
           </View>
         </View>

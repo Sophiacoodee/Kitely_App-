@@ -12,9 +12,11 @@ import {
   StatusBar,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 export default function ContactUsScreen() {
   const { height } = useWindowDimensions();
+  const { t } = useTranslation();
 
   const handleCall = () => {
     Linking.openURL('tel:77863408');
@@ -27,7 +29,7 @@ export default function ContactUsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={[styles.headerContainer, { minHeight: height * 0.22 }]}>
-        <Text style={styles.headerTitle}>Contact us</Text>
+        <Text style={styles.headerTitle}>{t('contactUs.headerTitle')}</Text>
         <Image
           source={require('../assets/kitelyBR.png')}
           style={styles.logo}

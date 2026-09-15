@@ -9,11 +9,12 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LineChart } from "react-native-gifted-charts";
+import { useTranslation } from "react-i18next";
 
 export default function BalanceDiario({ navigation }) {
   const { width } = useWindowDimensions();
+  const { t } = useTranslation();
 
-  // Cálculo del ancho dinámico para la gráfica considerando márgenes internos
   const chartWidth = Math.min(width - 80, 500);
 
   const datosGrafica = [
@@ -34,20 +35,29 @@ export default function BalanceDiario({ navigation }) {
     { id: "5", nombre: "Leonardo de León", monto: 125.0 },
   ];
 
+  const diasSemana = [
+    t('balanceDiario.days.mon'),
+    t('balanceDiario.days.tue'),
+    t('balanceDiario.days.wed'),
+    t('balanceDiario.days.thu'),
+    t('balanceDiario.days.fri'),
+    t('balanceDiario.days.sat'),
+    t('balanceDiario.days.sun'),
+  ];
+
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.headerTitulo}>Daily Balance</Text>
+      <Text style={styles.headerTitulo}>{t('balanceDiario.headerTitulo')}</Text>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.tarjeta}>
-          <Text style={styles.tarjetaTitulo}>Balance</Text>
-          <Text style={styles.tarjetaSubtitulo}>Today's running total</Text>
+          <Text style={styles.tarjetaTitulo}>{t('balanceDiario.tarjetaTitulo')}</Text>
+          <Text style={styles.tarjetaSubtitulo}>{t('balanceDiario.tarjetaSubtitulo')}</Text>
           <Text style={styles.tarjetaMonto}>$ 240.50</Text>
 
-          {/* Contenedor de la Gráfica */}
           <View style={styles.chartContainer}>
             <LineChart
               data={datosGrafica}
@@ -71,20 +81,19 @@ export default function BalanceDiario({ navigation }) {
                 fontSize: 11,
                 fontWeight: "500",
               }}
-              xAxisLabelTexts={["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]}
+              xAxisLabelTexts={diasSemana}
             />
           </View>
 
-          {/* Transacciones */}
           <Text style={styles.seccionTitulo}>
-            {`${transaccionesEjemplo.length} transactions completed`}
+            {t('balanceDiario.transactionsCompleted', { count: transaccionesEjemplo.length })}
           </Text>
 
-          {transaccionesEjemplo.map((t) => (
-            <View style={styles.filaTransaccion} key={t.id}>
-              <Text style={styles.nombreTransaccion}>{t.nombre}</Text>
+          {transaccionesEjemplo.map((tItem) => (
+            <View style={styles.filaTransaccion} key={tItem.id}>
+              <Text style={styles.nombreTransaccion}>{tItem.nombre}</Text>
               <Text style={styles.montoTransaccion}>
-                {`$${t.monto.toFixed(2)}`}
+                {`$${tItem.monto.toFixed(2)}`}
               </Text>
             </View>
           ))}
@@ -93,7 +102,7 @@ export default function BalanceDiario({ navigation }) {
             activeOpacity={0.7}
             onPress={() => navigation?.navigate("AllTransactions")}
           >
-            <Text style={styles.verTodas}>View all transactions</Text>
+            <Text style={styles.verTodas}>{t('balanceDiario.verTodas')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

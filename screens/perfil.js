@@ -16,14 +16,15 @@ import {
 } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 import { auth, db } from '../firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 
 export default function PerfilScreen({ navigation }) {
+  const { t } = useTranslation();
   const [profileImage, setProfileImage] = useState(null);
   const [fullName, setFullName] = useState('');
 
-  // Formatea el nombre completo para conservar solo un nombre y un apellido
   const formatName = (name) => {
     if (!name || name.trim() === '') return '';
     const parts = name.trim().split(/\s+/);
@@ -33,7 +34,6 @@ export default function PerfilScreen({ navigation }) {
     return parts[0];
   };
 
-  // Se ejecuta cada vez que el usuario regresa a esta pantalla
   useFocusEffect(
     useCallback(() => {
       loadUserData();
@@ -101,9 +101,9 @@ export default function PerfilScreen({ navigation }) {
 
           <View style={styles.headerTextContainer}>
             <Text style={styles.profileTitle}>
-              {fullName !== '' ? fullName : 'Profile'}
+              {fullName !== '' ? fullName : t('perfil.defaultName')}
             </Text>
-            <Text style={styles.profileSubtitle}>Manage your account</Text>
+            <Text style={styles.profileSubtitle}>{t('perfil.subtitle')}</Text>
           </View>
         </View>
 
@@ -116,8 +116,8 @@ export default function PerfilScreen({ navigation }) {
           >
             <FontAwesome5 name="user-alt" size={20} color="#021B42" style={styles.icon} />
             <View style={styles.optionTextContainer}>
-              <Text style={styles.optionTitle}>Personal information</Text>
-              <Text style={styles.optionSubtitle}>View your information</Text>
+              <Text style={styles.optionTitle}>{t('perfil.personalInfoTitle')}</Text>
+              <Text style={styles.optionSubtitle}>{t('perfil.personalInfoSubtitle')}</Text>
             </View>
             <Ionicons name="chevron-forward" size={22} color="#021B42" />
           </TouchableOpacity>
@@ -131,8 +131,8 @@ export default function PerfilScreen({ navigation }) {
           >
             <Ionicons name="card" size={22} color="#021B42" style={styles.icon} />
             <View style={styles.optionTextContainer}>
-              <Text style={styles.optionTitle}>Payment methods</Text>
-              <Text style={styles.optionSubtitle}>Manage your cards and accounts</Text>
+              <Text style={styles.optionTitle}>{t('perfil.paymentMethodsTitle')}</Text>
+              <Text style={styles.optionSubtitle}>{t('perfil.paymentMethodsSubtitle')}</Text>
             </View>
             <Ionicons name="chevron-forward" size={22} color="#021B42" />
           </TouchableOpacity>
@@ -146,8 +146,8 @@ export default function PerfilScreen({ navigation }) {
           >
             <Ionicons name="help-circle" size={24} color="#021B42" style={styles.icon} />
             <View style={styles.optionTextContainer}>
-              <Text style={styles.optionTitle}>Help</Text>
-              <Text style={styles.optionSubtitle}>Go to support</Text>
+              <Text style={styles.optionTitle}>{t('perfil.helpTitle')}</Text>
+              <Text style={styles.optionSubtitle}>{t('perfil.helpsSubtitle')}</Text>
             </View>
             <Ionicons name="chevron-forward" size={22} color="#021B42" />
           </TouchableOpacity>
@@ -161,8 +161,8 @@ export default function PerfilScreen({ navigation }) {
           >
             <Ionicons name="information-circle" size={24} color="#021B42" style={styles.icon} />
             <View style={styles.optionTextContainer}>
-              <Text style={styles.optionTitle}>About Kitely</Text>
-              <Text style={styles.optionSubtitle}>App version 1.00</Text>
+              <Text style={styles.optionTitle}>{t('perfil.aboutTitle')}</Text>
+              <Text style={styles.optionSubtitle}>{t('perfil.aboutSubtitle')}</Text>
             </View>
             <Ionicons name="chevron-forward" size={22} color="#021B42" />
           </TouchableOpacity>

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,47 +14,49 @@ import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth, db } from '../firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
-const RECENT_TRANSACTIONS = [
-  {
-    id: '1',
-    title: 'Walmart',
-    subtitle: 'Food • Today, 10:24 AM',
-    amount: '-$42.00',
-    status: 'Completed',
-    icon: 'home-outline',
-  },
-  {
-    id: '2',
-    title: 'Pharmacy Vida Nueva',
-    subtitle: 'Medicine • Yesterday, 4:32 PM',
-    amount: '-$42.00',
-    status: 'Completed',
-    icon: 'heart-outline',
-  },
-  {
-    id: '3',
-    title: 'Vidrí',
-    subtitle: 'Construction • 12 Jul 2026',
-    amount: '-$42.00',
-    status: 'Completed',
-    icon: 'lock-closed-outline',
-  },
-  {
-    id: '4',
-    title: 'Super Selectos',
-    subtitle: 'Food • 08 Jul 2026',
-    amount: '-$65.00',
-    status: 'Completed',
-    icon: 'cart-outline',
-  }
-];
-
 export default function TransmitterHome({ navigation }) {
+  const { t } = useTranslation();
   const [profileImage, setProfileImage] = useState(null);
   const [fullName, setFullName] = useState('');
+
+  const RECENT_TRANSACTIONS = useMemo(() => [
+    {
+      id: '1',
+      title: 'Walmart',
+      subtitle: `${t('transmitterHome.categoryFood')} • Today, 10:24 AM`,
+      amount: '-$42.00',
+      status: t('transmitterHome.statusCompleted'),
+      icon: 'home-outline',
+    },
+    {
+      id: '2',
+      title: 'Pharmacy Vida Nueva',
+      subtitle: `${t('transmitterHome.categoryMedicine')} • Yesterday, 4:32 PM`,
+      amount: '-$42.00',
+      status: t('transmitterHome.statusCompleted'),
+      icon: 'heart-outline',
+    },
+    {
+      id: '3',
+      title: 'Vidrí',
+      subtitle: `${t('transmitterHome.categoryConstruction')} • 12 Jul 2026`,
+      amount: '-$42.00',
+      status: t('transmitterHome.statusCompleted'),
+      icon: 'lock-closed-outline',
+    },
+    {
+      id: '4',
+      title: 'Super Selectos',
+      subtitle: `${t('transmitterHome.categoryFood')} • 08 Jul 2026`,
+      amount: '-$65.00',
+      status: t('transmitterHome.statusCompleted'),
+      icon: 'cart-outline',
+    }
+  ], [t]);
 
   useFocusEffect(
     useCallback(() => {
@@ -91,6 +93,9 @@ export default function TransmitterHome({ navigation }) {
     }
   };
 
+  const displayName = fullName !== '' ? fullName : t('transmitterHome.fallbackUser');
+  const greetingText = t('transmitterHome.greeting', { name: displayName });
+
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
@@ -107,10 +112,10 @@ export default function TransmitterHome({ navigation }) {
 
           <View style={styles.headerTextContainer}>
             <Text style={styles.headerTitle}>
-              Hello, {fullName !== '' ? fullName : 'User'}!
+              {greetingText}
             </Text>
             <Text style={styles.headerSubtitle}>
-              Transparent remittances, stronger connections.
+              {t('transmitterHome.subtitle')}
             </Text>
           </View>
 
@@ -121,7 +126,7 @@ export default function TransmitterHome({ navigation }) {
 
         {/* Balance Disponible */}
         <View style={styles.balanceCard}>
-          <Text style={styles.balanceLabel}>Available Balance</Text>
+          <Text style={styles.balanceLabel}>{t('transmitterHome.balanceLabel')}</Text>
           <Text style={styles.balanceAmount}>$316.00</Text>
         </View>
 
@@ -132,7 +137,7 @@ export default function TransmitterHome({ navigation }) {
             onPress={() => navigation.navigate('CategoryTransmitter')}
           >
             <Ionicons name="paper-plane" size={24} color="#021024" />
-            <Text style={styles.actionText}>Send{'\n'}Remittance</Text>
+            <Text style={styles.actionText}>{t('transmitterHome.sendRemittance')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -140,7 +145,7 @@ export default function TransmitterHome({ navigation }) {
             onPress={() => navigation.navigate('FamilyTransmitter')}
           >
             <FontAwesome5 name="users" size={20} color="#021024" />
-            <Text style={styles.actionText}>Beneficiaries</Text>
+            <Text style={styles.actionText}>{t('transmitterHome.beneficiaries')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -148,7 +153,7 @@ export default function TransmitterHome({ navigation }) {
             onPress={() => navigation.navigate('AllTransactions')}
           >
             <Ionicons name="time" size={24} color="#021024" />
-            <Text style={styles.actionText}>History</Text>
+            <Text style={styles.actionText}>{t('transmitterHome.history')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -163,21 +168,21 @@ export default function TransmitterHome({ navigation }) {
             <View style={styles.legendContainer}>
               <View style={styles.legendItem}>
                 <View style={[styles.dot, { backgroundColor: '#805AD5' }]} />
-                <Text style={styles.legendLabel}>Food</Text>
+                <Text style={styles.legendLabel}>{t('transmitterHome.categoryFood')}</Text>
                 <Text style={styles.legendPercent}>64%</Text>
                 <Text style={styles.legendAmount}>$42.00</Text>
               </View>
 
               <View style={styles.legendItem}>
                 <View style={[styles.dot, { backgroundColor: '#ECC94B' }]} />
-                <Text style={styles.legendLabel}>Medicine</Text>
+                <Text style={styles.legendLabel}>{t('transmitterHome.categoryMedicine')}</Text>
                 <Text style={styles.legendPercent}>11%</Text>
                 <Text style={styles.legendAmount}>$16.00</Text>
               </View>
 
               <View style={styles.legendItem}>
                 <View style={[styles.dot, { backgroundColor: '#00D2A0' }]} />
-                <Text style={styles.legendLabel}>Construction</Text>
+                <Text style={styles.legendLabel}>{t('transmitterHome.categoryConstruction')}</Text>
                 <Text style={styles.legendPercent}>25%</Text>
                 <Text style={styles.legendAmount}>$258.00</Text>
               </View>
@@ -186,7 +191,7 @@ export default function TransmitterHome({ navigation }) {
         </View>
 
         {/* Lista Deslizable de Gastos Recientes */}
-        <Text style={styles.sectionTitle}>Spending by Category</Text>
+        <Text style={styles.sectionTitle}>{t('transmitterHome.spendingTitle')}</Text>
         <FlatList
           data={RECENT_TRANSACTIONS}
           keyExtractor={(item) => item.id}

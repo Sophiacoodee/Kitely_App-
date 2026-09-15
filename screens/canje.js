@@ -9,10 +9,12 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 export default function CanjeExitosoScreen({ route, navigation }) {
   const { width } = useWindowDimensions();
   const isTablet = width >= 600;
+  const { t } = useTranslation();
 
   const { amount = '25.00', category = 'Groceries', date = 'May 08, 2026' } = route?.params || {};
 
@@ -30,14 +32,14 @@ export default function CanjeExitosoScreen({ route, navigation }) {
             <View style={styles.checkCircle}>
               <Ionicons name="checkmark" size={48} color="#FFFFFF" />
             </View>
-            <Text style={styles.titleText}>Transaction Completed</Text>
+            <Text style={styles.titleText}>{t('canjeExitoso.titleText')}</Text>
           </View>
 
           <View style={styles.cardContainer}>
             <View style={styles.rowItem}>
               <View style={styles.rowLeft}>
                 <Ionicons name="storefront-outline" size={22} color="#1F2937" />
-                <Text style={styles.label}>Place</Text>
+                <Text style={styles.label}>{t('canjeExitoso.placeLabel')}</Text>
               </View>
               <Text style={styles.value}>Super Selectos</Text>
             </View>
@@ -45,7 +47,7 @@ export default function CanjeExitosoScreen({ route, navigation }) {
             <View style={styles.rowItem}>
               <View style={styles.rowLeft}>
                 <Ionicons name="pricetag-outline" size={22} color="#1F2937" />
-                <Text style={styles.label}>Amount</Text>
+                <Text style={styles.label}>{t('canjeExitoso.amountLabel')}</Text>
               </View>
               <Text style={styles.value}>${amount}</Text>
             </View>
@@ -53,7 +55,7 @@ export default function CanjeExitosoScreen({ route, navigation }) {
             <View style={styles.rowItem}>
               <View style={styles.rowLeft}>
                 <Ionicons name="grid-outline" size={22} color="#1F2937" />
-                <Text style={styles.label}>Category</Text>
+                <Text style={styles.label}>{t('canjeExitoso.categoryLabel')}</Text>
               </View>
               <Text style={styles.value}>{category}</Text>
             </View>
@@ -61,7 +63,7 @@ export default function CanjeExitosoScreen({ route, navigation }) {
             <View style={styles.rowItem}>
               <View style={styles.rowLeft}>
                 <Ionicons name="calendar-outline" size={22} color="#1F2937" />
-                <Text style={styles.label}>Date</Text>
+                <Text style={styles.label}>{t('canjeExitoso.dateLabel')}</Text>
               </View>
               <Text style={styles.value}>{date}</Text>
             </View>
@@ -71,7 +73,7 @@ export default function CanjeExitosoScreen({ route, navigation }) {
               activeOpacity={0.8}
               onPress={() => navigation?.navigate('AllTransactions')}
             >
-              <Text style={styles.primaryButtonText}>View details</Text>
+              <Text style={styles.primaryButtonText}>{t('canjeExitoso.viewDetails')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -79,7 +81,7 @@ export default function CanjeExitosoScreen({ route, navigation }) {
               activeOpacity={0.6}
               onPress={() => navigation?.navigate('CategoryTransmitter')}
             >
-              <Text style={styles.linkText}>Back to home</Text>
+              <Text style={styles.linkText}>{t('canjeExitoso.backToHome')}</Text>
             </TouchableOpacity>
           </View>
         </View>

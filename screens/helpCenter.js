@@ -9,37 +9,12 @@ import {
   Platform,
   StatusBar,
 } from 'react-native';
-
-const FAQ_DATA = [
-  {
-    category: 'Sending a Remittance',
-    question: 'How do I send a remittance?',
-    answer:
-      'Choose "Send", select the category you want to support, choose a beneficiary, enter the amount, and confirm the transaction.',
-  },
-  {
-    question: 'What categories can I choose from?',
-    answer:
-      'You can choose from categories such as Food, Education, Health, and Home & Essentials.',
-  },
-  {
-    question: 'Can I choose who receives the remittance?',
-    answer:
-      'Yes. After selecting a category, you can choose one of your registered beneficiaries.',
-  },
-  {
-    question: 'How do I choose the amount?',
-    answer:
-      'After selecting the category and beneficiary, enter the amount you want to send and review the transaction before confirming it.',
-  },
-  {
-    question: 'Can I change the category after sending?',
-    answer:
-      'Once a transaction is confirmed and completed, the category cannot be changed. Please review all details before confirming.',
-  },
-];
+import { useTranslation } from 'react-i18next';
 
 export default function HelpScreen() {
+  const { t } = useTranslation();
+  const faqData = t('helpCenter.faqData', { returnObjects: true });
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
@@ -48,7 +23,7 @@ export default function HelpScreen() {
           style={styles.headerImage}
           resizeMode="contain"
         />
-        <Text style={styles.headerTitle}>How can we{'\n'}help?</Text>
+        <Text style={styles.headerTitle}>{t('helpCenter.headerTitle')}</Text>
       </View>
 
       <View style={styles.cardContainer}>
@@ -56,15 +31,16 @@ export default function HelpScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          {FAQ_DATA.map((item, index) => (
-            <View key={index} style={styles.faqItem}>
-              {item.category && (
-                <Text style={styles.categoryTitle}>{item.category}</Text>
-              )}
-              <Text style={styles.questionText}>{item.question}</Text>
-              <Text style={styles.answerText}>{item.answer}</Text>
-            </View>
-          ))}
+          {Array.isArray(faqData) &&
+            faqData.map((item, index) => (
+              <View key={index} style={styles.faqItem}>
+                {item.category && (
+                  <Text style={styles.categoryTitle}>{item.category}</Text>
+                )}
+                <Text style={styles.questionText}>{item.question}</Text>
+                <Text style={styles.answerText}>{item.answer}</Text>
+              </View>
+            ))}
         </ScrollView>
       </View>
     </SafeAreaView>

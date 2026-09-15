@@ -1,0 +1,401 @@
+{
+  "aboutUs": {
+    "title": "Sobre nosotros",
+    "missionTitle": "Nuestra Misión",
+    "missionBody": "Transformamos el modelo tradicional de remesas en El Salvador ofreciendo una plataforma transparente y segura. Nos aseguramos de que el esfuerzo de quienes envían dinero desde el extranjero se convierta en bienestar directo mediante canjes en áreas clave."
+  },
+  "allTransactions": {
+    "headerTitle": "Todas las transacciones",
+    "historyTitle": "Historial",
+    "completed": "Completado",
+    "emptyText": "No se encontraron transacciones para esta fecha.",
+    "modalTitle": "Filtrar por categoría",
+    "categories": {
+      "all": "Todos",
+      "groceries": "Supermercado",
+      "health": "Salud",
+      "clothing": "Ropa",
+      "house": "Hogar",
+      "education": "Educación",
+      "construction": "Construcción"
+    }
+  },
+  "authorizedCategories": {
+    "title": "Categorías autorizadas",
+    "subtitle": "Elige las categorías que deseas\npermitir para transacciones",
+    "saveChanges": "Guardar cambios",
+    "errorTitle": "Error",
+    "errorSaveMessage": "No se pudieron guardar los cambios",
+    "list": {
+      "food": "Comida",
+      "medicine": "Medicina",
+      "education": "Educación",
+      "entertainment": "Entretenimiento",
+      "construction": "Construcción",
+      "petSupplies": "Mascotas",
+      "clothes": "Ropa"
+    }
+  },
+  "balanceDiario": {
+    "headerTitulo": "Balance diario",
+    "tarjetaTitulo": "Balance",
+    "tarjetaSubtitulo": "Total acumulado de hoy",
+    "transactionsCompleted": "{{count}} transacciones completadas",
+    "verTodas": "Ver todas las transacciones",
+    "days": {
+      "mon": "LUN",
+      "tue": "MAR",
+      "wed": "MIÉ",
+      "thu": "JUE",
+      "fri": "VIE",
+      "sat": "SÁB",
+      "sun": "DOM"
+    }
+  },
+  "canjeExitoso": {
+    "titleText": "Canje completado",
+    "placeLabel": "Comercio",
+    "amountLabel": "Monto",
+    "categoryLabel": "Categoría",
+    "dateLabel": "Fecha",
+    "viewDetails": "Ver detalles",
+    "backToHome": "Volver al inicio"
+  },
+  "categoriesScreen": {
+    "headerTitle": "Categorías",
+    "headerSubtitle": "Elige una o más categorías",
+    "amountLabel": "Monto",
+    "amountSublabel": "Envías (USD) - Máx: ${{max}}",
+    "currencyCode": "USD",
+    "continueButton": "Continuar",
+    "attentionTitle": "Atención",
+    "errorSelectCategory": "Por favor selecciona al menos una categoría.",
+    "errorEnterAmount": "Por favor ingresa un monto.",
+    "errorValidAmount": "Por favor ingresa un monto válido mayor a $0.00.",
+    "limitExceededTitle": "Límite excedido",
+    "limitExceededMessage": "El monto máximo permitido por transacción es ${{max}}.",
+    "list": {
+      "groceries": "Supermercado",
+      "health": "Salud",
+      "clothing": "Ropa",
+      "house": "Hogar",
+      "education": "Educación",
+      "cleaning": "Limpieza",
+      "entertainment": "Entretenimiento",
+      "construction": "Construcción"
+    }
+  },
+  "contactUs": {
+    "headerTitle": "Contáctanos"
+  },
+  "faceId": {
+    "titulo": "FACE ID",
+    "subtitulo": "Mira tu teléfono para\nconfirmar tu identidad",
+    "authenticating": "Autenticando...",
+    "tapToRetry": "Toca el círculo para reintentar Face ID",
+    "botonPinTexto": "O ingresa tu PIN de seguridad",
+    "hardwareUnavailableTitle": "Hardware no disponible",
+    "hardwareUnavailableMessage": "Face ID no está disponible en este dispositivo.",
+    "requiredConfigTitle": "Configuración requerida",
+    "requiredConfigMessage": "No hay datos biométricos configurados en este dispositivo.",
+    "usePin": "Usar PIN",
+    "cancel": "Cancelar",
+    "promptMessage": "Confirma tu identidad con Face ID",
+    "authFailedTitle": "Autenticación fallida",
+    "authFailedMessage": "Por favor intenta de nuevo.",
+    "authErrorTitle": "Error de autenticación",
+    "authErrorMessage": "Ocurrió un error durante la autenticación. Por favor intenta de nuevo."
+  },
+  "beneficiaries": {
+    "headerTitle": "Mi familia",
+    "headerSubtitle": "Tus beneficiarios",
+    "addButton": "Agregar",
+    "searchPlaceholder": "Buscar un beneficiario",
+    "emptyText": "No se encontraron beneficiarios",
+    "modalTitle": "Agregar Beneficiario",
+    "fullNamePlaceholder": "Nombre completo",
+    "photoUrlPlaceholder": "URL de foto (Opcional)",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "deleteTitle": "Eliminar beneficiario",
+    "deleteMessage": "¿Estás seguro de que deseas eliminar este beneficiario?",
+    "delete": "Eliminar",
+    "errorTitle": "Error",
+    "errorNameRequired": "Por favor ingresa un nombre para el beneficiario."
+  },
+  "forgotPassword": {
+    "title": "¿Olvidaste tu contraseña?",
+    "subtitle": "Ingresa tu correo electrónico y te enviaremos un enlace para recuperarla.",
+    "emailLabel": "Correo electrónico",
+    "emailPlaceholder": "Ingresa tu correo",
+    "sendButton": "Enviar enlace",
+    "or": "o",
+    "returnLogin": "Volver al inicio de sesión",
+    "errorTitle": "Error",
+    "errorEmailRequired": "Por favor ingresa tu dirección de correo electrónico",
+    "successTitle": "Éxito",
+    "successMessage": "Revisa tu correo electrónico para ver las instrucciones para restablecer tu contraseña"
+  },
+  "helpCenter": {
+    "headerTitle": "¿Cómo podemos\nayudarte?",
+    "faqData": [
+      {
+        "category": "Envío de remesa",
+        "question": "¿Cómo envío una remesa?",
+        "answer": "Elige \"Enviar\", selecciona la categoría que deseas apoyar, elige un beneficiario, ingresa el monto y confirma la transacción."
+      },
+      {
+        "question": "¿De qué categorías puedo elegir?",
+        "answer": "Puedes elegir entre categorías como Alimentos, Educación, Salud y Hogar y Esenciales."
+      },
+      {
+        "question": "¿Puedo elegir quién recibe la remesa?",
+        "answer": "Sí. Después de seleccionar una categoría, puedes elegir uno de tus beneficiarios registrados."
+      },
+      {
+        "question": "¿Cómo elijo el monto?",
+        "answer": "Después de seleccionar la categoría y el beneficiario, ingresa el monto que deseas enviar y revisa la transacción antes de confirmarla."
+      },
+      {
+        "question": "¿Puedo cambiar la categoría después de enviar?",
+        "answer": "Una vez que una transacción está confirmada y completada, la categoría no se puede cambiar. Por favor revisa todos los detalles antes de confirmar."
+      }
+    ]
+  },
+  "homeStore": {
+    "branchName": "Super Selectos - Escalón",
+    "subGreeting": "Sucursal Autorizada • ID: #4082",
+    "balanceLabel": "Saldo disponible de caja",
+    "cutoffDate": "Fecha de corte: {{date}}",
+    "saving": "Guardando...",
+    "saveLocation": "Guardar ubicación",
+    "selectLocationTitle": "Seleccionar Ubicación",
+    "confirmSaveLocation": "Confirmar y Guardar Ubicación",
+    "authorizedCategoriesButton": "Categorías autorizadas",
+    "recentActivityTitle": "Actividad reciente de la sucursal",
+    "statusCompleted": "Completado",
+    "categories": {
+      "Food": "Alimentos",
+      "Medicine": "Medicina",
+      "Education": "Educación",
+      "Entertainment": "Entretenimiento"
+    },
+    "activities": {
+      "act1": {
+        "title": "Redirección - Alimentos",
+        "subtitle": "Caja 02 • Ticket #1042",
+        "time": "Hoy 10:24 a.m."
+      },
+      "act2": {
+        "title": "Redirección - Medicina",
+        "subtitle": "Caja 01 • Ticket #1038",
+        "time": "Ayer 4:15 p.m."
+      },
+      "act3": {
+        "title": "Redirection - Alimentos",
+        "subtitle": "Caja 04 • Ticket #1012",
+        "time": "10 Ago 2:30 p.m."
+      },
+      "act4": {
+        "title": "Redirección - Entretenimiento",
+        "subtitle": "Caja 03 • Ticket #0998",
+        "time": "08 Ago 11:10 a.m."
+      }
+    },
+    "alertSuccessTitle": "¡Éxito!",
+    "alertSuccessMessage": "Ubicación guardada en Firebase correctamente.",
+    "alertErrorTitle": "Error",
+    "alertErrorMessage": "No se pudo guardar la ubicación."
+  },
+  "inicioReceptor": {
+    "hello": "Hola",
+    "userFallback": "Usuario",
+    "subtitle": "Remesas transparentes, conexiones más fuertes.",
+    "senders": "Remitentes",
+    "scanCode": "Escanear",
+    "history": "Historial",
+    "modalTitle": "Ubicación de Sucursal",
+    "spendingByCategory": "Gastos por Categoría",
+    "food": "Alimentos",
+    "medicine": "Medicina",
+    "construction": "Construcción",
+    "recentSpending": "Gastos Recientes",
+    "defaultSucursal": "Sucursal",
+    "defaultSucursalTitle": "Super Selectos",
+    "activeLocation": "Ubicación activa",
+    "selectedBranch": "Sucursal Seleccionada"
+  },
+  "language": {
+    "title": "Idioma",
+    "subtitle": "El idioma que elijas\nse usará en toda la aplicación",
+    "apply": "Aplicar",
+    "spanishName": "Español",
+    "spanishSub": "Español (El Salvador)",
+    "englishName": "English",
+    "englishSub": "English (United States)"
+  },
+  "login": {
+    "incompleteTitle": "Campos Incompletos",
+    "incompleteMsg": "Por favor ingresa correo y contraseña.",
+    "welcome": "¡Bienvenido!",
+    "loginFailedTitle": "Error de Inicio",
+    "loginFailedMsg": "Correo o contraseña inválidos. Intenta de nuevo.",
+    "invalidEmailTitle": "Correo Inválido",
+    "invalidEmailMsg": "Por favor ingresa un correo válido.",
+    "title": "Bienvenido de nuevo",
+    "subtitle": "Inicia sesión para seguir usando Kitely.",
+    "emailLabel": "Correo electrónico",
+    "emailPlaceholder": "Ingresa tu correo",
+    "passLabel": "Contraseña",
+    "passPlaceholder": "Ingresa tu contraseña",
+    "forgotPass": "¿Olvidaste tu contraseña?",
+    "loginButton": "Iniciar sesión",
+    "noAccount": "¿No tienes una cuenta?",
+    "signUp": "Regístrate"
+  },
+  "metodoPago": {
+    "title": "Método de pago",
+    "cardholderLabel": "Nombre del titular",
+    "cardholderPlaceholder": "Nombre en la tarjeta",
+    "cardNumberLabel": "Número de tarjeta",
+    "cardNumberPlaceholder": "•••• •••• •••• ••••",
+    "expireDateLabel": "Fecha de expiración",
+    "expireDatePlaceholder": "MM/AA",
+    "cvvLabel": "CVV",
+    "cvvPlaceholder": "123",
+    "continue": "Continuar"
+  },
+  "perfil": {
+    "defaultName": "Perfil",
+    "subtitle": "Administra tu cuenta",
+    "personalInfoTitle": "Información personal",
+    "personalInfoSubtitle": "Ver tu información",
+    "paymentMethodsTitle": "Métodos de pago",
+    "paymentMethodsSubtitle": "Gestiona tus tarjetas y cuentas",
+    "helpTitle": "Ayuda",
+    "helpSubtitle": "Ir al soporte",
+    "aboutTitle": "Acerca de Kitely",
+    "aboutSubtitle": "Versión de la app 1.00"
+  },
+  "personalInformation": {
+    "title": "Información personal",
+    "permissionDeniedTitle": "Permiso denegado",
+    "permissionDeniedMessage": "Se requieren permisos para acceder a tu galería.",
+    "userFallback": "Usuario",
+    "fullName": "Nombre completo",
+    "email": "Correo electrónico",
+    "idNumber": "Número de identidad",
+    "dob": "Fecha de nacimiento",
+    "country": "País",
+    "placeholder": "no proporcionado"
+  },
+  "pin": {
+    "title": "Ingresa tu PIN",
+    "subtitle": "Ingresa tu PIN de seguridad"
+  },
+  "qrScanner": {
+    "cameraRequired": "Se requiere permiso de cámara.",
+    "openingCamera": "Abriendo cámara del dispositivo...",
+    "scanningImage": "Escaneando imagen...",
+    "processingPixels": "Procesando píxeles del QR...",
+    "detected": "¡QR detectado con éxito!",
+    "failed": "No se pudo leer el código QR de la imagen.",
+    "openLink": "Abrir enlace",
+    "takeAnother": "Tomar otra foto",
+    "prompt": "Toma una foto del código QR",
+    "openCameraBtn": "Abrir cámara del dispositivo"
+  },
+  "register": {
+    "incompleteFields": "Campos incompletos",
+    "fillAll": "Por favor completa todos los campos.",
+    "invalidName": "Nombre inválido",
+    "nameLetters": "El nombre solo debe contener letras.",
+    "invalidPassword": "Contraseña inválida",
+    "passwordUppercase": "La contraseña debe contener al menos una letra mayúscula.",
+    "passwordSpecial": "La contraseña debe contener al menos un carácter especial.",
+    "success": "¡Éxito!",
+    "userRegistered": "Usuario registrado con éxito.",
+    "emailExists": "Correo existente",
+    "emailAlreadyInUse": "Este correo ya está registrado.",
+    "invalidEmailTitle": "Correo inválido",
+    "invalidEmailText": "El correo ingresado no es válido.",
+    "weakPasswordTitle": "Contraseña débil",
+    "weakPasswordText": "La contraseña debe tener al menos 6 caracteres.",
+    "error": "Error",
+    "title": "Crea tu cuenta",
+    "subtitle": "Envía y recibe apoyo\ncon propósito.",
+    "placeholderName": "Ingresa tu nombre completo",
+    "placeholderId": "Ingresa tu número de identidad",
+    "placeholderDob": "Selecciona fecha de nacimiento",
+    "selectCountry": "Selecciona país",
+    "countrySalvador": "🇸🇻 El Salvador",
+    "countryUSA": "🇺🇸 Estados Unidos",
+    "placeholderEmail": "Ingresa tu correo",
+    "placeholderPassword": "Ingresa contraseña",
+    "signUp": "Registrarse",
+    "haveAccount": "¿Ya tienes una cuenta? ",
+    "logIn": "Iniciar sesión"
+  },
+  "roleSelection": {
+    "headerTitle": "Por favor selecciona tu rol para continuar",
+    "senderTitle": "Remitente",
+    "senderSubtitle": "Envía remesas a tus familiares",
+    "receiverTitle": "Receptor",
+    "receiverSubtitle": "Recibe remesas de forma transparente",
+    "storeTitle": "Comercio",
+    "storeSubtitle": "Registra las remesas canjeadas",
+    "continue": "Continuar"
+  },
+  "settings": {
+    "headerTitle": "Configuración",
+    "headerSubtitle": "Personaliza tu experiencia",
+    "sectionAccount": "Cuenta",
+    "personalInfo": "Información personal",
+    "beneficiaries": "Beneficiarios",
+    "sectionPreferences": "Preferencias",
+    "language": "Idioma",
+    "notifications": "Notificaciones",
+    "sectionHelp": "Ayuda",
+    "helpCenter": "Centro de ayuda",
+    "contactSupport": "Contactar soporte"
+  },
+  "transactionDetail": {
+    "headerTitle": "Detalles de la transacción",
+    "amountLabel": "Monto",
+    "statusLabel": "Estado",
+    "statusInProgress": "En progreso",
+    "statusCompleted": "Completado",
+    "statusFailed": "Fallido"
+  },
+  "transaction": {
+    "headerTitle": "Transacción",
+    "sectionCategories": "Categorías elegidas",
+    "sectionReceiver": "Destinatario",
+    "sectionAmount": "Monto (USD)",
+    "currency": "USD",
+    "continue": "Continuar"
+  },
+  "canje": {
+    "completedText": "Transacción completada",
+    "placeLabel": "Lugar",
+    "amountLabel": "Monto",
+    "categoryLabel": "Categoría",
+    "dateLabel": "Fecha",
+    "viewDetails": "Ver detalles",
+    "backHome": "Volver al inicio"
+  },
+  "transmitterHome": {
+    "greeting": "¡Hola, {{name}}!",
+    "fallbackUser": "Usuario",
+    "subtitle": "Remesas transparentes, conexiones más fuertes.",
+    "balanceLabel": "Saldo disponible",
+    "sendRemittance": "Enviar\nRemesa",
+    "beneficiaries": "Beneficiarios",
+    "history": "Historial",
+    "categoryFood": "Alimentos",
+    "categoryMedicine": "Medicina",
+    "categoryConstruction": "Construcción",
+    "spendingTitle": "Gastos por categoría",
+    "statusCompleted": "Completado"
+  }
+}

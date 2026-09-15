@@ -15,6 +15,8 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import dayjs from "dayjs";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/config";
+import { useTranslation } from "react-i18next";
+
 function getIconoPorCategoria(categoria) {
   if (!categoria) return "pricetag-outline";
   const catLower = categoria.toLowerCase();
@@ -32,6 +34,7 @@ const CATEGORIES = ["All", "Groceries", "Health", "Clothing", "House", "Educatio
 export default function AllTransactions({ navigation }) {
   const { width } = useWindowDimensions();
   const isTablet = width >= 600;
+  const { t } = useTranslation();
 
   const [transactions, setTransactions] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -74,14 +77,14 @@ export default function AllTransactions({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={[styles.headerBar, isTablet && styles.headerBarTablet]}>
-        <Text style={styles.title}>All the transactions</Text>
+        <Text style={styles.title}>{t ('allTransactions.headerTitle')}</Text>
       </View>
 
       <View style={styles.content}>
         <View style={[styles.mainWrapper, isTablet && styles.mainWrapperTablet]}>
           <View style={styles.historyHeader}>
-            <Text style={styles.history}>
-              History {selectedCategory !== "All" && `(${selectedCategory})`}
+            <Text style={styles.history}>{t('allTransactions.historyTitle')}
+             {selectedCategory !== "All" && `(${selectedCategory})`}
             </Text>
             <TouchableOpacity onPress={() => setShowFilterModal(true)}>
               <Ionicons name="filter-outline" size={24} color="#021533" />
@@ -131,12 +134,11 @@ export default function AllTransactions({ navigation }) {
                   </View>
 
                   <Text style={styles.amount}>{transaction.amount}</Text>
-                  <Text style={styles.completed}>Completed</Text>
+                  <Text style={styles.completed}>{t('allTransactions.completed')}</Text>
                 </View>
               ))
             ) : (
-              <Text style={styles.emptyText}>
-                No transactions found for this date.
+              <Text style={styles.emptyText}>{t('allTransactions.emptyText')}
               </Text>
             )}
           </ScrollView>
@@ -179,7 +181,7 @@ export default function AllTransactions({ navigation }) {
                     selectedCategory === cat && styles.activeFilterText,
                   ]}
                 >
-                  {cat}
+                  {t(`allTransactions.categories.${cat.toLowerCase()}`, { defaultValue: cat })}
                 </Text>
               </TouchableOpacity>
             ))}

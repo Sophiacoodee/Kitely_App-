@@ -9,21 +9,24 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
-const CATEGORIES_DATA = [
-  { id: 'groceries', name: 'Groceries', icon: 'bag-handle-sharp' },
-  { id: 'health', name: 'Health', icon: 'heart-sharp' },
-  { id: 'clothing', name: 'Clothing', icon: 'shirt-sharp' },
-  { id: 'house', name: 'House', icon: 'home-sharp' },
-  { id: 'education', name: 'Education', icon: 'school-sharp' },
-  { id: 'cleaning', name: 'Cleaning', icon: 'sparkles-sharp' },
-  { id: 'entertainment', name: 'Entertainment', icon: 'film-sharp' },
-  { id: 'construction', name: 'Construction', icon: 'construct-sharp' },
-];
+import { useTranslation } from 'react-i18next';
 
 const MAX_AMOUNT = 3000;
 
 export default function CategoriesScreen({ navigation }) {
+  const { t } = useTranslation();
+
+  const CATEGORIES_DATA = [
+    { id: 'groceries', name: t('categoriesScreen.list.groceries', { defaultValue: 'Groceries' }), icon: 'bag-handle-sharp' },
+    { id: 'health', name: t('categoriesScreen.list.health', { defaultValue: 'Health' }), icon: 'heart-sharp' },
+    { id: 'clothing', name: t('categoriesScreen.list.clothing', { defaultValue: 'Clothing' }), icon: 'shirt-sharp' },
+    { id: 'house', name: t('categoriesScreen.list.house', { defaultValue: 'House' }), icon: 'home-sharp' },
+    { id: 'education', name: t('categoriesScreen.list.education', { defaultValue: 'Education' }), icon: 'school-sharp' },
+    { id: 'cleaning', name: t('categoriesScreen.list.cleaning', { defaultValue: 'Cleaning' }), icon: 'sparkles-sharp' },
+    { id: 'entertainment', name: t('categoriesScreen.list.entertainment', { defaultValue: 'Entertainment' }), icon: 'film-sharp' },
+    { id: 'construction', name: t('categoriesScreen.list.construction', { defaultValue: 'Construction' }), icon: 'construct-sharp' },
+  ];
+
   const [selectedCategories, setSelectedCategories] = useState(['clothing']);
   const [amount, setAmount] = useState('');
 
@@ -52,31 +55,30 @@ export default function CategoriesScreen({ navigation }) {
 
   const handleContinue = () => {
     if (selectedCategories.length === 0) {
-      Alert.alert('Attention', 'Please select at least one category.');
+      Alert.alert(t('categoriesScreen.attentionTitle'), t('categoriesScreen.errorSelectCategory'));
       return;
     }
 
     if (!amount || amount.trim() === '') {
-      Alert.alert('Attention', 'Please enter an amount.');
+      Alert.alert(t('categoriesScreen.attentionTitle'), t('categoriesScreen.errorEnterAmount'));
       return;
     }
 
     const numericAmount = parseFloat(amount);
 
     if (isNaN(numericAmount) || numericAmount <= 0) {
-      Alert.alert('Attention', 'Please enter a valid amount greater than $0.00.');
+      Alert.alert(t('categoriesScreen.attentionTitle'), t('categoriesScreen.errorValidAmount'));
       return;
     }
 
     if (numericAmount > MAX_AMOUNT) {
       Alert.alert(
-        'Limit Exceeded',
-        `The maximum allowed amount per transaction is $${MAX_AMOUNT.toLocaleString('en-US', { minimumFractionDigits: 2 })}.`
+        t('categoriesScreen.limitExceededTitle'),
+        t('categoriesScreen.limitExceededMessage', { max: MAX_AMOUNT.toLocaleString('en-US', { minimumFractionDigits: 2 }) })
       );
       return;
     }
 
-    // Navega a la pantalla Transaction enviando los datos reales
     navigation.navigate('Transaction', {
       selectedCategories,
       amount: numericAmount.toFixed(2),
@@ -92,9 +94,9 @@ export default function CategoriesScreen({ navigation }) {
         >
           <View style={styles.header}>
             <View>
-              <Text style={styles.headerTitle}>Categories</Text>
+              <Text style={styles.headerTitle}>{t('categoriesScreen.headerTitle')}</Text>
               <Text style={styles.headerSubtitle}>
-                Choose one or more categories
+                {t('categoriesScreen.headerSubtitle')}
               </Text>
             </View>
           </View>
@@ -131,9 +133,9 @@ export default function CategoriesScreen({ navigation }) {
         </ScrollView>
 
         <View style={styles.overlayAmountSection}>
-          <Text style={styles.amountLabel}>Amount</Text>
+          <Text style={styles.amountLabel}>{t('categoriesScreen.amountLabel')}</Text>
           <Text style={styles.amountSublabel}>
-            You send (USD) - Max: ${MAX_AMOUNT.toLocaleString()}
+            {t('categoriesScreen.amountSublabel', { max: MAX_AMOUNT.toLocaleString() })}
           </Text>
 
           <View style={styles.inputContainer}>
@@ -147,7 +149,7 @@ export default function CategoriesScreen({ navigation }) {
               placeholderTextColor="#94A3B8"
               maxLength={10}
             />
-            <Text style={styles.currencyCode}>USD</Text>
+            <Text style={styles.currencyCode}>{t('categoriesScreen.currencyCode')}</Text>
           </View>
 
           <TouchableOpacity
@@ -155,7 +157,7 @@ export default function CategoriesScreen({ navigation }) {
             onPress={handleContinue}
             activeOpacity={0.8}
           >
-            <Text style={styles.continueButtonText}>Continue</Text>
+            <Text style={styles.continueButtonText}>{t('categoriesScreen.continueButton')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -195,7 +197,7 @@ const styles = StyleSheet.create({
   gridContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justify: 'space-between',
+    justifyContent: 'space-between',
   },
   categoryCard: {
     width: '48%',
@@ -220,7 +222,7 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: 11,
-    justify: 'center',
+    justifyContent: 'center',
     alignItems: 'center',
   },
   categoryName: {
@@ -264,7 +266,7 @@ const styles = StyleSheet.create({
     height: 50,
     marginBottom: 14,
   },
-  currencySymbol: {
+    currencySymbol: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#021024',

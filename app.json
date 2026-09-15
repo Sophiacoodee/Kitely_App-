@@ -13,36 +13,38 @@
     },
     "ios": {
       "supportsTablet": true
-   
-      },
-      "edgeToEdgeEnabled": true,
-      "config": {
-        "googleMaps": {
-          "apiKey": "TU_API_KEY_AQUI"
-        }
-      },
-      "package": "com.anonymous.Kitely_App"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
+    "edgeToEdgeEnabled": true,
+    "config": {
+      "googleMaps": {
+        "apiKey": "TU_API_KEY_AQUI"
+      }
     },
+    "package": "com.anonymous.Kitely_App",
     "plugins": [
-      "@react-native-community/datetimepicker"
+      "expo-localization"
+    ]
+  },
+  "web": {
+    "favicon": "./assets/favicon.png"
+  },
+  "plugins": [
+    "@react-native-community/datetimepicker"
+  ],
+  "android": {
+    "adaptiveIcon": {
+      "foregroundImage": "./assets/adaptive-icon.png",
+      "backgroundColor": "#ffffff"
+    },
+    "edgeToEdgeEnabled": false,
+    "permissions": [
+      "CAMERA"
     ],
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": false,
-      "permissions": [
-        "CAMERA"
-      ],
-      "config": {
-        "googleMaps": {
-          "apiKey": "TU_API_KEY_AQUI"
-        }
-      },
-      "package": "com.kitely.app"
-    }
+    "config": {
+      "googleMaps": {
+        "apiKey": "TU_API_KEY_AQUI"
+      }
+    },
+    "package": "com.kitely.app"
   }
+}

@@ -12,8 +12,10 @@ import {
   FontAwesome5,
   Ionicons,
 } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 export default function SettingsScreen({ navigation }) {
+  const { t } = useTranslation();
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   const toggleNotifications = () => {
@@ -27,15 +29,15 @@ export default function SettingsScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.topSection}>
-          <Text style={styles.headerTitle}>Settings</Text>
-          <Text style={styles.headerSubtitle}>Customize your experience</Text>
+          <Text style={styles.headerTitle}>{t('settings.headerTitle')}</Text>
+          <Text style={styles.headerSubtitle}>{t('settings.headerSubtitle')}</Text>
         </View>
 
         <View style={styles.bottomSection}>
           <View style={styles.sectionCard}>
             <View style={styles.sectionHeader}>
               <FontAwesome5 name="user" size={20} color="#021024" style={styles.sectionIcon} />
-              <Text style={styles.sectionTitle}>Account</Text>
+              <Text style={styles.sectionTitle}>{t('settings.sectionAccount')}</Text>
             </View>
 
             <TouchableOpacity
@@ -43,7 +45,7 @@ export default function SettingsScreen({ navigation }) {
               activeOpacity={0.7}
               onPress={() => navigation.navigate('PersonalInformation')}
             >
-              <Text style={styles.optionText}>Personal information</Text>
+              <Text style={styles.optionText}>{t('settings.personalInfo')}</Text>
               <Ionicons name="chevron-forward" size={18} color="#021024" />
             </TouchableOpacity>
 
@@ -52,7 +54,7 @@ export default function SettingsScreen({ navigation }) {
               activeOpacity={0.7}
               onPress={() => navigation.navigate('FamilyTransmitter')}
             >
-              <Text style={styles.optionText}>Beneficiaries</Text>
+              <Text style={styles.optionText}>{t('settings.beneficiaries')}</Text>
               <Ionicons name="chevron-forward" size={18} color="#021024" />
             </TouchableOpacity>
           </View>
@@ -60,7 +62,7 @@ export default function SettingsScreen({ navigation }) {
           <View style={styles.sectionCard}>
             <View style={styles.sectionHeader}>
               <Ionicons name="settings-sharp" size={22} color="#021024" style={styles.sectionIcon} />
-              <Text style={styles.sectionTitle}>Preferences</Text>
+              <Text style={styles.sectionTitle}>{t('settings.sectionPreferences')}</Text>
             </View>
 
             <TouchableOpacity
@@ -68,12 +70,12 @@ export default function SettingsScreen({ navigation }) {
               activeOpacity={0.7}
               onPress={() => navigation.navigate('Languaje')}
             >
-              <Text style={styles.optionText}>Language</Text>
+              <Text style={styles.optionText}>{t('settings.language')}</Text>
               <Ionicons name="chevron-forward" size={18} color="#021024" />
             </TouchableOpacity>
 
             <View style={[styles.optionRow, styles.lastOptionRow]}>
-              <Text style={styles.optionText}>Notifications</Text>
+              <Text style={styles.optionText}>{t('settings.notifications')}</Text>
               <Switch
                 trackColor={{ false: '#CBD5E1', true: '#55C900' }}
                 thumbColor="#FFFFFF"
@@ -87,7 +89,7 @@ export default function SettingsScreen({ navigation }) {
           <View style={styles.sectionCard}>
             <View style={styles.sectionHeader}>
               <FontAwesome5 name="question-circle" size={22} color="#021024" style={styles.sectionIcon} />
-              <Text style={styles.sectionTitle}>Help</Text>
+              <Text style={styles.sectionTitle}>{t('settings.sectionHelp')}</Text>
             </View>
 
             <TouchableOpacity
@@ -95,7 +97,7 @@ export default function SettingsScreen({ navigation }) {
               activeOpacity={0.7}
               onPress={() => navigation.navigate('HelpCenter')}
             >
-              <Text style={styles.optionText}>Help center</Text>
+              <Text style={styles.optionText}>{t('settings.helpCenter')}</Text>
               <Ionicons name="chevron-forward" size={18} color="#021024" />
             </TouchableOpacity>
 
@@ -104,7 +106,7 @@ export default function SettingsScreen({ navigation }) {
               activeOpacity={0.7}
               onPress={() => navigation.navigate('ContactUs')}
             >
-              <Text style={styles.optionText}>Contact support</Text>
+              <Text style={styles.optionText}>{t('settings.contactSupport')}</Text>
               <Ionicons name="chevron-forward" size={18} color="#021024" />
             </TouchableOpacity>
           </View>
@@ -180,7 +182,7 @@ const styles = StyleSheet.create({
   optionRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignmentItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderTopWidth: 1,

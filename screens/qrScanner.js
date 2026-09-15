@@ -3,14 +3,20 @@ import { StyleSheet, View, Text, TouchableOpacity, Image, Linking, Animated, Eas
 import * as ImagePicker from "expo-image-picker";
 import jsQR from "jsqr";
 import { manipulateAsync, SaveFormat } from "expo-image-manipulator";
+import { useTranslation } from "react-i18next";
 
 export default function PhotoQRScreen() {
+  const { t } = useTranslation();
   const [imageUri, setImageUri] = useState(null);
   const [scannedData, setScannedData] = useState(null);
-  const [statusText,setStatusText] = useState("Scanning image...");
+  const [statusText, setStatusText] = useState("");
   const [isScanningAnim, setIsScanningAnim] = useState(false);
   
   const laserAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    setStatusText(t("qrScanner.scanningImage"));
+  }, [t]);
 
   useEffect(() => {
     let animationLoop;
@@ -41,11 +47,11 @@ export default function PhotoQRScreen() {
 
   const takePhotoAndScan = async () => {
     setScannedData(null);
-    setStatusText("Opening device camera...");
+    setStatusText(t("qrScanner.openingCamera"));
 
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
     if (!permissionResult.granted) {
-      alert("Camera permission is required.");
+      alert(t("qrScanner.cameraRequired"));
       return;
     }
 
@@ -64,7 +70,7 @@ export default function PhotoQRScreen() {
 
   const analyzeQR = async (uri) => {
     setIsScanningAnim(true);
-    setStatusText("Processing QR pixels...");
+    setStatusText(t("qrScanner.processingPixels"));
     try {
       const manipulated = await manipulateAsync(
         uri,
@@ -75,12 +81,12 @@ export default function PhotoQRScreen() {
       setTimeout(() => {
         setIsScanningAnim(false);
         setScannedData("https://expo.dev"); 
-        setStatusText("QR detected successfully!");
+        setStatusText(t("qrScanner.detected"));
       }, 2500);
 
     } catch (e) {
       setIsScanningAnim(false);
-      setStatusText("Failed to read QR code from image.");
+      setStatusText(t("qrScanner.failed"));
     }
   };
 
@@ -113,21 +119,21 @@ export default function PhotoQRScreen() {
                 <Text style={styles.subtext} selectable>{scannedData}</Text>
                 {scannedData.startsWith("http") && (
                   <TouchableOpacity style={styles.linkButton} onPress={() => Linking.openURL(scannedData)}>
-                    <Text style={styles.buttonText}>Open Link</Text>
+                    <Text style={styles.buttonText}>{t("qrScanner.openLink")}</Text>
                   </TouchableOpacity>
                 )}
               </>
             ) : null}
             <TouchableOpacity style={styles.button} onPress={takePhotoAndScan}>
-              <Text style={styles.buttonText}>Take another photo</Text>
+              <Text style={styles.buttonText}>{t("qrScanner.takeAnother")}</Text>
             </TouchableOpacity>
           </View>
         </View>
       ) : (
         <View style={styles.emptyContainer}>
-          <Text style={styles.promptText}>Take a photo of the QR code</Text>
+          <Text style={styles.promptText}>{t("qrScanner.prompt")}</Text>
           <TouchableOpacity style={styles.button} onPress={takePhotoAndScan}>
-            <Text style={styles.buttonText}>Open Device Camera</Text>
+            <Text style={styles.buttonText}>{t("qrScanner.openCameraBtn")}</Text>
           </TouchableOpacity>
         </View>
       )}

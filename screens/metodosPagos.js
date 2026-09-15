@@ -11,8 +11,10 @@ import {
 } from 'react-native';
 import { FontAwesome5, FontAwesome } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from 'react-i18next';
 
 export default function MetodoPagoScreen({ navigation }) {
+  const { t } = useTranslation();
   const [cardholderName, setCardholderName] = useState();
   const [cardNumber, setCardNumber] = useState();
   const [expireDate, setExpireDate] = useState();
@@ -26,52 +28,52 @@ export default function MetodoPagoScreen({ navigation }) {
       <SafeAreaView style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           
-          <Text style={styles.mainTitle}>Payment</Text>
+          <Text style={styles.mainTitle}>{t('metodoPago.title')}</Text>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Cardholder´s name</Text>
+            <Text style={styles.label}>{t('metodoPago.cardholderLabel')}</Text>
             <TextInput
               style={styles.input}
               value={cardholderName}
               onChangeText={setCardholderName}
-              placeholder="Name on card"
+              placeholder={t('metodoPago.cardholderPlaceholder')}
               placeholderTextColor="#999"
             />
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Card Number</Text>
+            <Text style={styles.label}>{t('metodoPago.cardNumberLabel')}</Text>
             <TextInput
               style={styles.input}
               value={cardNumber}
               onChangeText={setCardNumber}
               keyboardType="numeric"
               secureTextEntry
-              placeholder="•••• •••• •••• ••••"
+              placeholder={t('metodoPago.cardNumberPlaceholder')}
               placeholderTextColor="#999"
             />
           </View>
 
           <View style={styles.row}>
             <View style={[styles.inputContainer, styles.halfInput]}>
-              <Text style={styles.label}>Expire Date</Text>
+              <Text style={styles.label}>{t('metodoPago.expireDateLabel')}</Text>
               <TextInput
                 style={styles.input}
                 value={expireDate}
                 onChangeText={setExpireDate}
-                placeholder="MM/YY"
+                placeholder={t('metodoPago.expireDatePlaceholder')}
                 placeholderTextColor="#999"
                 keyboardType="numeric"
               />
             </View>
 
             <View style={[styles.inputContainer, styles.halfInput]}>
-              <Text style={styles.label}>CVV</Text>
+              <Text style={styles.label}>{t('metodoPago.cvvLabel')}</Text>
               <TextInput
                 style={styles.input}
                 value={cvv}
                 onChangeText={setCvv}
-                placeholder="123"
+                placeholder={t('metodoPago.cvvPlaceholder')}
                 placeholderTextColor="#999"
                 keyboardType="numeric"
                 secureTextEntry
@@ -109,7 +111,7 @@ export default function MetodoPagoScreen({ navigation }) {
             activeOpacity={0.8}
             onPress={() => navigation.goBack()}
           >
-            <Text style={styles.buttonText}>Continue</Text>
+            <Text style={styles.buttonText}>{t('metodoPago.continue')}</Text>
           </TouchableOpacity>
 
         </ScrollView>

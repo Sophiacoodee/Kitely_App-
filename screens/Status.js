@@ -7,49 +7,59 @@ import {
   StatusBar,
 } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 export default function TransactionDetailScreen() {
- 
+  const { t } = useTranslation();
+
   const transactionData = {
     title: 'Groceries',
     date: 'May 22, 2022 · 10:24 a:m',
     amount: '$25.00',
-    status: 'In progress',
+    statusKey: 'statusInProgress',
     iconName: 'home',
+  };
+
+  const getTranslatedStatus = (key) => {
+    switch (key) {
+      case 'statusCompleted':
+        return t('transactionDetail.statusCompleted');
+      case 'statusFailed':
+        return t('transactionDetail.statusFailed');
+      case 'statusInProgress':
+      default:
+        return t('transactionDetail.statusInProgress');
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#04122D" />
 
-      
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Transaction details</Text>
+        <Text style={styles.headerTitle}>{t('transactionDetail.headerTitle')}</Text>
       </View>
 
-      
       <View style={styles.contentContainer}>
-        
         <View style={styles.iconWrapper}>
           <View style={styles.iconCircle}>
             <FontAwesome5 name={transactionData.iconName} size={48} color="#04122D" />
           </View>
         </View>
 
-       
         <Text style={styles.title}>{transactionData.title}</Text>
         <Text style={styles.date}>{transactionData.date}</Text>
 
-       
         <View style={styles.card}>
-          <Text style={styles.cardLabel}>Amount</Text>
+          <Text style={styles.cardLabel}>{t('transactionDetail.amountLabel')}</Text>
           <Text style={styles.cardValueAmount}>{transactionData.amount}</Text>
         </View>
 
-  
         <View style={styles.card}>
-          <Text style={styles.cardLabel}>Status</Text>
-          <Text style={styles.cardValueStatus}>{transactionData.status}</Text>
+          <Text style={styles.cardLabel}>{t('transactionDetail.statusLabel')}</Text>
+          <Text style={styles.cardValueStatus}>
+            {getTranslatedStatus(transactionData.statusKey)}
+          </Text>
         </View>
       </View>
     </SafeAreaView>
@@ -59,7 +69,7 @@ export default function TransactionDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#04122D', 
+    backgroundColor: '#04122D',
   },
   header: {
     height: 120,
@@ -81,7 +91,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconWrapper: {
-  
     marginTop: -50,
     marginBottom: 20,
   },
@@ -92,7 +101,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-  
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
@@ -120,11 +128,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignmentItems: 'center',
     marginBottom: 16,
     borderWidth: 1,
     borderColor: '#E2E8F0',
- 
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
