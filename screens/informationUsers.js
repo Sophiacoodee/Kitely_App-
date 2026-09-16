@@ -10,70 +10,58 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
-  Alert,
   ActivityIndicator,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "react-i18next";
 
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/config";
 
-export default function PersonalInformationScreen({ navigation }) {
+export default function PublicProfileScreen({ navigation, route }) {
   const { t } = useTranslation();
   const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [idNumber, setIdNumber] = useState("");
-  const [dob, setDob] = useState("");
   const [country, setCountry] = useState("");
-
   const [profileImage, setProfileImage] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const targetUserId = route?.params?.userId || auth.currentUser?.uid;
+
   useEffect(() => {
     loadUserData();
-  }, []);
+  }, [targetUserId]);
 
   const loadUserData = async () => {
     try {
-      const currentUser = auth.currentUser;
-
-      if (currentUser) {
-        const docRef = doc(db, "Usuarios", currentUser.uid);
+      if (targetUserId) {
+        const docRef = doc(db, "Usuarios", targetUserId);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           const userData = docSnap.data();
-          setFullName(userData.nombre || currentUser.displayName || "");
-          setEmail(userData.correo || currentUser.email || "");
-          setIdNumber(userData.identidad || "");
-          setDob(userData.fechaNacimiento || "");
+          setFullName(userData.nombre || "");
           setCountry(userData.pais || "");
 
           if (userData.fotoPerfil) {
             setProfileImage(userData.fotoPerfil);
           } else {
-            const savedImage = await AsyncStorage.getItem(`@user_profile_image_${currentUser.uid}`);
+            const savedImage = await AsyncStorage.getItem(
+              `@user_profile_image_${targetUserId}`
+            );
             if (savedImage) setProfileImage(savedImage);
           }
-        } else {
-          if (currentUser.displayName) setFullName(currentUser.displayName);
-          if (currentUser.email) setEmail(currentUser.email);
         }
       } else {
         const savedUser = await AsyncStorage.getItem("@user_data");
         if (savedUser) {
           const user = JSON.parse(savedUser);
           if (user.fullName) setFullName(user.fullName);
-          if (user.email) setEmail(user.email);
-          if (user.idNumber) setIdNumber(user.idNumber);
-          if (user.dob) setDob(user.dob);
           if (user.country) setCountry(user.country);
         }
       }
     } catch (error) {
+      console.error("Error al cargar la información del usuario:", error);
     } finally {
       setLoading(false);
     }
@@ -86,50 +74,6 @@ export default function PersonalInformationScreen({ navigation }) {
       return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
     }
     return name.substring(0, 2).toUpperCase();
-  };
-
-  const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (status !== "granted") {
-      Alert.alert(
-        t("personalInformation.permissionDeniedTitle"),
-        t("personalInformation.permissionDeniedMessage")
-      );
-      return;
-    }
-
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.5,
-      base64: true,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      const asset = result.assets[0];
-      const base64Image = `data:image/jpeg;base64,${asset.base64}`;
-
-      setProfileImage(base64Image);
-
-      const currentUser = auth.currentUser;
-      if (currentUser) {
-        try {
-          const userRef = doc(db, "Usuarios", currentUser.uid);
-          await updateDoc(userRef, {
-            fotoPerfil: base64Image,
-          });
-
-          await AsyncStorage.setItem(
-            `@user_profile_image_${currentUser.uid}`,
-            base64Image
-          );
-        } catch (error) {
-          Alert.alert("Error", "Could not save profile image");
-        }
-      }
-    }
   };
 
   if (loading) {
@@ -162,11 +106,7 @@ export default function PersonalInformationScreen({ navigation }) {
           </View>
 
           <View style={styles.avatarContainer}>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={pickImage}
-              style={styles.avatarWrapper}
-            >
+            <View style={styles.avatarWrapper}>
               {profileImage ? (
                 <Image source={{ uri: profileImage }} style={styles.avatarImage} />
               ) : (
@@ -174,10 +114,7 @@ export default function PersonalInformationScreen({ navigation }) {
                   <Text style={styles.avatarText}>{getInitials(fullName)}</Text>
                 </View>
               )}
-              <View style={styles.cameraBadge}>
-                <Ionicons name="camera" size={16} color="#FFFFFF" />
-              </View>
-            </TouchableOpacity>
+            </View>
 
             <Text style={styles.userNameText}>
               {fullName !== "" ? fullName : t("personalInformation.userFallback")}
@@ -190,39 +127,6 @@ export default function PersonalInformationScreen({ navigation }) {
               <TextInput
                 style={[styles.input, styles.disabledInput]}
                 value={fullName}
-                editable={false}
-                placeholder={t("personalInformation.placeholder")}
-                placeholderTextColor="#94A3B8"
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>{t("personalInformation.email")}</Text>
-              <TextInput
-                style={[styles.input, styles.disabledInput]}
-                value={email}
-                editable={false}
-                placeholder={t("personalInformation.placeholder")}
-                placeholderTextColor="#94A3B8"
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>{t("personalInformation.idNumber")}</Text>
-              <TextInput
-                style={[styles.input, styles.disabledInput]}
-                value={idNumber}
-                editable={false}
-                placeholder={t("personalInformation.placeholder")}
-                placeholderTextColor="#94A3B8"
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>{t("personalInformation.dob")}</Text>
-              <TextInput
-                style={[styles.input, styles.disabledInput]}
-                value={dob}
                 editable={false}
                 placeholder={t("personalInformation.placeholder")}
                 placeholderTextColor="#94A3B8"
@@ -306,19 +210,6 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "bold",
     color: "#14452F",
-  },
-  cameraBadge: {
-    position: "absolute",
-    bottom: 2,
-    right: 2,
-    backgroundColor: "#55C900",
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#021B42",
   },
   userNameText: {
     fontSize: 22,

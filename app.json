@@ -22,7 +22,8 @@
     },
     "package": "com.anonymous.Kitely_App",
     "plugins": [
-      "expo-localization"
+      "expo-localization",
+      "expo-barcode-scanner"
     ]
   },
   "web": {

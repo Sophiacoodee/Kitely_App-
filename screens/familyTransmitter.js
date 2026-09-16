@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,109 +12,209 @@ import {
   SafeAreaView,
   Platform,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-
-const INITIAL_BENEFICIARIES = [
-  {
-    id: '1',
-    name: 'Lucia Pocasangre',
-    avatar: 'https://tse3.mm.bing.net/th/id/OIP._qjHrR7e96-I0mshLsmOvgHaE7?r=0&rs=1&pid=ImgDetMain&o=7&rm=3',
-  },
-  {
-    id: '2',
-    name: 'Alan Martinez',
-    avatar: 'https://www.shutterstock.com/image-photo/young-latin-man-making-selfie-600nw-1385281145.jpg',
-  },
-  {
-    id: '3',
-    name: 'Mariana Munguia',
-    avatar: 'https://m.media-amazon.com/images/M/MV5BMjEzMzEwNTk1OV5BMl5BanBnXkFtZTgwNTU1MzI3MjE@._V1_QL75_UX216_.jpg',
-  },
-  {
-    id: '4',
-    name: 'Moises Rivas',
-    avatar: 'https://media.istockphoto.com/id/1183945946/pt/foto/headshot-portrait-of-happy-mid-adult-hispanic-businessman.jpg?s=612x612&w=0&k=20&c=-nsGHWZgtQI6FVFrHMQ7NOgMCqYglUBbF-nHIZcRe2o=',
-  },
-];
+import { auth, db } from '../firebase/config';
+import {
+  collection,
+  addDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  where,
+  getDocs,
+} from 'firebase/firestore';
 
 export default function BeneficiariesScreen({ navigation }) {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
-  const [beneficiaries, setBeneficiaries] = useState(INITIAL_BENEFICIARIES);
+  const [beneficiaries, setBeneficiaries] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [newName, setNewName] = useState('');
-  const [newAvatar, setNewAvatar] = useState('');
+  const [userQuery, setUserQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+
+  useEffect(() => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      setLoading(false);
+      return;
+    }
+
+    const q = query(
+      collection(db, 'Beneficiarios'),
+      where('ownerUid', '==', currentUser.uid)
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const list = snapshot.docs.map((docSnap) => {
+          const data = docSnap.data();
+          return {
+            id: docSnap.id,
+            ...data,
+            avatar: data.fotoPerfil || data.avatar || data.photoURL || null,
+          };
+        });
+        setBeneficiaries(list);
+        setLoading(false);
+      },
+      (error) => {
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
 
   const filteredBeneficiaries = beneficiaries.filter((item) =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    (item.name || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleSearchUsersInDB = async () => {
+    if (!userQuery.trim()) return;
+    setSearching(true);
+    setSearchResults([]);
+
+    try {
+      const usersRef = collection(db, 'Usuarios');
+      const querySnapshot = await getDocs(usersRef);
+
+      const matches = [];
+      const term = userQuery.trim().toLowerCase();
+      const currentUid = auth.currentUser?.uid;
+
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const docId = docSnap.id;
+
+        if (docId === currentUid) return;
+
+        const name = (data.nombre || data.fullName || '').toLowerCase();
+        const email = (data.correo || data.email || '').toLowerCase();
+
+        if (name.includes(term) || email.includes(term)) {
+          matches.push({
+            uid: docId,
+            name: data.nombre || data.fullName || 'User',
+            email: data.correo || data.email || '',
+            avatar: data.fotoPerfil || data.photoURL || data.avatar || data.profileImage || null,
+          });
+        }
+      });
+
+      setSearchResults(matches);
+    } catch (error) {
+      Alert.alert(
+        t('beneficiaries.errorTitle', 'Error'),
+        'Search failed'
+      );
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const handleAddBeneficiary = async (user) => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) return;
+
+    const alreadyExists = beneficiaries.some(
+      (b) => b.beneficiaryUid === user.uid
+    );
+    if (alreadyExists) {
+      Alert.alert(
+        t('beneficiaries.errorTitle', 'Attention'),
+        'User is already in your list'
+      );
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, 'Beneficiarios'), {
+        ownerUid: currentUser.uid,
+        beneficiaryUid: user.uid,
+        name: user.name,
+        email: user.email,
+        fotoPerfil: user.avatar || null,
+        avatar: user.avatar || null,
+        createdAt: new Date(),
+      });
+
+      setModalVisible(false);
+      setUserQuery('');
+      setSearchResults([]);
+    } catch (error) {
+      Alert.alert(
+        t('beneficiaries.errorTitle', 'Error'),
+        'Could not save beneficiary'
+      );
+    }
+  };
 
   const handleDelete = (id) => {
     Alert.alert(
-      t('beneficiaries.deleteTitle'),
-      t('beneficiaries.deleteMessage'),
+      t('beneficiaries.deleteTitle', 'Delete'),
+      t('beneficiaries.deleteMessage', 'Remove this beneficiary?'),
       [
         {
-          text: t('beneficiaries.cancel'),
+          text: t('beneficiaries.cancel', 'Cancel'),
           style: 'cancel',
         },
         {
-          text: t('beneficiaries.delete'),
+          text: t('beneficiaries.delete', 'Delete'),
           style: 'destructive',
-          onPress: () => {
-            setBeneficiaries((list) =>
-              list.filter((item) => item.id !== id)
-            );
+          onPress: async () => {
+            try {
+              await deleteDoc(doc(db, 'Beneficiarios', id));
+            } catch (error) {
+            }
           },
         },
       ]
     );
   };
 
-  const handleAddBeneficiary = () => {
-    if (!newName.trim()) {
-      Alert.alert(t('beneficiaries.errorTitle'), t('beneficiaries.errorNameRequired'));
-      return;
-    }
+  const handleNavigateToProfile = (item) => {
+    const targetUid = item.beneficiaryUid || item.id;
 
-    const newBeneficiary = {
-      id: Date.now().toString(),
-      name: newName.trim(),
-      avatar: newAvatar.trim() || 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150',
-    };
-
-    setBeneficiaries([newBeneficiary, ...beneficiaries]);
-    setNewName('');
-    setNewAvatar('');
-    setModalVisible(false);
+    navigation.navigate('InformationUsers', {
+      userId: targetUid,
+      userData: item,
+    });
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#021B42" />
       <View style={styles.mainContainer}>
-        
-        {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.headerTitle}>{t('beneficiaries.headerTitle')}</Text>
-            <Text style={styles.headerSubtitle}>{t('beneficiaries.headerSubtitle')}</Text>
+            <Text style={styles.headerTitle}>
+              {t('beneficiaries.headerTitle')}
+            </Text>
+            <Text style={styles.headerSubtitle}>
+              {t('beneficiaries.headerSubtitle')}
+            </Text>
           </View>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.addButton}
             activeOpacity={0.8}
             onPress={() => setModalVisible(true)}
           >
             <Ionicons name="add" size={20} color="#FFFFFF" />
-            <Text style={styles.addButtonText}>{t('beneficiaries.addButton')}</Text>
+            <Text style={styles.addButtonText}>
+              {t('beneficiaries.addButton')}
+            </Text>
           </TouchableOpacity>
         </View>
 
-        {/* Buscador */}
         <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
@@ -126,75 +226,137 @@ export default function BeneficiariesScreen({ navigation }) {
           <Ionicons name="search-outline" size={20} color="#021024" />
         </View>
 
-        {/* Lista de Beneficiarios */}
-        <FlatList
-          data={filteredBeneficiaries}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContent}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>{t('beneficiaries.emptyText')}</Text>
-            </View>
-          }
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <Image source={{ uri: item.avatar }} style={styles.avatar} />
-              <Text style={styles.nameText}>{item.name}</Text>
-
+        {loading ? (
+          <ActivityIndicator size="large" color="#55A605" style={{ marginTop: 40 }} />
+        ) : (
+          <FlatList
+            data={filteredBeneficiaries}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.listContent}
+            ListEmptyComponent={
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>
+                  {t('beneficiaries.emptyText')}
+                </Text>
+              </View>
+            }
+            renderItem={({ item }) => (
               <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={() => handleDelete(item.id)}
+                style={styles.card}
+                activeOpacity={0.7}
+                onPress={() => handleNavigateToProfile(item)}
               >
-                <Ionicons name="trash-outline" size={22} color="#021024" />
-              </TouchableOpacity>
+                {item.avatar ? (
+                  <Image source={{ uri: item.avatar }} style={styles.avatar} />
+                ) : (
+                  <View style={[styles.avatar, styles.placeholderAvatar]}>
+                    <Ionicons name="person" size={24} color="#94A3B8" />
+                  </View>
+                )}
+                <Text style={styles.nameText}>{item.name}</Text>
 
-              <Ionicons name="chevron-forward" size={20} color="#021024" />
-            </View>
-          )}
-        />
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={() => handleDelete(item.id)}
+                >
+                  <Ionicons name="trash-outline" size={22} color="#021024" />
+                </TouchableOpacity>
+
+                <Ionicons name="chevron-forward" size={20} color="#021024" />
+              </TouchableOpacity>
+            )}
+          />
+        )}
       </View>
 
-      {/* Modal para agregar beneficiario */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
+        onRequestClose={() => {
+          setModalVisible(false);
+          setSearchResults([]);
+          setUserQuery('');
+        }}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{t('beneficiaries.modalTitle')}</Text>
+            <Text style={styles.modalTitle}>
+              {t('beneficiaries.modalTitle', 'Add Beneficiary')}
+            </Text>
 
-            <TextInput
-              style={styles.modalInput}
-              placeholder={t('beneficiaries.fullNamePlaceholder')}
-              placeholderTextColor="#94A3B8"
-              value={newName}
-              onChangeText={setNewName}
-            />
+            <View style={styles.modalSearchBox}>
+              <TextInput
+                style={styles.modalInput}
+                placeholder={t(
+                  'beneficiaries.searchUserPlaceholder',
+                  'User'
+                )}
+                placeholderTextColor="#94A3B8"
+                value={userQuery}
+                onChangeText={setUserQuery}
+              />
+              <TouchableOpacity
+                style={styles.modalSearchBtn}
+                onPress={handleSearchUsersInDB}
+              >
+                <Ionicons name="search" size={20} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
 
-            <TextInput
-              style={styles.modalInput}
-              placeholder={t('beneficiaries.photoUrlPlaceholder')}
-              placeholderTextColor="#94A3B8"
-              value={newAvatar}
-              onChangeText={setNewAvatar}
-            />
+            {searching ? (
+              <ActivityIndicator color="#55A605" style={{ marginVertical: 20 }} />
+            ) : (
+              <FlatList
+                data={searchResults}
+                keyExtractor={(item) => item.uid}
+                style={{ width: '100%', maxHeight: 220 }}
+                ListEmptyComponent={
+                  userQuery.length > 0 ? (
+                    <Text style={styles.noResultsText}>
+                      No users found.
+                    </Text>
+                  ) : null
+                }
+                renderItem={({ item }) => (
+                  <View style={styles.resultItem}>
+                    {item.avatar ? (
+                      <Image source={{ uri: item.avatar }} style={styles.resultAvatar} />
+                    ) : (
+                      <View style={[styles.resultAvatar, styles.placeholderAvatar]}>
+                        <Ionicons name="person" size={18} color="#94A3B8" />
+                      </View>
+                    )}
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.resultName}>{item.name}</Text>
+                      {item.email ? (
+                        <Text style={styles.resultEmail}>{item.email}</Text>
+                      ) : null}
+                    </View>
+                    <TouchableOpacity
+                      style={styles.addResultBtn}
+                      onPress={() => handleAddBeneficiary(item)}
+                    >
+                      <Text style={styles.addResultBtnText}>Add</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              />
+            )}
 
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setModalVisible(false)}
+                onPress={() => {
+                  setModalVisible(false);
+                  setSearchResults([]);
+                  setUserQuery('');
+                }}
               >
-                <Text style={styles.cancelButtonText}>{t('beneficiaries.cancel')}</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.modalButton, styles.saveButton]}
-                onPress={handleAddBeneficiary}
-              >
-                <Text style={styles.saveButtonText}>{t('beneficiaries.save')}</Text>
+                <Text style={styles.cancelButtonText}>
+                  {t('beneficiaries.cancel', 'Close')}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -280,6 +442,11 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     marginRight: 14,
   },
+  placeholderAvatar: {
+    backgroundColor: '#E2E8F0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   nameText: {
     flex: 1,
     fontSize: 16,
@@ -321,21 +488,74 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginBottom: 16,
   },
-  modalInput: {
+  modalSearchBox: {
+    flexDirection: 'row',
     width: '100%',
+    marginBottom: 12,
+  },
+  modalInput: {
+    flex: 1,
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
     paddingHorizontal: 16,
     height: 48,
     fontSize: 14,
     color: '#021024',
-    marginBottom: 12,
+  },
+  modalSearchBtn: {
+    backgroundColor: '#55A605',
+    width: 48,
+    height: 48,
+    borderTopRightRadius: 12,
+    borderBottomRightRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  resultItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1E293B',
+    padding: 10,
+    borderRadius: 12,
+    marginBottom: 8,
+    width: '100%',
+  },
+  resultAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    marginRight: 10,
+  },
+  resultName: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  resultEmail: {
+    color: '#94A3B8',
+    fontSize: 12,
+  },
+  addResultBtn: {
+    backgroundColor: '#55A605',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  addResultBtnText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  noResultsText: {
+    color: '#94A3B8',
+    marginVertical: 15,
   },
   modalButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     width: '100%',
-    marginTop: 8,
+    marginTop: 12,
   },
   modalButton: {
     flex: 1,
@@ -343,20 +563,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 6,
   },
   cancelButton: {
     backgroundColor: '#1E293B',
   },
-  saveButton: {
-    backgroundColor: '#55A605',
-  },
   cancelButtonText: {
     color: '#94A3B8',
-    fontWeight: 'bold',
-  },
-  saveButtonText: {
-    color: '#FFFFFF',
     fontWeight: 'bold',
   },
 });

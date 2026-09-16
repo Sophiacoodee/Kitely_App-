@@ -79,7 +79,7 @@ export default function CanjeExitosoScreen({ route, navigation }) {
             <TouchableOpacity 
               style={styles.linkButton} 
               activeOpacity={0.6}
-              onPress={() => navigation?.navigate('CategoryTransmitter')}
+              onPress={() => navigation?.navigate('TransmitterHome')}
             >
               <Text style={styles.linkText}>{t('canjeExitoso.backToHome')}</Text>
             </TouchableOpacity>

@@ -29,6 +29,7 @@ import ContactUs from '../screens/contacUs';
 import HelpCenter from '../screens/helpCenter';
 import Languaje from '../screens/languaje';
 import PersonalInformation from '../screens/personalInformation';
+import InformationUsers from "../screens/informationUsers";
 
 const Stack = createNativeStackNavigator();
 
@@ -66,6 +67,7 @@ export default function AppNavigator() {
         <Stack.Screen name="HelpCenter" component={HelpCenter} />
         <Stack.Screen name="Languaje" component={Languaje} />
         <Stack.Screen name="PersonalInformation" component={PersonalInformation} />
+        <Stack.Screen name="InformationUsers" component={InformationUsers} />
       </Stack.Navigator>
     </NavigationContainer>
   );
