@@ -6,8 +6,11 @@ import {
   Switch,
   TouchableOpacity,
   ScrollView,
+<<<<<<< HEAD
   Alert,
   useWindowDimensions,
+=======
+>>>>>>> rodrigo
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -64,16 +67,66 @@ export default function AuthorizedCategories({ navigation }) {
   };
 
   return (
+<<<<<<< HEAD
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={[styles.headerWrapper, isTablet && styles.headerWrapperTablet]}>
           <Text style={styles.title}>{t('authorizedCategories.title')}</Text>
           <Text style={styles.subtitle}>
             {t('authorizedCategories.subtitle')}
+=======
+    <ScrollView style={styles.container}>
+
+      <View style={styles.header}>
+        <Text style={styles.title}>
+          Authorized Categories
+        </Text>
+ 
+        <Text style={styles.subtitle}>
+          Choose the categories you want{"\n"}
+          to allow for transactions
+        </Text>
+      </View>
+ 
+      <View style={styles.card}>
+        {categories.map((category, index) => (
+          <View style={styles.categoryRow} key={category.name}>
+ 
+            <View style={styles.categoryInfo}>
+              <Ionicons
+                name={category.icon}
+                size={32}
+                color="#021533"
+              />
+ 
+              <Text style={styles.categoryName}>
+                {category.name}
+              </Text>
+            </View>
+ 
+            <Switch
+              value={category.enabled}
+              onValueChange={() => toggleCategory(index)}
+              trackColor={{
+                false: "#FFFFFF",
+                true: "#55C900",
+              }}
+              thumbColor="#FFFFFF"
+            />
+ 
+          </View>
+        ))}
+ 
+        
+        <TouchableOpacity style={styles.saveButton}>
+          <Text style={styles.saveText}>
+            Save changes
+>>>>>>> rodrigo
           </Text>
         </View>
       </View>
 
+<<<<<<< HEAD
       <ScrollView
         style={styles.card}
         contentContainerStyle={[
@@ -113,6 +166,9 @@ export default function AuthorizedCategories({ navigation }) {
         </View>
       </ScrollView>
     </View>
+=======
+    </ScrollView>
+>>>>>>> rodrigo
   );
 }
 

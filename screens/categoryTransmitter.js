@@ -87,6 +87,7 @@ export default function CategoriesScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+<<<<<<< HEAD
       <View style={styles.mainWrapper}>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -137,12 +138,65 @@ export default function CategoriesScreen({ navigation }) {
           <Text style={styles.amountSublabel}>
             {t('categoriesScreen.amountSublabel', { max: MAX_AMOUNT.toLocaleString() })}
           </Text>
+=======
+      <ScrollView 
+        showsVerticalScrollIndicator={false} 
+        contentContainerStyle={styles.scrollContent}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={() => navigation.goBack()}
+          >
+            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          <View>
+            <Text style={styles.headerTitle}>Categories</Text>
+            <Text style={styles.headerSubtitle}>Choose one or more categories</Text>
+          </View>
+        </View>
+
+        <View style={styles.gridContainer}>
+          {CATEGORIES_DATA.map((item) => {
+            const isSelected = selectedCategories.includes(item.id);
+            return (
+              <TouchableOpacity
+                key={item.id}
+                style={[
+                  styles.categoryCard,
+                  isSelected && styles.selectedCategoryCard
+                ]}
+                onPress={() => toggleCategory(item.id)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.categoryName}>{item.name}</Text>
+                <Ionicons 
+                  name={item.icon} 
+                  size={44} 
+                  color="#021024" 
+                  style={{ marginTop: 10 }} 
+                />
+                {isSelected && (
+                  <View style={styles.checkBadge}>
+                    <Ionicons name="checkmark" size={14} color="#FFFFFF" />
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        <View style={styles.overlayAmountSection}>
+          <Text style={styles.amountLabel}>Amount</Text>
+          <Text style={styles.amountSublabel}>You send (USD)</Text>
+>>>>>>> rodrigo
 
           <View style={styles.inputContainer}>
             <Text style={styles.currencySymbol}>$</Text>
             <TextInput
               style={styles.input}
               value={amount}
+<<<<<<< HEAD
               onChangeText={handleAmountChange}
               keyboardType="decimal-pad"
               placeholder="0.00"
@@ -153,14 +207,32 @@ export default function CategoriesScreen({ navigation }) {
           </View>
 
           <TouchableOpacity
+=======
+              onChangeText={setAmount}
+              keyboardType="numeric"
+              placeholder="0.00"
+              placeholderTextColor="#94A3B8"
+            />
+            <Text style={styles.currencyCode}>USD</Text>
+          </View>
+
+          <TouchableOpacity 
+>>>>>>> rodrigo
             style={styles.continueButton}
             onPress={handleContinue}
             activeOpacity={0.8}
           >
+<<<<<<< HEAD
             <Text style={styles.continueButtonText}>{t('categoriesScreen.continueButton')}</Text>
           </TouchableOpacity>
         </View>
       </View>
+=======
+            <Text style={styles.continueButtonText}>Continue</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+>>>>>>> rodrigo
     </View>
   );
 }
@@ -177,7 +249,11 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 20,
+<<<<<<< HEAD
     paddingBottom: 230,
+=======
+    paddingBottom: 40,
+>>>>>>> rodrigo
   },
   header: {
     flexDirection: 'row',
@@ -231,21 +307,10 @@ const styles = StyleSheet.create({
     color: '#021024',
   },
   overlayAmountSection: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
     backgroundColor: '#021B42',
-    paddingHorizontal: 20,
     paddingTop: 16,
-    paddingBottom: 30,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 10,
+    paddingBottom: 10,
+    marginTop: 10,
   },
   amountLabel: {
     fontSize: 12,
