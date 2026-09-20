@@ -52,12 +52,10 @@ export default function CategoriesScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Sección Deslizable (Categorías) */}
       <ScrollView 
         showsVerticalScrollIndicator={false} 
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity 
             style={styles.backButton} 
@@ -71,7 +69,6 @@ export default function CategoriesScreen({ navigation }) {
           </View>
         </View>
 
-        {/* Grilla de Selección de Categorías */}
         <View style={styles.gridContainer}>
           {CATEGORIES_DATA.map((item) => {
             const isSelected = selectedCategories.includes(item.id);
@@ -101,35 +98,33 @@ export default function CategoriesScreen({ navigation }) {
             );
           })}
         </View>
-      </ScrollView>
 
-      {/* Sección del Monto y Continuar Sobrepuesta / Flotante */}
-      <View style={styles.overlayAmountSection}>
-        <Text style={styles.amountLabel}>Amount</Text>
-        <Text style={styles.amountSublabel}>You send (USD)</Text>
+        <View style={styles.overlayAmountSection}>
+          <Text style={styles.amountLabel}>Amount</Text>
+          <Text style={styles.amountSublabel}>You send (USD)</Text>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.currencySymbol}>$</Text>
-          <TextInput
-            style={styles.input}
-            value={amount}
-            onChangeText={setAmount}
-            keyboardType="numeric"
-            placeholder="0.00"
-            placeholderTextColor="#94A3B8"
-          />
-          <Text style={styles.currencyCode}>USD</Text>
+          <View style={styles.inputContainer}>
+            <Text style={styles.currencySymbol}>$</Text>
+            <TextInput
+              style={styles.input}
+              value={amount}
+              onChangeText={setAmount}
+              keyboardType="numeric"
+              placeholder="0.00"
+              placeholderTextColor="#94A3B8"
+            />
+            <Text style={styles.currencyCode}>USD</Text>
+          </View>
+
+          <TouchableOpacity 
+            style={styles.continueButton}
+            onPress={handleContinue}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.continueButtonText}>Continue</Text>
+          </TouchableOpacity>
         </View>
-
-        {/* Botón Continuar */}
-        <TouchableOpacity 
-          style={styles.continueButton}
-          onPress={handleContinue}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.continueButtonText}>Continue</Text>
-        </TouchableOpacity>
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -142,7 +137,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingBottom: 230, // Espacio suficiente para que el último elemento se lea completo sobre la tarjeta
+    paddingBottom: 40,
   },
   header: {
     flexDirection: 'row',
@@ -198,23 +193,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#021024',
   },
-  // Contenedor Sobrepuesto Flotante al Fondo
   overlayAmountSection: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
     backgroundColor: '#021B42',
-    paddingHorizontal: 20,
     paddingTop: 16,
-    paddingBottom: 30,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 10,
+    paddingBottom: 10,
+    marginTop: 10,
   },
   amountLabel: {
     fontSize: 12,

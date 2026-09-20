@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Switch,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
  
@@ -37,8 +38,8 @@ export default function AuthorizedCategories() {
   };
  
   return (
-    <View style={styles.container}>
- 
+    <ScrollView style={styles.container}>
+
       <View style={styles.header}>
         <Text style={styles.title}>
           Authorized Categories
@@ -79,15 +80,15 @@ export default function AuthorizedCategories() {
           </View>
         ))}
  
-       
+        
         <TouchableOpacity style={styles.saveButton}>
           <Text style={styles.saveText}>
             Save changes
           </Text>
         </TouchableOpacity>
       </View>
- 
-    </View>
+
+    </ScrollView>
   );
 }
  
@@ -163,4 +164,3 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
-  

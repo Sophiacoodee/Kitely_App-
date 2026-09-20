@@ -29,7 +29,7 @@ export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator 
-        initialRouteName="Login" 
+        initialRouteName="CategoryTransmitter" 
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Login" component={LoginScreen} />
