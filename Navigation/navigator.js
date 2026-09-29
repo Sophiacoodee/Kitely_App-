@@ -36,13 +36,8 @@ const Stack = createNativeStackNavigator();
 export default function AppNavigator() {
   return (
     <NavigationContainer>
-<<<<<<< HEAD
-      <Stack.Navigator
-        initialRouteName="Login"
-=======
       <Stack.Navigator 
-        initialRouteName="CategoryTransmitter" 
->>>>>>> rodrigo
+        initialRouteName="Login"
         screenOptions={{ headerShown: false }}
       >
         <Stack.Screen name="Login" component={LoginScreen} />

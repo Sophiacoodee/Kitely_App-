@@ -7,11 +7,12 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-
-const MAX_AMOUNT = 3000;
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function CategoriesScreen({ navigation }) {
   const { t } = useTranslation();
@@ -27,7 +28,7 @@ export default function CategoriesScreen({ navigation }) {
     { id: 'construction', name: t('categoriesScreen.list.construction', { defaultValue: 'Construction' }), icon: 'construct-sharp' },
   ];
 
-  const [selectedCategories, setSelectedCategories] = useState(['clothing']);
+  const [selectedCategories, setSelectedCategories] = useState(['clothing', 'cleaning']);
   const [amount, setAmount] = useState('');
 
   const toggleCategory = (id) => {
@@ -53,7 +54,7 @@ export default function CategoriesScreen({ navigation }) {
     setAmount(cleanedText);
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (selectedCategories.length === 0) {
       Alert.alert(t('categoriesScreen.attentionTitle'), t('categoriesScreen.errorSelectCategory'));
       return;
@@ -71,27 +72,58 @@ export default function CategoriesScreen({ navigation }) {
       return;
     }
 
-    if (numericAmount > MAX_AMOUNT) {
+    // Cargar el saldo disponible del emisor desde AsyncStorage
+    const savedBalance = await AsyncStorage.getItem('@transmitter_balance');
+    const currentBalance = savedBalance !== null ? parseFloat(savedBalance) : 316.00;
+
+    // Validación para no permitir enviar más dinero del saldo disponible
+    if (numericAmount > currentBalance) {
       Alert.alert(
-        t('categoriesScreen.limitExceededTitle'),
-        t('categoriesScreen.limitExceededMessage', { max: MAX_AMOUNT.toLocaleString('en-US', { minimumFractionDigits: 2 }) })
+        t('categoriesScreen.limitExceededTitle', { defaultValue: 'Saldo insuficiente' }),
+        `No puedes enviar más del saldo disponible ($${currentBalance.toFixed(2)})`
       );
       return;
     }
 
+    const formattedAmount = numericAmount.toFixed(2);
+    const newBalance = (currentBalance - numericAmount).toFixed(2);
+
+    try {
+      // Restar y guardar el nuevo saldo disponible del emisor
+      await AsyncStorage.setItem('@transmitter_balance', newBalance);
+
+      // Guardar los datos de la remesa enviada para la pantalla Store
+      await AsyncStorage.setItem('@remittance_amount', formattedAmount);
+
+      const categoriesToSave = selectedCategories.map((catId) => {
+        const found = CATEGORIES_DATA.find((c) => c.id === catId);
+        return {
+          name: found ? found.name : catId,
+          enabled: true,
+        };
+      });
+
+      await AsyncStorage.setItem('@user_categories', JSON.stringify(categoriesToSave));
+    } catch (e) {
+      console.error('Error al guardar la transacción:', e);
+    }
+
     navigation.navigate('Transaction', {
       selectedCategories,
-      amount: numericAmount.toFixed(2),
+      amount: formattedAmount,
     });
   };
 
   return (
-    <View style={styles.container}>
-<<<<<<< HEAD
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
       <View style={styles.mainWrapper}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
         >
           <View style={styles.header}>
             <View>
@@ -119,7 +151,7 @@ export default function CategoriesScreen({ navigation }) {
                   <Ionicons
                     name={item.icon}
                     size={44}
-                    color="#021024"
+                    color="#021533"
                     style={{ marginTop: 10 }}
                   />
                   {isSelected && (
@@ -136,67 +168,14 @@ export default function CategoriesScreen({ navigation }) {
         <View style={styles.overlayAmountSection}>
           <Text style={styles.amountLabel}>{t('categoriesScreen.amountLabel')}</Text>
           <Text style={styles.amountSublabel}>
-            {t('categoriesScreen.amountSublabel', { max: MAX_AMOUNT.toLocaleString() })}
+            {t('categoriesScreen.amountSublabel', { max: '3000.00' })}
           </Text>
-=======
-      <ScrollView 
-        showsVerticalScrollIndicator={false} 
-        contentContainerStyle={styles.scrollContent}
-      >
-        <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton} 
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-          <View>
-            <Text style={styles.headerTitle}>Categories</Text>
-            <Text style={styles.headerSubtitle}>Choose one or more categories</Text>
-          </View>
-        </View>
-
-        <View style={styles.gridContainer}>
-          {CATEGORIES_DATA.map((item) => {
-            const isSelected = selectedCategories.includes(item.id);
-            return (
-              <TouchableOpacity
-                key={item.id}
-                style={[
-                  styles.categoryCard,
-                  isSelected && styles.selectedCategoryCard
-                ]}
-                onPress={() => toggleCategory(item.id)}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.categoryName}>{item.name}</Text>
-                <Ionicons 
-                  name={item.icon} 
-                  size={44} 
-                  color="#021024" 
-                  style={{ marginTop: 10 }} 
-                />
-                {isSelected && (
-                  <View style={styles.checkBadge}>
-                    <Ionicons name="checkmark" size={14} color="#FFFFFF" />
-                  </View>
-                )}
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
-        <View style={styles.overlayAmountSection}>
-          <Text style={styles.amountLabel}>Amount</Text>
-          <Text style={styles.amountSublabel}>You send (USD)</Text>
->>>>>>> rodrigo
 
           <View style={styles.inputContainer}>
             <Text style={styles.currencySymbol}>$</Text>
             <TextInput
               style={styles.input}
               value={amount}
-<<<<<<< HEAD
               onChangeText={handleAmountChange}
               keyboardType="decimal-pad"
               placeholder="0.00"
@@ -207,40 +186,22 @@ export default function CategoriesScreen({ navigation }) {
           </View>
 
           <TouchableOpacity
-=======
-              onChangeText={setAmount}
-              keyboardType="numeric"
-              placeholder="0.00"
-              placeholderTextColor="#94A3B8"
-            />
-            <Text style={styles.currencyCode}>USD</Text>
-          </View>
-
-          <TouchableOpacity 
->>>>>>> rodrigo
             style={styles.continueButton}
             onPress={handleContinue}
             activeOpacity={0.8}
           >
-<<<<<<< HEAD
             <Text style={styles.continueButtonText}>{t('categoriesScreen.continueButton')}</Text>
           </TouchableOpacity>
         </View>
       </View>
-=======
-            <Text style={styles.continueButtonText}>Continue</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
->>>>>>> rodrigo
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#021B42',
+    backgroundColor: '#021533',
     paddingTop: 50,
   },
   mainWrapper: {
@@ -249,11 +210,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 20,
-<<<<<<< HEAD
     paddingBottom: 230,
-=======
-    paddingBottom: 40,
->>>>>>> rodrigo
   },
   header: {
     flexDirection: 'row',
@@ -285,16 +242,17 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     padding: 12,
     position: 'relative',
+    borderWidth: 3,
+    borderColor: 'transparent',
   },
   selectedCategoryCard: {
-    borderWidth: 3.5,
-    borderColor: '#55C900',
+    borderColor: '#52D017',
   },
   checkBadge: {
     position: 'absolute',
-    top: 10,
-    right: 10,
-    backgroundColor: '#55C900',
+    top: 8,
+    right: 8,
+    backgroundColor: '#52D017',
     width: 22,
     height: 22,
     borderRadius: 11,
@@ -304,21 +262,25 @@ const styles = StyleSheet.create({
   categoryName: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#021024',
+    color: '#021533',
   },
   overlayAmountSection: {
-    backgroundColor: '#021B42',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#021533',
+    paddingHorizontal: 20,
     paddingTop: 16,
-    paddingBottom: 10,
-    marginTop: 10,
+    paddingBottom: Platform.OS === 'ios' ? 30 : 20,
   },
   amountLabel: {
     fontSize: 12,
-    fontStyle: 'italic',
     color: '#94A3B8',
   },
   amountSublabel: {
     fontSize: 13,
+    fontWeight: 'bold',
     color: '#FFFFFF',
     marginBottom: 8,
   },
@@ -331,25 +293,25 @@ const styles = StyleSheet.create({
     height: 50,
     marginBottom: 14,
   },
-    currencySymbol: {
+  currencySymbol: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#021024',
+    color: '#021533',
     marginRight: 4,
   },
   input: {
     flex: 1,
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#021024',
+    color: '#021533',
   },
   currencyCode: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#021024',
+    color: '#021533',
   },
   continueButton: {
-    backgroundColor: '#55C900',
+    backgroundColor: '#52D017',
     borderRadius: 20,
     height: 50,
     justifyContent: 'center',

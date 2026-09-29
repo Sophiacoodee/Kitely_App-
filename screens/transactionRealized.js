@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     height: 52,
     justifyContent: 'center',
-    alignmentItems: 'center',
+    alignItems: 'center',
     marginTop: 16,
   },
   primaryButtonText: {
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   secondaryButton: {
     height: 50,
     justifyContent: 'center',
-    alignmentItems: 'center',
+    alignItems: 'center',
     marginTop: 8,
   },
   secondaryButtonText: {

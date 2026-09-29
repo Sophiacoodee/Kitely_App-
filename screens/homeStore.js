@@ -24,12 +24,17 @@ const { width } = Dimensions.get('window');
 
 const CATEGORY_ICONS = {
   Food: 'shopping-cart',
+  Groceries: 'shopping-bag',
   Medicine: 'medical-services',
+  Health: 'favorite',
   Education: 'school',
   Entertainment: 'movie',
   Construction: 'build',
   'Pet supplies': 'pets',
   Clothes: 'checkroom',
+  Clothing: 'checkroom',
+  House: 'home',
+  Cleaning: 'cleaning-services',
 };
 
 export default function HomeStoreScreen({ navigation }) {
@@ -46,13 +51,62 @@ export default function HomeStoreScreen({ navigation }) {
   const [isMapModalVisible, setIsMapModalVisible] = useState(false);
   const [activeCategories, setActiveCategories] = useState([]);
   const [profileImage, setProfileImage] = useState(null);
+  const [remittanceAmount, setRemittanceAmount] = useState('250.00');
+  const [recentActivities, setRecentActivities] = useState([]);
 
   useFocusEffect(
     useCallback(() => {
       loadAuthorizedCategories();
       loadUserData();
+      loadRemittanceAmountAndActivities();
     }, [])
   );
+
+  const loadRemittanceAmountAndActivities = async () => {
+    try {
+      const savedAmount = await AsyncStorage.getItem('@remittance_amount');
+      if (savedAmount !== null) {
+        setRemittanceAmount(savedAmount);
+      }
+
+      const savedActivities = await AsyncStorage.getItem('@store_recent_activities');
+      if (savedActivities !== null) {
+        setRecentActivities(JSON.parse(savedActivities));
+      } else {
+        const initialActivities = [
+          { id: '1', title: 'Redirection • Food', subtitle: 'Register 32 • Ticket #1042', amount: '+$25.00', time: 'Today 10:24 a.m.', status: t('homeStore.statusCompleted', { defaultValue: 'Completed' }), icon: 'shopping-cart' },
+          { id: '2', title: 'Redirection • Medicine', subtitle: 'Register 31 • Ticket #1039', amount: '+$12.50', time: 'Yesterday 4:15 p.m.', status: t('homeStore.statusCompleted', { defaultValue: 'Completed' }), icon: 'medical-services' },
+          { id: '3', title: 'Redirection • Food', subtitle: 'Register 34 • Ticket #1012', amount: '+$45.00', time: '10 Aug 2:30 p.m.', status: t('homeStore.statusCompleted', { defaultValue: 'Completed' }), icon: 'shopping-cart' },
+          { id: '4', title: 'Redirection • Entertainment', subtitle: 'Register 33 • Ticket #0958', amount: '+$18.00', time: '09 Aug 11:10 a.m.', status: t('homeStore.statusCompleted', { defaultValue: 'Completed' }), icon: 'movie' },
+        ];
+        setRecentActivities(initialActivities);
+        await AsyncStorage.setItem('@store_recent_activities', JSON.stringify(initialActivities));
+      }
+
+      if (savedAmount !== null) {
+        const lastProcessedAmount = await AsyncStorage.getItem('@last_processed_amount');
+        if (lastProcessedAmount !== savedAmount) {
+          const currentList = savedActivities ? JSON.parse(savedActivities) : [];
+          const newTicketNum = 1042 + currentList.length + 1;
+          const newActivity = {
+            id: Date.now().toString(),
+            title: 'Redirection • Transaction',
+            subtitle: `Register 32 • Ticket #${newTicketNum}`,
+            amount: `+$${parseFloat(savedAmount).toFixed(2)}`,
+            time: 'Today ' + dayjs().format('hh:mm a'),
+            status: t('homeStore.statusCompleted', { defaultValue: 'Completed' }),
+            icon: 'shopping-cart',
+          };
+          const updatedList = [newActivity, ...currentList];
+          setRecentActivities(updatedList);
+          await AsyncStorage.setItem('@store_recent_activities', JSON.stringify(updatedList));
+          await AsyncStorage.setItem('@last_processed_amount', savedAmount);
+        }
+      }
+    } catch (e) {
+      console.error('Error al cargar la actividad reciente:', e);
+    }
+  };
 
   const loadUserData = async () => {
     try {
@@ -91,13 +145,6 @@ export default function HomeStoreScreen({ navigation }) {
       console.error('Error al cargar categorías en la pantalla principal', e);
     }
   };
-
-  const recentActivities = [
-    { id: '1', title: t('homeStore.activities.act1.title'), subtitle: t('homeStore.activities.act1.subtitle'), amount: '+$25.00', time: t('homeStore.activities.act1.time'), status: t('homeStore.statusCompleted'), icon: 'shopping-cart' },
-    { id: '2', title: t('homeStore.activities.act2.title'), subtitle: t('homeStore.activities.act2.subtitle'), amount: '+$12.50', time: t('homeStore.activities.act2.time'), status: t('homeStore.statusCompleted'), icon: 'medical-services' },
-    { id: '3', title: t('homeStore.activities.act3.title'), subtitle: t('homeStore.activities.act3.subtitle'), amount: '+$45.00', time: t('homeStore.activities.act3.time'), status: t('homeStore.statusCompleted'), icon: 'shopping-cart' },
-    { id: '4', title: t('homeStore.activities.act4.title'), subtitle: t('homeStore.activities.act4.subtitle'), amount: '+$18.00', time: t('homeStore.activities.act4.time'), status: t('homeStore.statusCompleted'), icon: 'movie' },
-  ];
 
   const mapHtml = `
     <!DOCTYPE html>
@@ -157,18 +204,17 @@ export default function HomeStoreScreen({ navigation }) {
     try {
       setIsSaving(true);
       await addDoc(collection(db, 'branches_locations'), {
-        branchName: 'Super Selectos - Escalón',
-        branchId: '#4082',
+        branchName: t('homeStore.branchName', { defaultValue: 'Super Selectos - Escalón' }),
         latitude: selectedCoords.latitude,
         longitude: selectedCoords.longitude,
         createdAt: serverTimestamp(),
       });
 
-      Alert.alert(t('homeStore.alertSuccessTitle'), t('homeStore.alertSuccessMessage'));
+      Alert.alert(t('homeStore.alertSuccessTitle', { defaultValue: 'Éxito' }), t('homeStore.alertSuccessMessage', { defaultValue: 'Ubicación guardada correctamente.' }));
       setIsMapModalVisible(false);
     } catch (error) {
       console.error('Error al guardar:', error);
-      Alert.alert(t('homeStore.alertErrorTitle'), t('homeStore.alertErrorMessage'));
+      Alert.alert(t('homeStore.alertErrorTitle', { defaultValue: 'Error' }), t('homeStore.alertErrorMessage', { defaultValue: 'No se pudo guardar la ubicación.' }));
     } finally {
       setIsSaving(false);
     }
@@ -200,7 +246,7 @@ export default function HomeStoreScreen({ navigation }) {
         <TouchableOpacity style={styles.balanceCard} activeOpacity={0.9} onPress={() => navigation.navigate('BalanceDiario')}>
           <View style={styles.balanceInfo}>
             <Text style={styles.balanceLabel}>{t('homeStore.balanceLabel')}</Text>
-            <Text style={styles.balanceAmount}>$250.00</Text>
+            <Text style={styles.balanceAmount}>${remittanceAmount}</Text>
             <Text style={styles.expiryText}>{t('homeStore.cutoffDate', { date: expirationDate })}</Text>
           </View>
         </TouchableOpacity>
@@ -223,7 +269,7 @@ export default function HomeStoreScreen({ navigation }) {
             disabled={isSaving}
           >
             <Ionicons name="save-outline" size={16} color="#FFFFFF" style={{ marginRight: 6 }} />
-            <Text style={styles.saveLocationText}>{isSaving ? t('homeStore.saving') : t('homeStore.saveLocation')}</Text>
+            <Text style={styles.saveLocationText}>{isSaving ? t('homeStore.saving', { defaultValue: 'Guardando...' }) : t('homeStore.saveLocation', { defaultValue: 'Guardar ubicación' })}</Text>
           </TouchableOpacity>
         </View>
 
@@ -234,7 +280,7 @@ export default function HomeStoreScreen({ navigation }) {
               <TouchableOpacity style={styles.closeButton} onPress={() => setIsMapModalVisible(false)}>
                 <Ionicons name="close" size={24} color="#021024" />
               </TouchableOpacity>
-              <Text style={styles.modalTitle}>{t('homeStore.selectLocationTitle')}</Text>
+              <Text style={styles.modalTitle}>{t('homeStore.selectLocationTitle', { defaultValue: 'Seleccionar ubicación' })}</Text>
               <View style={{ width: 36 }} />
             </View>
 
@@ -248,12 +294,12 @@ export default function HomeStoreScreen({ navigation }) {
 
             <TouchableOpacity style={styles.fullMapSaveButton} onPress={handleSaveLocation} disabled={isSaving}>
               <Ionicons name="save-outline" size={18} color="#FFFFFF" style={{ marginRight: 8 }} />
-              <Text style={styles.fullMapSaveText}>{isSaving ? t('homeStore.saving') : t('homeStore.confirmSaveLocation')}</Text>
+              <Text style={styles.fullMapSaveText}>{isSaving ? t('homeStore.saving', { defaultValue: 'Guardando...' }) : t('homeStore.confirmSaveLocation', { defaultValue: 'Confirmar ubicación' })}</Text>
             </TouchableOpacity>
           </SafeAreaView>
         </Modal>
 
-        {/* Authorized Categories Button */}
+        {/* Authorized Categories Title / Button */}
         <TouchableOpacity
           style={styles.categoriesHeaderButton}
           activeOpacity={0.7}
@@ -265,33 +311,24 @@ export default function HomeStoreScreen({ navigation }) {
 
         {/* Categories Grid */}
         <View style={styles.gridContainer}>
-          <TouchableOpacity style={styles.categoryCard}>
-            <MaterialIcons name="shopping-cart" size={28} color="#021B42" />
-            <Text style={styles.categoryText}>{t('homeStore.categories.Food')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.categoryCard}>
-            <MaterialIcons name="medical-services" size={28} color="#021B42" />
-            <Text style={styles.categoryText}>{t('homeStore.categories.Medicine')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.categoryCard}>
-            <MaterialIcons name="school" size={28} color="#021B42" />
-            <Text style={styles.categoryText}>{t('homeStore.categories.Education')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.categoryCard}>
-            <MaterialIcons name="movie" size={28} color="#021B42" />
-            <Text style={styles.categoryText}>{t('homeStore.categories.Entertainment')}</Text>
-          </TouchableOpacity>
-          
-          {activeCategories.map((item) => (
-            <View key={item.name} style={styles.categoryCard}>
-              <MaterialIcons
-                name={CATEGORY_ICONS[item.name] || 'category'}
-                size={28}
-                color="#021B42"
-              />
-              <Text style={styles.categoryText}>{item.name}</Text>
-            </View>
-          ))}
+          {activeCategories.length > 0 ? (
+            activeCategories.map((item) => (
+              <View key={item.name} style={styles.categoryCard}>
+                <MaterialIcons
+                  name={CATEGORY_ICONS[item.name] || 'category'}
+                  size={28}
+                  color="#021B42"
+                />
+                <Text style={styles.categoryText}>
+                  {t(`homeStore.categories.${item.name}`, { defaultValue: item.name })}
+                </Text>
+              </View>
+            ))
+          ) : (
+            <Text style={{ color: '#a0aab8', textAlign: 'center', width: '100%', paddingVertical: 10 }}>
+              {t('homeStore.noCategories', { defaultValue: 'No hay categorías seleccionadas' })}
+            </Text>
+          )}
         </View>
 
         {/* Activity Section */}

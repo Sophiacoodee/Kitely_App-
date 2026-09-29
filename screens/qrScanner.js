@@ -110,7 +110,6 @@ export default function PhotoQRScreen() {
             )}
           </View>
 
-<<<<<<< HEAD
           <View style={styles.overlayBox}>
             <Text style={styles.statusMsg}>{statusText}</Text>
             {scannedData ? (
@@ -126,26 +125,6 @@ export default function PhotoQRScreen() {
             <TouchableOpacity style={styles.button} onPress={takePhotoAndScan}>
               <Text style={styles.buttonText}>{t("qrScanner.takeAnother", "Escanear otro")}</Text>
             </TouchableOpacity>
-=======
-        <Text style={styles.title}>Scan Your QR code</Text>
-        <Text style={styles.subtitle}>Center the QR code inside the frame</Text>
-      </View>
-
-      <View style={styles.scannerFrame}>
-        <View style={styles.qrContainer}>
-          <CameraView
-            style={[StyleSheet.absoluteFillObject, styles.qrContainer]}
-            enableTorch={flash}
-            barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
-            onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
-          />
-
-          <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-            <View style={[styles.corner, styles.topLeft]} />
-            <View style={[styles.corner, styles.topRight]} />
-            <View style={[styles.corner, styles.bottomLeft]} />
-            <View style={[styles.corner, styles.bottomRight]} />
->>>>>>> rodrigo
           </View>
         </View>
       ) : (

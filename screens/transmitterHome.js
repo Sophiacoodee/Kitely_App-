@@ -22,6 +22,7 @@ export default function TransmitterHome({ navigation }) {
   const { t } = useTranslation();
   const [profileImage, setProfileImage] = useState(null);
   const [fullName, setFullName] = useState('');
+  const [availableBalance, setAvailableBalance] = useState(316.00);
 
   const RECENT_TRANSACTIONS = useMemo(() => [
     {
@@ -61,8 +62,23 @@ export default function TransmitterHome({ navigation }) {
   useFocusEffect(
     useCallback(() => {
       loadUserData();
+      loadBalance();
     }, [])
   );
+
+  const loadBalance = async () => {
+    try {
+      const savedBalance = await AsyncStorage.getItem('@transmitter_balance');
+      if (savedBalance !== null) {
+        setAvailableBalance(parseFloat(savedBalance));
+      } else {
+        await AsyncStorage.setItem('@transmitter_balance', '316.00');
+        setAvailableBalance(316.00);
+      }
+    } catch (error) {
+      console.error('Error al cargar saldo:', error);
+    }
+  };
 
   const loadUserData = async () => {
     try {
@@ -127,7 +143,7 @@ export default function TransmitterHome({ navigation }) {
         {/* Balance Disponible */}
         <View style={styles.balanceCard}>
           <Text style={styles.balanceLabel}>{t('transmitterHome.balanceLabel')}</Text>
-          <Text style={styles.balanceAmount}>$316.00</Text>
+          <Text style={styles.balanceAmount}>${availableBalance.toFixed(2)}</Text>
         </View>
 
         {/* Botones de Acción Rápida */}

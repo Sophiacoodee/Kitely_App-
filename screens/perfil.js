@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   Platform,
   StatusBar,
+  Alert,
 } from 'react-native';
 import {
   FontAwesome5,
@@ -19,6 +20,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTranslation } from 'react-i18next';
 import { auth, db } from '../firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function PerfilScreen({ navigation }) {
   const { t } = useTranslation();
@@ -44,7 +46,6 @@ export default function PerfilScreen({ navigation }) {
     try {
       const currentUser = auth.currentUser;
       if (currentUser) {
-        // 1. Cargar imagen de perfil guardada con el UID único
         const savedImage = await AsyncStorage.getItem(
           `@user_profile_image_${currentUser.uid}`
         );
@@ -54,7 +55,6 @@ export default function PerfilScreen({ navigation }) {
           setProfileImage(null);
         }
 
-        // 2. Cargar nombre del usuario desde Firestore y formatear
         const docRef = doc(db, 'Usuarios', currentUser.uid);
         const docSnap = await getDoc(docRef);
 
@@ -70,6 +70,88 @@ export default function PerfilScreen({ navigation }) {
     } catch (error) {
       console.error('Error al cargar datos del perfil:', error);
     }
+  };
+
+  const saveProfileImage = async (imageUri) => {
+    try {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        await AsyncStorage.setItem(
+          `@user_profile_image_${currentUser.uid}`,
+          imageUri
+        );
+        setProfileImage(imageUri);
+      }
+    } catch (error) {
+      console.error('Error al guardar la imagen de perfil:', error);
+      Alert.alert('Error', 'No se pudo guardar la imagen de perfil.');
+    }
+  };
+
+  const takePhotoWithCamera = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(
+        'Permiso denegado',
+        'Se necesita acceso a la cámara para tomar fotos.'
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      await saveProfileImage(result.assets[0].uri);
+    }
+  };
+
+  const pickImageFromGallery = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(
+        'Permiso denegado',
+        'Se necesita acceso a la galería para elegir una foto.'
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      await saveProfileImage(result.assets[0].uri);
+    }
+  };
+
+  const handleSelectImageSource = () => {
+    Alert.alert(
+      'Foto de Perfil',
+      '¿De dónde deseas seleccionar la foto?',
+      [
+        {
+          text: 'Tomar Foto',
+          onPress: takePhotoWithCamera,
+        },
+        {
+          text: 'Seleccionar de Galería',
+          onPress: pickImageFromGallery,
+        },
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   const getInitials = (name) => {
@@ -88,16 +170,26 @@ export default function PerfilScreen({ navigation }) {
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.topHeader}>
-          {profileImage ? (
-            <Image
-              source={{ uri: profileImage }}
-              style={styles.avatar}
-            />
-          ) : (
-            <View style={styles.avatarPlaceholder}>
-              <Text style={styles.avatarText}>{getInitials(fullName)}</Text>
-            </View>
-          )}
+          <View style={styles.avatarContainer}>
+            {profileImage ? (
+              <Image
+                source={{ uri: profileImage }}
+                style={styles.avatar}
+              />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <Text style={styles.avatarText}>{getInitials(fullName)}</Text>
+              </View>
+            )}
+
+            <TouchableOpacity
+              style={styles.cameraBadge}
+              activeOpacity={0.8}
+              onPress={handleSelectImageSource}
+            >
+              <Ionicons name="camera" size={14} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
 
           <View style={styles.headerTextContainer}>
             <Text style={styles.profileTitle}>
@@ -108,7 +200,6 @@ export default function PerfilScreen({ navigation }) {
         </View>
 
         <View style={styles.whitePanel}>
-          {/* PERSONAL INFORMATION */}
           <TouchableOpacity
             style={styles.menuOption}
             activeOpacity={0.7}
@@ -123,7 +214,6 @@ export default function PerfilScreen({ navigation }) {
           </TouchableOpacity>
           <View style={styles.separator} />
 
-          {/* PAYMENT METHODS */}
           <TouchableOpacity
             style={styles.menuOption}
             activeOpacity={0.7}
@@ -138,7 +228,6 @@ export default function PerfilScreen({ navigation }) {
           </TouchableOpacity>
           <View style={styles.separator} />
 
-          {/* HELP CENTER */}
           <TouchableOpacity
             style={styles.menuOption}
             activeOpacity={0.7}
@@ -153,7 +242,6 @@ export default function PerfilScreen({ navigation }) {
           </TouchableOpacity>
           <View style={styles.separator} />
 
-          {/* ABOUT KITELY */}
           <TouchableOpacity
             style={styles.menuOption}
             activeOpacity={0.7}
@@ -189,13 +277,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  avatarContainer: {
+    position: 'relative',
+    marginRight: 16,
+  },
   avatar: {
     width: 65,
     height: 65,
     borderRadius: 32.5,
     borderWidth: 2,
     borderColor: '#FFFFFF',
-    marginRight: 16,
   },
   avatarPlaceholder: {
     width: 65,
@@ -204,7 +295,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#D1E7DD',
     borderWidth: 2,
     borderColor: '#FFFFFF',
-    marginRight: 16,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -212,6 +302,19 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     color: '#14452F',
+  },
+  cameraBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#52D017',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#021B42',
   },
   headerTextContainer: {
     justifyContent: 'center',
