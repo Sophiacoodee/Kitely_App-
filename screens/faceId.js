@@ -13,10 +13,11 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as LocalAuthentication from "expo-local-authentication";
 import { useTranslation } from "react-i18next";
 
-export default function ConfirmacionFaceIdScreen({ navigation }) {
+export default function ConfirmacionFaceIdScreen({ navigation, route }) {
   const { width } = useWindowDimensions();
   const isTablet = width >= 600;
   const { t } = useTranslation();
+  const { transaccionId } = route?.params ?? {};
 
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
@@ -29,7 +30,7 @@ export default function ConfirmacionFaceIdScreen({ navigation }) {
         Alert.alert(
           t('faceId.hardwareUnavailableTitle'),
           t('faceId.hardwareUnavailableMessage'),
-          [{ text: t('faceId.usePin'), onPress: () => navigation.navigate("....") }]
+          [{ text: t('faceId.usePin'), onPress: () => navigation.navigate("Pin", { transaccionId }) }]
         );
         return;
       }
@@ -39,7 +40,7 @@ export default function ConfirmacionFaceIdScreen({ navigation }) {
         Alert.alert(
           t('faceId.requiredConfigTitle'),
           t('faceId.requiredConfigMessage'),
-          [{ text: t('faceId.usePin'), onPress: () => navigation.navigate("....") }]
+          [{ text: t('faceId.usePin'), onPress: () => navigation.navigate("Pin", { transaccionId }) }]
         );
         return;
       }
@@ -51,7 +52,7 @@ export default function ConfirmacionFaceIdScreen({ navigation }) {
       });
 
       if (result.success) {
-        navigation.navigate("....");
+        navigation.replace("Canje", { transaccionId });
       } else {
         Alert.alert(t('faceId.authFailedTitle'), t('faceId.authFailedMessage'));
       }
@@ -114,7 +115,7 @@ export default function ConfirmacionFaceIdScreen({ navigation }) {
 
           <TouchableOpacity
             style={styles.botonPin}
-            onPress={() => navigation.navigate("....")}
+            onPress={() => navigation.navigate("Pin", { transaccionId })}
             activeOpacity={0.8}
           >
             <Text style={styles.botonPinTexto}>

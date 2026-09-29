@@ -14,7 +14,6 @@ import CategoryTransmitter from "../screens/categoryTransmitter";
 import PerfilScreen from "../screens/perfil";
 import MetodoPagoScreen from "../screens/metodosPagos";
 import AboutUScreen from "../screens/aboutus";
-import FaceIdScreen from "../screens/faceId";
 import QRScannerScreen from "../screens/qrScanner";
 import BalanceDiarioScreen from "../screens/balanceDiario";
 import SettingsScreen from "../screens/settings";
@@ -30,7 +29,7 @@ import HelpCenter from '../screens/helpCenter';
 import Languaje from '../screens/languaje';
 import PersonalInformation from '../screens/personalInformation';
 import InformationUsers from "../screens/informationUsers";
-
+import FaceIdScreen from '../screens/faceId';
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
@@ -52,7 +51,6 @@ export default function AppNavigator() {
         <Stack.Screen name="Perfil" component={PerfilScreen} />
         <Stack.Screen name="MetodosPagos" component={MetodoPagoScreen} />
         <Stack.Screen name="AboutUs" component={AboutUScreen} />
-        <Stack.Screen name="FaceId" component={FaceIdScreen} />
         <Stack.Screen name="QRScanner" component={QRScannerScreen} />
         <Stack.Screen name="BalanceDiario" component={BalanceDiarioScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
@@ -68,6 +66,7 @@ export default function AppNavigator() {
         <Stack.Screen name="Languaje" component={Languaje} />
         <Stack.Screen name="PersonalInformation" component={PersonalInformation} />
         <Stack.Screen name="InformationUsers" component={InformationUsers} />
+        <Stack.Screen name="faceld" component={FaceIdScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

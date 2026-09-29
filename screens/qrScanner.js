@@ -1,209 +1,242 @@
-import React, { useState, useEffect, useRef } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Image, Linking, Animated, Easing } from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import { Camera } from "expo-camera";
-import { useTranslation } from "react-i18next";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  AppState,
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { CameraView, useCameraPermissions } from "expo-camera";
 
-export default function PhotoQRScreen() {
-  const { t } = useTranslation();
-  const [imageUri, setImageUri] = useState(null);
-  const [scannedData, setScannedData] = useState(null);
-  const [statusText, setStatusText] = useState("");
-  const [isScanningAnim, setIsScanningAnim] = useState(false);
+const { width, height } = Dimensions.get("window");
+const MARCO = 280;
+const LADO = (width - MARCO) / 2;
+const ARRIBA = (height - MARCO) / 2;
 
-  const laserAnim = useRef(new Animated.Value(0)).current;
+export default function QRScannerScreen({ navigation }) {
+  const [permission, requestPermission] = useCameraPermissions();
+  const [flash, setFlash] = useState(false);
+  const [camara, setCamara] = useState("back");
+  const qrLock = useRef(false);
+  const appState = useRef(AppState.currentState);
 
+  // Libera el candado si la app vuelve de segundo plano
   useEffect(() => {
-    setStatusText(t("qrScanner.scanningImage", "Escaneando imagen..."));
-  }, [t]);
-
-  useEffect(() => {
-    let animationLoop;
-    if (isScanningAnim) {
-      laserAnim.setValue(0);
-      animationLoop = Animated.loop(
-        Animated.sequence([
-          Animated.timing(laserAnim, {
-            toValue: 200,
-            duration: 1200,
-            easing: Easing.linear,
-            useNativeDriver: true,
-          }),
-          Animated.timing(laserAnim, {
-            toValue: 0,
-            duration: 1200,
-            easing: Easing.linear,
-            useNativeDriver: true,
-          }),
-        ])
-      );
-      animationLoop.start();
-    } else {
-      laserAnim.stopAnimation();
-    }
-    return () => animationLoop && animationLoop.stop();
-  }, [isScanningAnim]);
-
-  const takePhotoAndScan = async () => {
-    setScannedData(null);
-    setStatusText(t("qrScanner.openingCamera", "Abriendo cámara..."));
-
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-    if (!permissionResult.granted) {
-      alert(t("qrScanner.cameraRequired", "Se requiere permiso para acceder a la cámara"));
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ['images'],
-      quality: 0.8,
-      allowsEditing: false,
-    });
-
-    if (!result.canceled && result.assets && result.assets.length > 0) {
-      const uri = result.assets[0].uri;
-      setImageUri(uri);
-      await decodeQR(uri);
-    }
-  };
-
-  const decodeQR = async (uri) => {
-    setIsScanningAnim(true);
-    setStatusText(t("qrScanner.processingPixels", "Procesando código..."));
-
-    try {
-      const results = await Camera.scanFromURLAsync(uri, ["qr"]);
-
-      if (results && results.length > 0) {
-        setScannedData(results[0].data);
-        setStatusText(t("qrScanner.detected", "Código QR detectado"));
-      } else {
-        setStatusText(t("qrScanner.failed", "No se encontró ningún código QR"));
+    const subscription = AppState.addEventListener("change", (siguiente) => {
+      if (appState.current.match(/inactive|background/) && siguiente === "active") {
+        qrLock.current = false;
       }
-    } catch (e) {
-      console.error("Error analizando el QR:", e);
-      setStatusText(t("qrScanner.failed", "No se pudo leer la imagen"));
-    } finally {
-      setIsScanningAnim(false);
-    }
-  };
+      appState.current = siguiente;
+    });
+    return () => subscription.remove();
+  }, []);
 
-  const laserTranslateY = laserAnim.interpolate({
-    inputRange: [0, 200],
-    outputRange: [0, 200],
-  });
+  // Libera el candado cada vez que se vuelve a esta pantalla (ej. después de cancelar)
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      qrLock.current = false;
+    });
+    return unsubscribe;
+  }, [navigation]);
+
+  if (!permission) {
+    return <View style={styles.container} />;
+  }
+
+  if (!permission.granted) {
+    return (
+      <View style={styles.permisoContainer}>
+        <Text style={styles.permisoTitulo}>Camera access</Text>
+        <Text style={styles.permisoTexto}>
+          We need access to your camera to scan the QR code.
+        </Text>
+        <TouchableOpacity style={styles.permisoBoton} onPress={requestPermission}>
+          <Text style={styles.permisoBotonTexto}>Allow camera</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  function manejarCodigo({ data }) {
+    if (!data || qrLock.current) return;
+    qrLock.current = true;
+
+    // "data" es lo que trae el QR. Para Kitely debe ser el id de la transacción.
+    // Cambia "ConfirmacionFaceId" por el nombre con el que registraste esa pantalla en navigator.js
+    navigation.navigate("faceld", { transaccionId: data.trim() });
+  }
 
   return (
     <View style={styles.container}>
-      {imageUri ? (
-        <View style={styles.previewContainer}>
-          <Image source={{ uri: imageUri }} style={styles.imagePreview} />
+      {/* Cámara a pantalla completa */}
+      <CameraView
+        style={StyleSheet.absoluteFill}
+        facing={camara}
+        enableTorch={flash}
+        barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+        onBarcodeScanned={manejarCodigo}
+      />
 
-          <View style={styles.scanFrame}>
-            {isScanningAnim && (
-              <Animated.View
-                style={[
-                  styles.laserLine,
-                  { transform: [{ translateY: laserTranslateY }] },
-                ]}
-              />
-            )}
+      {/* Oscurecido alrededor del recuadro */}
+      <View style={styles.overlay} pointerEvents="none">
+        <View style={[styles.sombra, { height: ARRIBA }]} />
+        <View style={{ flexDirection: "row", height: MARCO }}>
+          <View style={[styles.sombra, { width: LADO }]} />
+          <View style={styles.marco}>
+            <View style={[styles.esquina, styles.arribaIzq]} />
+            <View style={[styles.esquina, styles.arribaDer]} />
+            <View style={[styles.esquina, styles.abajoIzq]} />
+            <View style={[styles.esquina, styles.abajoDer]} />
           </View>
-
-          <View style={styles.overlayBox}>
-            <Text style={styles.statusMsg}>{statusText}</Text>
-            {scannedData ? (
-              <>
-                <Text style={styles.subtext} selectable>{scannedData}</Text>
-                {scannedData.startsWith("http") && (
-                  <TouchableOpacity style={styles.linkButton} onPress={() => Linking.openURL(scannedData)}>
-                    <Text style={styles.buttonText}>{t("qrScanner.openLink", "Abrir enlace")}</Text>
-                  </TouchableOpacity>
-                )}
-              </>
-            ) : null}
-            <TouchableOpacity style={styles.button} onPress={takePhotoAndScan}>
-              <Text style={styles.buttonText}>{t("qrScanner.takeAnother", "Escanear otro")}</Text>
-            </TouchableOpacity>
-          </View>
+          <View style={[styles.sombra, { width: LADO }]} />
         </View>
-      ) : (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.promptText}>{t("qrScanner.prompt", "Escanea un código QR para continuar")}</Text>
-          <TouchableOpacity style={styles.button} onPress={takePhotoAndScan}>
-            <Text style={styles.buttonText}>{t("qrScanner.openCameraBtn", "Abrir cámara")}</Text>
+        <View style={[styles.sombra, { flex: 1 }]} />
+      </View>
+
+      {/* Textos y botones */}
+      <View style={styles.ui} pointerEvents="box-none">
+        <View style={styles.encabezado}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.botonIcono}>
+            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
-      )}
+
+        <View style={styles.textos}>
+          <Text style={styles.titulo}>Scan your QR code</Text>
+          <Text style={styles.subtitulo}>Center the QR code inside the frame</Text>
+        </View>
+
+        <View style={styles.pie}>
+          <TouchableOpacity onPress={() => setFlash(!flash)} style={styles.botonIcono}>
+            <Ionicons name={flash ? "flash" : "flash-off"} size={28} color="#FFFFFF" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setCamara(camara === "back" ? "front" : "back")}
+            style={styles.botonIcono}
+          >
+            <Ionicons name="camera-reverse-outline" size={28} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#111" },
-  emptyContainer: { flex: 1, justifyContent: "center", alignItems: "center", padding: 20 },
-  promptText: { color: "#fff", fontSize: 16, marginBottom: 20 },
-  previewContainer: { flex: 1, position: "relative", alignItems: "center", justifyContent: "center" },
-  imagePreview: { width: "100%", height: "100%", resizeMode: "contain", position: "absolute" },
-  scanFrame: {
-    width: 220,
-    height: 220,
-    borderWidth: 2,
-    borderColor: "rgba(0, 122, 255, 0.8)",
-    borderRadius: 16,
-    overflow: "hidden",
-    position: "relative",
+  container: {
+    flex: 1,
+    backgroundColor: "#000000",
   },
-  laserLine: {
-    width: "100%",
-    height: 3,
-    backgroundColor: "#007AFF",
-    shadowColor: "#007AFF",
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 10,
-    elevation: 5,
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
   },
-  overlayBox: {
+  sombra: {
+    backgroundColor: "rgba(0, 0, 0, 0.55)",
+  },
+  marco: {
+    width: MARCO,
+    height: MARCO,
+  },
+  esquina: {
     position: "absolute",
-    bottom: 40,
-    left: 20,
-    right: 20,
-    backgroundColor: "rgba(0,0,0,0.85)",
-    padding: 20,
-    borderRadius: 16,
+    width: 34,
+    height: 34,
+    borderColor: "#FFFFFF",
+    borderWidth: 4,
+  },
+  arribaIzq: {
+    top: 0,
+    left: 0,
+    borderRightWidth: 0,
+    borderBottomWidth: 0,
+    borderTopLeftRadius: 18,
+  },
+  arribaDer: {
+    top: 0,
+    right: 0,
+    borderLeftWidth: 0,
+    borderBottomWidth: 0,
+    borderTopRightRadius: 18,
+  },
+  abajoIzq: {
+    bottom: 0,
+    left: 0,
+    borderRightWidth: 0,
+    borderTopWidth: 0,
+    borderBottomLeftRadius: 18,
+  },
+  abajoDer: {
+    bottom: 0,
+    right: 0,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderBottomRightRadius: 18,
+  },
+  ui: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "space-between",
+    paddingTop: 55,
+    paddingBottom: 45,
+    paddingHorizontal: 24,
+  },
+  encabezado: {
+    flexDirection: "row",
+  },
+  botonIcono: {
+    padding: 6,
+  },
+  textos: {
     alignItems: "center",
+    position: "absolute",
+    top: 110,
+    left: 0,
+    right: 0,
   },
-  statusMsg: {
-    color: "#4CD964",
+  titulo: {
+    color: "#FFFFFF",
+    fontSize: 20,
+    fontWeight: "700",
+    marginBottom: 8,
+  },
+  subtitulo: {
+    color: "rgba(255,255,255,0.8)",
     fontSize: 15,
-    fontWeight: "bold",
-    marginBottom: 10,
     textAlign: "center",
   },
-  subtext: {
-    color: "#fff",
-    fontSize: 14,
-    marginBottom: 16,
-    textAlign: "center",
+  pie: {
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
-  button: {
-    backgroundColor: "#007AFF",
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 10,
-    marginTop: 8,
+  permisoContainer: {
+    flex: 1,
+    backgroundColor: "#021B42",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
   },
-  linkButton: {
-    backgroundColor: "#34C759",
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    borderRadius: 10,
+  permisoTitulo: {
+    color: "#FFFFFF",
+    fontSize: 22,
+    fontWeight: "700",
     marginBottom: 10,
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
+  permisoTexto: {
+    color: "rgba(255,255,255,0.8)",
     fontSize: 15,
+    textAlign: "center",
+    marginBottom: 24,
+  },
+  permisoBoton: {
+    backgroundColor: "#55C900",
+    paddingVertical: 13,
+    paddingHorizontal: 28,
+    borderRadius: 26,
+  },
+  permisoBotonTexto: {
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "600",
   },
 });
