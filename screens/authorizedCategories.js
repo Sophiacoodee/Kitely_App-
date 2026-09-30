@@ -36,7 +36,7 @@ export default function AuthorizedCategories({ navigation }) {
 
   const loadCategories = async () => {
     try {
-      const savedCategories = await AsyncStorage.getItem("@user_categories");
+      const savedCategories = await AsyncStorage.getItem("@authorized_categories_independent");
       if (savedCategories !== null) {
         setCategories(JSON.parse(savedCategories));
       }
@@ -54,12 +54,13 @@ export default function AuthorizedCategories({ navigation }) {
   const handleSaveChanges = async () => {
     try {
       await AsyncStorage.setItem(
-        "@user_categories",
+        "@authorized_categories_independent",
         JSON.stringify(categories)
       );
-      navigation.navigate("HomeStore");
+      // Regresa o navega sin interferir con las pantallas del remitente
+      navigation.goBack();
     } catch (e) {
-      Alert.alert(t('authorizedCategories.errorTitle'), t('authorizedCategories.errorSaveMessage'));
+      Alert.alert(t('authorizedCategories.errorTitle', 'Error'), t('authorizedCategories.errorSaveMessage', 'No se pudieron guardar los cambios'));
     }
   };
 

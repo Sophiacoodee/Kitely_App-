@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
+// Mapeo de iconos para que coincidan perfectamente con los nombres de la pantalla de configuración
 const CATEGORY_ICONS = {
   Food: 'shopping-cart',
   Groceries: 'shopping-bag',
@@ -49,11 +50,12 @@ export default function HomeStoreScreen({ navigation }) {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isMapModalVisible, setIsMapModalVisible] = useState(false);
-  const [activeCategories, setActiveCategories] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [profileImage, setProfileImage] = useState(null);
   const [remittanceAmount, setRemittanceAmount] = useState('250.00');
   const [recentActivities, setRecentActivities] = useState([]);
 
+  // Se usa useFocusEffect para recargar las categorías guardadas cada vez que vuelvas a esta pantalla
   useFocusEffect(
     useCallback(() => {
       loadAuthorizedCategories();
@@ -61,6 +63,17 @@ export default function HomeStoreScreen({ navigation }) {
       loadRemittanceAmountAndActivities();
     }, [])
   );
+
+  const loadAuthorizedCategories = async () => {
+    try {
+      const savedCategories = await AsyncStorage.getItem('@authorized_categories_independent');
+      if (savedCategories !== null) {
+        setCategories(JSON.parse(savedCategories));
+      }
+    } catch (e) {
+      console.error('Error al cargar categorías autorizadas:', e);
+    }
+  };
 
   const loadRemittanceAmountAndActivities = async () => {
     try {
@@ -82,27 +95,6 @@ export default function HomeStoreScreen({ navigation }) {
         setRecentActivities(initialActivities);
         await AsyncStorage.setItem('@store_recent_activities', JSON.stringify(initialActivities));
       }
-
-      if (savedAmount !== null) {
-        const lastProcessedAmount = await AsyncStorage.getItem('@last_processed_amount');
-        if (lastProcessedAmount !== savedAmount) {
-          const currentList = savedActivities ? JSON.parse(savedActivities) : [];
-          const newTicketNum = 1042 + currentList.length + 1;
-          const newActivity = {
-            id: Date.now().toString(),
-            title: 'Redirection • Transaction',
-            subtitle: `Register 32 • Ticket #${newTicketNum}`,
-            amount: `+$${parseFloat(savedAmount).toFixed(2)}`,
-            time: 'Today ' + dayjs().format('hh:mm a'),
-            status: t('homeStore.statusCompleted', { defaultValue: 'Completed' }),
-            icon: 'shopping-cart',
-          };
-          const updatedList = [newActivity, ...currentList];
-          setRecentActivities(updatedList);
-          await AsyncStorage.setItem('@store_recent_activities', JSON.stringify(updatedList));
-          await AsyncStorage.setItem('@last_processed_amount', savedAmount);
-        }
-      }
     } catch (e) {
       console.error('Error al cargar la actividad reciente:', e);
     }
@@ -123,26 +115,6 @@ export default function HomeStoreScreen({ navigation }) {
       }
     } catch (error) {
       console.error('Error al cargar la foto de perfil:', error);
-    }
-  };
-
-  const loadAuthorizedCategories = async () => {
-    try {
-      const saved = await AsyncStorage.getItem('@user_categories');
-      if (saved !== null) {
-        const parsed = JSON.parse(saved);
-        const enabledOnly = parsed.filter((cat) => cat.enabled);
-        setActiveCategories(enabledOnly);
-      } else {
-        setActiveCategories([
-          { name: 'Food', enabled: true },
-          { name: 'Medicine', enabled: true },
-          { name: 'Education', enabled: true },
-          { name: 'Entertainment', enabled: true },
-        ]);
-      }
-    } catch (e) {
-      console.error('Error al cargar categorías en la pantalla principal', e);
     }
   };
 
@@ -220,11 +192,14 @@ export default function HomeStoreScreen({ navigation }) {
     }
   };
 
+  // Filtra únicamente las categorías que tengan el switch activado (enabled: true)
+  const activeCategories = categories.filter((cat) => cat.enabled);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
 
-        {/* Header */}
+        {/* Encabezado */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Perfil')}>
             {profileImage ? (
@@ -237,12 +212,13 @@ export default function HomeStoreScreen({ navigation }) {
             <Text style={styles.greeting}>{t('homeStore.branchName')}</Text>
             <Text style={styles.subGreeting}>{t('homeStore.subGreeting')}</Text>
           </View>
-          <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('Settings')}>
+          {/* Botón de configuración que navega a la pantalla AuthorizedCategories */}
+          <TouchableOpacity style={styles.avatarButton} onPress={() => navigation.navigate('AuthorizedCategories')}>
             <Ionicons name="settings-outline" size={22} color="#021024" />
           </TouchableOpacity>
         </View>
 
-        {/* Balance Card */}
+        {/* Balance */}
         <TouchableOpacity style={styles.balanceCard} activeOpacity={0.9} onPress={() => navigation.navigate('BalanceDiario')}>
           <View style={styles.balanceInfo}>
             <Text style={styles.balanceLabel}>{t('homeStore.balanceLabel')}</Text>
@@ -251,7 +227,7 @@ export default function HomeStoreScreen({ navigation }) {
           </View>
         </TouchableOpacity>
 
-        {/* Map Container */}
+        {/* Mapa */}
         <View style={styles.mapContainer}>
           <WebView
             ref={webViewRef}
@@ -273,7 +249,6 @@ export default function HomeStoreScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* Fullscreen Map Modal */}
         <Modal visible={isMapModalVisible} animationType="slide" onRequestClose={() => setIsMapModalVisible(false)}>
           <SafeAreaView style={styles.fullMapContainer}>
             <View style={styles.modalHeader}>
@@ -299,17 +274,17 @@ export default function HomeStoreScreen({ navigation }) {
           </SafeAreaView>
         </Modal>
 
-        {/* Authorized Categories Title / Button */}
+        {/* Título de Categorías Autorizadas */}
         <TouchableOpacity
           style={styles.categoriesHeaderButton}
           activeOpacity={0.7}
           onPress={() => navigation.navigate('AuthorizedCategories')}
         >
-          <Text style={styles.categoriesButtonText}>{t('homeStore.authorizedCategoriesButton')}</Text>
+          <Text style={styles.categoriesButtonText}>{t('homeStore.authorizedCategoriesButton', 'Authorized Categories')}</Text>
           <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
         </TouchableOpacity>
 
-        {/* Categories Grid */}
+        {/* Cuadrícula de Categorías Dinámicas según AuthorizedCategories */}
         <View style={styles.gridContainer}>
           {activeCategories.length > 0 ? (
             activeCategories.map((item) => (
@@ -320,7 +295,7 @@ export default function HomeStoreScreen({ navigation }) {
                   color="#021B42"
                 />
                 <Text style={styles.categoryText}>
-                  {t(`homeStore.categories.${item.name}`, { defaultValue: item.name })}
+                  {item.name}
                 </Text>
               </View>
             ))
@@ -331,7 +306,7 @@ export default function HomeStoreScreen({ navigation }) {
           )}
         </View>
 
-        {/* Activity Section */}
+        {/* Actividad Reciente */}
         <Text style={styles.sectionTitle}>{t('homeStore.recentActivityTitle')}</Text>
 
         {recentActivities.map((item) => (

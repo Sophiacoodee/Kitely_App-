@@ -11,6 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { useTranslation } from "react-i18next";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Transaction({ route, navigation }) {
   const { t } = useTranslation();
@@ -27,7 +28,9 @@ export default function Transaction({ route, navigation }) {
       const now = new Date();
       const dateStr = now.toISOString().split('T')[0];
       const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).toLowerCase();
+      const numericAmount = parseFloat(amount) || 0;
 
+      // 1. Guardar en Firebase (Firestore)
       await addDoc(collection(db, "transactions"), {
         category: displayCategory || "Groceries",
         name: "Super Selectos",
@@ -37,6 +40,28 @@ export default function Transaction({ route, navigation }) {
         time: timeStr,
         createdAt: serverTimestamp(),
       });
+
+      // 2. Crear la tarjeta rectangular para el historial de TransmitterHome (con signo -)
+      const primaryCatKey = (selectedCategories[0] || 'food').toLowerCase();
+      const newTransactionCard = {
+        id: Date.now().toString(),
+        title: "Super Selectos",
+        subtitle: `${displayCategory} • Just now`,
+        amount: `-$${numericAmount.toFixed(2)}`,
+        rawAmount: numericAmount,
+        status: 'Completed',
+        dateText: 'Just now',
+        icon: primaryCatKey.includes('medic') ? 'medical' : primaryCatKey.includes('construc') ? 'construct' : 'cart',
+        categoryKey: primaryCatKey.includes('medic') ? 'medicine' : primaryCatKey.includes('construc') ? 'construction' : 'food',
+      };
+
+      // 3. Apilar la transacción en AsyncStorage para que aparezca en el historial del Home
+      const existingTransactions = await AsyncStorage.getItem('@transmitter_transactions');
+      const transactionsList = existingTransactions ? JSON.parse(existingTransactions) : [];
+      const updatedList = [newTransactionCard, ...transactionsList];
+      await AsyncStorage.setItem('@transmitter_transactions', JSON.stringify(updatedList));
+
+      // NOTA: Ya no tocamos ni restamos aquí el balance duplicado para evitar saltos extraños de dinero.
 
       setLoading(false);
       navigation.navigate("Canje", {
