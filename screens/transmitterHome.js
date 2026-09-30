@@ -19,19 +19,26 @@ import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
+// Lista oficial de categorías con Clothing y House separados
+const ALL_CATEGORIES_CONFIG = [
+  { key: 'Groceries', color: '#805AD5' },
+  { key: 'Health', color: '#3182CE' },
+  { key: 'Clothing', color: '#ED64A6' },
+  { key: 'House', color: '#DD6B20' },
+  { key: 'Education', color: '#ECC94B' },
+  { key: 'Cleaning', color: '#4FD1C5' },
+  { key: 'Entertainment', color: '#ED8936' },
+  { key: 'Construction', color: '#00D2A0' },
+];
+
 export default function TransmitterHome({ navigation }) {
   const { t } = useTranslation();
   const [profileImage, setProfileImage] = useState(null);
   const [fullName, setFullName] = useState('');
   const [availableBalance, setAvailableBalance] = useState(1236.00);
   const [transactions, setTransactions] = useState([]);
-  const [categoryTotals, setCategoryTotals] = useState({
-    food: { amount: 0, percentage: 0, color: '#805AD5' },
-    medicine: { amount: 0, percentage: 0, color: '#ECC94B' },
-    construction: { amount: 0, percentage: 0, color: '#00D2A0' },
-  });
+  const [categorySummary, setCategorySummary] = useState([]);
 
-  // Cada vez que entras o vuelves a esta pantalla, se actualiza el historial en tiempo real
   useFocusEffect(
     useCallback(() => {
       loadUserData();
@@ -78,75 +85,96 @@ export default function TransmitterHome({ navigation }) {
     }
   };
 
-  // Carga únicamente las transacciones reales guardadas en el almacenamiento
   const loadStoredTransactions = async () => {
     try {
       const savedTransactions = await AsyncStorage.getItem('@transmitter_transactions');
       if (savedTransactions !== null) {
         const parsedList = JSON.parse(savedTransactions);
         setTransactions(parsedList);
-        calculateCategoryTotals(parsedList);
+        calculateCategoryStats(parsedList);
       } else {
         setTransactions([]);
-        calculateCategoryTotals([]);
+        // Inicializa todas las categorías en 0% si no hay transacciones
+        resetCategoriesToZero();
       }
     } catch (error) {
       console.error(error);
       setTransactions([]);
+      resetCategoriesToZero();
     }
   };
 
-  const calculateCategoryTotals = (list) => {
-    let foodTotal = 0;
-    let medicineTotal = 0;
-    let constructionTotal = 0;
-    let totalAll = 0;
+  const resetCategoriesToZero = () => {
+    const zeroArray = ALL_CATEGORIES_CONFIG.map(cat => ({
+      key: cat.key,
+      count: 0,
+      percentage: 0,
+      color: cat.color,
+    }));
+    setCategorySummary(zeroArray);
+  };
 
+  // Calcula la frecuencia de uso, porcentajes y ordena de mayor a menor
+  const calculateCategoryStats = (list) => {
     if (!list || list.length === 0) {
-      setCategoryTotals({
-        food: { amount: 0, percentage: 0, color: '#805AD5' },
-        medicine: { amount: 0, percentage: 0, color: '#ECC94B' },
-        construction: { amount: 0, percentage: 0, color: '#00D2A0' },
-      });
+      resetCategoriesToZero();
       return;
     }
 
+    let statsMap = {};
+    ALL_CATEGORIES_CONFIG.forEach(cat => {
+      statsMap[cat.key] = 0;
+    });
+
+    let totalSelections = 0;
+
     list.forEach((item) => {
-      const amt = item.rawAmount || 0;
-      totalAll += amt;
-      const catKey = (item.categoryKey || '').toLowerCase();
-      if (catKey === 'medicine') {
-        medicineTotal += amt;
-      } else if (catKey === 'construction') {
-        constructionTotal += amt;
-      } else {
-        foodTotal += amt;
+      const rawCat = item.subtitle ? item.subtitle.split('•')[0].trim() : (item.categoryKey || 'Groceries');
+      
+      const matchedCat = ALL_CATEGORIES_CONFIG.find(
+        c => c.key.toLowerCase() === rawCat.toLowerCase()
+      ) ? ALL_CATEGORIES_CONFIG.find(c => c.key.toLowerCase() === rawCat.toLowerCase()).key : 'Groceries';
+
+      if (statsMap[matchedCat] !== undefined) {
+        statsMap[matchedCat] += 1;
       }
+      totalSelections += 1;
     });
 
-    const calcPercent = (val) => (totalAll > 0 ? Math.round((val / totalAll) * 100) : 0);
-
-    setCategoryTotals({
-      food: {
-        amount: foodTotal,
-        percentage: calcPercent(foodTotal),
-        color: '#805AD5',
-      },
-      medicine: {
-        amount: medicineTotal,
-        percentage: calcPercent(medicineTotal),
-        color: '#ECC94B',
-      },
-      construction: {
-        amount: constructionTotal,
-        percentage: calcPercent(constructionTotal),
-        color: '#00D2A0',
-      },
+    const summaryArray = ALL_CATEGORIES_CONFIG.map(cat => {
+      const count = statsMap[cat.key];
+      const percentage = totalSelections > 0 ? Math.round((count / totalSelections) * 100) : 0;
+      return {
+        key: cat.key,
+        count,
+        percentage,
+        color: cat.color,
+      };
     });
+
+    // Ordenar de la categoría más seleccionada a la que menos
+    summaryArray.sort((a, b) => b.count - a.count);
+
+    setCategorySummary(summaryArray);
+  };
+
+  // Función opcional por si deseas vaciar el historial de pruebas y reiniciar todo a 0 desde la app
+  const handleClearHistory = async () => {
+    try {
+      await AsyncStorage.removeItem('@transmitter_transactions');
+      setTransactions([]);
+      resetCategoriesToZero();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const displayName = fullName !== '' ? fullName : t('transmitterHome.fallbackUser');
   const greetingText = t('transmitterHome.greeting', { name: displayName });
+
+  // Colores dinámicos para el gráfico de pastel basados en las 2 categorías principales actuales
+  const primaryColor = categorySummary[0]?.color || '#805AD5';
+  const secondaryColor = categorySummary[1]?.color || '#00D2A0';
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
@@ -202,44 +230,38 @@ export default function TransmitterHome({ navigation }) {
           </TouchableOpacity>
         </View>
 
+        {/* Gráfico de pastel interactivo y dinámico con porcentajes en 0 */}
         <View style={styles.card}>
           <View style={styles.chartRow}>
-            <View style={styles.pieContainer}>
-              <View style={[styles.pieSegment, { backgroundColor: categoryTotals.construction.color }]} />
-              <View style={[styles.pieInnerCircle, { backgroundColor: categoryTotals.food.color }]} />
+            <View style={[styles.pieContainer, { backgroundColor: secondaryColor }]}>
+              <View style={[styles.pieSegment, { backgroundColor: primaryColor }]} />
+              <View style={styles.pieInnerCircle} />
             </View>
 
             <View style={styles.legendContainer}>
-              <View style={styles.legendItem}>
-                <View style={[styles.dot, { backgroundColor: categoryTotals.food.color }]} />
-                <Text style={styles.legendLabel}>Food / Clothing</Text>
-                <Text style={styles.legendPercent}>{categoryTotals.food.percentage}%</Text>
-                <Text style={styles.legendAmount}>${categoryTotals.food.amount.toFixed(2)}</Text>
-              </View>
-
-              <View style={styles.legendItem}>
-                <View style={[styles.dot, { backgroundColor: categoryTotals.medicine.color }]} />
-                <Text style={styles.legendLabel}>Medicine</Text>
-                <Text style={styles.legendPercent}>{categoryTotals.medicine.percentage}%</Text>
-                <Text style={styles.legendAmount}>${categoryTotals.medicine.amount.toFixed(2)}</Text>
-              </View>
-
-              <View style={styles.legendItem}>
-                <View style={[styles.dot, { backgroundColor: categoryTotals.construction.color }]} />
-                <Text style={styles.legendLabel}>Construction</Text>
-                <Text style={styles.legendPercent}>{categoryTotals.construction.percentage}%</Text>
-                <Text style={styles.legendAmount}>${categoryTotals.construction.amount.toFixed(2)}</Text>
-              </View>
+              {categorySummary.map((item, index) => (
+                <View key={index} style={styles.legendItem}>
+                  <View style={[styles.dot, { backgroundColor: item.color }]} />
+                  <Text style={styles.legendLabel} numberOfLines={1}>{item.key}</Text>
+                  <Text style={styles.legendPercent}>{item.percentage}%</Text>
+                </View>
+              ))}
             </View>
           </View>
         </View>
 
-        <Text style={styles.sectionTitle}>Spending by Category</Text>
+        <View style={styles.sectionHeaderRow}>
+          <Text style={styles.sectionTitle}>Spending by Category</Text>
+          {transactions.length > 0 && (
+            <TouchableOpacity onPress={handleClearHistory}>
+              <Text style={styles.resetText}>Reiniciar a 0</Text>
+            </TouchableOpacity>
+          )}
+        </View>
         
-        {/* Historial dinámico real con diseño de tarjetas con guión (-) */}
         {transactions.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No hay transacciones aún.</Text>
+            <Text style={styles.emptyText}>Todo en 0%. ¡Haz tu primera transacción!</Text>
           </View>
         ) : (
           <FlatList
@@ -352,7 +374,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 24,
-    padding: 18,
+    padding: 16,
     marginBottom: 20,
   },
   chartRow: {
@@ -363,7 +385,6 @@ const styles = StyleSheet.create({
     width: 65,
     height: 65,
     borderRadius: 32.5,
-    backgroundColor: '#00D2A0',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
@@ -379,6 +400,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
+    backgroundColor: '#FFFFFF',
   },
   legendContainer: {
     flex: 1,
@@ -386,35 +408,40 @@ const styles = StyleSheet.create({
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 3,
   },
   dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: 8,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginRight: 6,
   },
   legendLabel: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: '600',
     color: '#021024',
     flex: 1,
   },
   legendPercent: {
-    fontSize: 12,
-    color: '#667085',
-    marginRight: 10,
-  },
-  legendAmount: {
-    fontSize: 13,
+    fontSize: 11,
     fontWeight: 'bold',
     color: '#021024',
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#FFFFFF',
-    marginBottom: 14,
+  },
+  resetText: {
+    color: '#55C900',
+    fontSize: 12,
+    fontWeight: '600',
   },
   emptyContainer: {
     padding: 20,
